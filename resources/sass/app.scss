@@ -1,0 +1,116 @@
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+// sidenav
+@import 'sidenav';
+
+// font awesome
+@import '~@fortawesome/fontawesome-free/scss/brands';
+@import '~@fortawesome/fontawesome-free/scss/regular';
+@import '~@fortawesome/fontawesome-free/scss/solid';
+@import '~@fortawesome/fontawesome-free/scss/fontawesome';
+
+//select2
+@import '~select2/dist/css/select2.min.css';
+// @import 'select2';
+
+/*select2 fullwidth*/
+.select2-container {
+    width: 100% !important;
+    padding: 0;
+}
+
+.select2-drop li {
+white-space: pre;
+}
+
+/*select2 height*/
+.select2-container .select2-selection--single {
+    height: 35px !important;
+}
+
+// .navbar-laravel {
+//     background-color: #fff;
+//     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+// }
+
+// buttons
+.back-happyrent-light-green {
+background-color: #00A3E0;
+}
+
+.back-light-green {
+background-color: #00A3E0;
+}
+
+::-webkit-input-placeholder {
+    font-style: italic;
+}
+:-moz-placeholder {
+    font-style: italic;
+}
+::-moz-placeholder {
+    font-style: italic;
+}
+:-ms-input-placeholder {
+    font-style: italic;
+}
+
+// set card header as theme color happyrent
+// .card-header, .modal-header {
+// background: #7edcff;
+// color: black;
+// }
+
+.required:after{
+    content: " *";
+    font-size: 14px;
+    color: #e3342f;
+}
+
+
+.img-thumbnail {
+    width: 250px;
+    height: 150px;
+}
+
+@media (max-width: 767px) {
+    .table-responsive .dropdown-menu {
+        position: static !important;
+    }
+    .alert {
+        width: 90%;
+    }
+}
+@media (min-width: 768px) {
+    .table-responsive {
+        overflow: visible;
+    }
+    .alert {
+        width: 50%;
+    }
+}
+// table scrollable yaxis
+.table-responsive {
+overflow-y:scroll;
+}
+
+//alert width
+.alert {
+    // width: 50%;
+    z-index: 1;
+    position: fixed;
+    right: 25px;
+    bottom: 5px;
+}
+
+// table scrollable yaxis
+.table-responsive {
+    overflow-y:scroll;
+}

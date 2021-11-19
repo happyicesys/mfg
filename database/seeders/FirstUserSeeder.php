@@ -1,0 +1,25 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\User;
+use Illuminate\Database\Seeder;
+
+class FirstUserSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
+    public function run()
+    {
+        User::create([
+            'name' => 'brian',
+            'username' => 'brian',
+            'email' => 'leehongjie91@gmail.com',
+            'password' => 'brian',
+            'phone_number' => '0182269545'
+        ]);
+    }
+}
