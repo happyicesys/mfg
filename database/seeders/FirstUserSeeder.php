@@ -21,5 +21,13 @@ class FirstUserSeeder extends Seeder
             'password' => 'brian',
             'phone_number' => '0182269545'
         ]);
+
+        User::create([
+            'name' => 'daniel',
+            'username' => 'daniel',
+            'email' => 'daniel.ma@happyice.com.sg',
+            'password' => 'daniel',
+            'phone_number' => '98888888'
+        ]);
     }
 }
