@@ -37,6 +37,8 @@ class VmmfgScopeSeeder extends Seeder
             'sequence' => 1.1,
             'name' => 'Assembly Task 1',
             'vmmfg_title_id' => $title->id,
+            'is_required_upload' => true,
+            'is_required' => true,
         ]);
 
         VmmfgItem::create([

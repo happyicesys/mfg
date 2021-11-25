@@ -22,6 +22,6 @@ class DatabaseSeeder extends Seeder
         VmmfgScopeSeeder::class,
         VmmfgJobSeeder::class,
        ]);
-       \App\Models\User::factory(300)->create();
+       \App\Models\User::factory(50)->create();
     }
 }

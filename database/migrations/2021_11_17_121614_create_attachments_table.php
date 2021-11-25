@@ -15,6 +15,11 @@ class CreateAttachmentsTable extends Migration
     {
         Schema::create('attachments', function (Blueprint $table) {
             $table->id();
+            $table->string('url');
+            $table->string('full_url');
+            $table->boolean('is_primary')->default(false);
+            $table->double('sequence')->nullable();
+            $table->morphs('modelable');
             $table->timestamps();
         });
     }

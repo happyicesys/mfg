@@ -52,12 +52,10 @@
     </style>
     @livewireStyles
     @stack('styles')
-
+    <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
+    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet"/>
 </head>
 <body>
-    @php
-        // dd(public_path('img/background.jpg'));
-    @endphp
     <div id="app">
         @include('layouts.topnav')
 
@@ -90,5 +88,7 @@
     <script src="{{ asset('js/app.js') }}" defer></script>
     @livewireScripts
     @stack('scripts')
+    <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
+    <script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script>
 </body>
 </html>

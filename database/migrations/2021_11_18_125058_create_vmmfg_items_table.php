@@ -18,6 +18,8 @@ class CreateVmmfgItemsTable extends Migration
             $table->double('sequence');
             $table->string('name');
             $table->bigInteger('vmmfg_title_id');
+            $table->boolean('is_required_upload')->default(false);
+            $table->boolean('is_required')->default(false);
             $table->timestamps();
         });
     }
