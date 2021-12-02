@@ -32,6 +32,7 @@ class VmmfgOps extends Component
     ];
     public $editArea = '';
     public $file;
+    public $zoomPictureUrl = '';
 
     public function mount()
     {
@@ -123,7 +124,17 @@ class VmmfgOps extends Component
 
     public function onUndoClicked(VmmfgTask $task)
     {
-        $task->delete();
+        if($task->attachments()) {
+            $task->update([
+                'is_done' => 0,
+                'done_by' => null,
+                'done_time' => null,
+                'status' => VmmfgTask::STATUS_NEW,
+            ]);
+        }else {
+            $task->delete();
+        }
+
         // $this->emit('updated');
         session()->flash('success', 'Your entry has been updated');
     }
@@ -186,5 +197,10 @@ class VmmfgOps extends Component
             'status' => VmmfgTask::STATUS_DONE,
         ]);
         session()->flash('success', 'Your entry has been updated');
+    }
+
+    public function onZoomPictureClicked(Attachment $attachment)
+    {
+        $this->zoomPictureUrl = $attachment->full_url;
     }
 }

@@ -134,8 +134,8 @@
                                             break;
                                         case 2:
                                             $showDone = false;
-                                            $showUndo = false;
-                                            $showChecked = false;
+                                            $showUndo = true;
+                                            $showChecked = true;
                                             $showDoneTimeDoneBy = true;
                                             $showCheckedBy = true;
                                             $showUndoChecked = true;
@@ -151,6 +151,7 @@
                                 }
                                 if(!auth()->user()->hasPermissionTo('vmmfg-ops-checker')) {
                                     $showChecked = false;
+                                    $showUndoChecked = false;
                                 }
 
                             @endphp
@@ -174,37 +175,9 @@
                                 </div>
                                 @if(!$item->attachments()->exists())
                                 <div class="row pt-2">
-                                    <span class="ml-auto">
-                                        @if($showDone)
-                                            <button class="btn btn-success btn-xs-block float-right" wire:key="item-done-{{$item->id}}" wire:click="onDoneClicked({{$item}})">
-                                                <i class="fas fa-check-circle"></i>
-                                                Done
-                                            </button>
-                                        @endif
-                                        @if($showUndo)
-                                            <button class="btn btn-warning btn-xs-block float-right" wire:key="item-undo-{{$item->id}}" wire:click="onUndoClicked({{$task}})">
-                                                <i class="fas fa-undo-alt"></i>
-                                                Not yet Done
-                                            </button>
-                                        @endif
-                                        @if($showChecked)
-                                            <button class="btn btn-secondary btn-xs-block float-right" wire:key="item-check-{{$item->id}}" wire:click="onCheckedClicked({{$task}})">
-                                                <i class="fas fa-check-circle"></i>
-                                                Checked?
-                                            </button>
-                                        @endif
-                                        @if($showUndoChecked)
-                                            <button class="btn btn-info btn-xs-block float-right" wire:key="item-undo-check-{{$item->id}}" wire:click="onUndoCheckedClicked({{$task}})">
-                                                <i class="fas fa-undo-alt"></i>
-                                                Un-Checked
-                                            </button>
-                                        @endif
-                                    </span>
-                                </div>
-                                <div class="row">
-                                    <span class="ml-auto" style="font-size: 12px;">
+                                    <span class="ml-auto" style="font-size: 13px;">
                                         @if($showDoneTimeDoneBy)
-                                            By: <span class="font-weight-bold">{{$task->doneBy->name}}</span> <br>
+                                            Done By: <span class="font-weight-bold">{{$task->doneBy->name}}</span> <br>
                                             On: <span class="font-weight-bold">{{$task->doneTime}}</span> <br>
                                         @endif
                                         @if($showCheckedBy)
@@ -212,6 +185,36 @@
                                         @endif
                                     </span>
                                 </div>
+                                <div class="row">
+                                    <div class="btn-group ml-auto">
+                                        @if($showDone)
+                                            <button class="btn btn-success btn-xs-block float-right" wire:key="item-done-{{$item->id}}" wire:click="onDoneClicked({{$item}})">
+                                                <i class="fas fa-check-circle"></i>
+                                                Done
+                                            </button>
+                                        @endif
+                                        @if($showUndo)
+                                            <button class="btn btn-success btn-xs-block" disabled>
+                                                <i class="fas fa-check-circle"></i>
+                                                Done
+                                            </button>
+                                            <button class="btn btn-warning btn-xs-block" wire:key="item-undo-{{$item->id}}" wire:click="onUndoClicked({{$task}})" {{$task->is_checked ? 'disabled' : ''}}>
+                                                <i class="fas fa-undo-alt"></i>
+                                            </button>
+                                        @endif
+                                        @if($showChecked)
+                                            <button class="btn btn-info btn-xs-block" wire:key="item-check-{{$item->id}}" wire:click="onCheckedClicked({{$task}})" {{$task->is_checked ? 'disabled' : ''}}>
+                                                <i class="fas fa-check-double"></i>
+                                            </button>
+                                        @endif
+                                        @if($showUndoChecked)
+                                            <button class="btn btn-danger btn-xs-block float-right" wire:key="item-undo-check-{{$item->id}}" wire:click="onUndoCheckedClicked({{$task}})">
+                                                <i class="fas fa-undo-alt"></i>
+                                            </button>
+                                        @endif
+                                    </div>
+                                </div>
+
                                 @endif
 
                             {{-- </div> --}}
@@ -226,7 +229,7 @@
                                             @if($ext === 'pdf')
                                                 <embed src="{{$attachment->full_url}}" type="application/pdf" class="" style="min-height: 500px;" class="border border-dark">
                                             @else
-                                                <img class="img-fluid border border-dark" src="{{$attachment->full_url}}" alt="">
+                                                <img class="img-fluid border border-dark" src="{{$attachment->full_url}}" alt="" wire:click="onZoomPictureClicked({{$attachment}})"  data-toggle="modal" data-target="#zoom-picture-modal">
                                             @endif
                                             </div>
                                         @endforeach
@@ -237,8 +240,8 @@
                                                     <label for="file">
                                                         Upload File(s)
                                                     </label>
-                                                    <input type="file" class="form-control-file" wire:model="file" {{$task && $task->is_done ? 'disabled' : ''}}>
-                                                    <button type="submit" class="btn btn-success" {{$task && $task->is_done ? 'disabled' : ''}}>
+                                                    <input type="file" class="form-control-file" wire:model="file">
+                                                    <button type="submit" class="btn btn-success">
                                                         <i class="fas fa-cloud-upload-alt"></i>
                                                     </button>
                                                 </form>
@@ -256,28 +259,18 @@
                                                             @if($ext === 'pdf')
                                                                 <embed src="{{$attachment->full_url}}" type="application/pdf" class="card-img-top" style="min-height: 500px;">
                                                             @else
-                                                                <img class="card-img-top" src="{{$attachment->full_url}}" alt="">
+                                                                <img class="card-img-top" src="{{$attachment->full_url}}" alt="" wire:click="onZoomPictureClicked({{$attachment}})"  data-toggle="modal" data-target="#zoom-picture-modal">
                                                             @endif
                                                             <div class="card-body">
-                                                                <div class="btn-group d-none d-sm-block">
-                                                                    <button type="button" class="btn btn-warning" wire:click="downloadAttachment({{$attachment}})">
+                                                                <div class="btn-group">
+                                                                    <button type="button" class="btn btn-warning btn-xs-block" wire:click="downloadAttachment({{$attachment}})">
                                                                         <i class="fas fa-cloud-download-alt"></i>
-                                                                        Download
                                                                     </button>
-                                                                    <button type="button" class="btn btn-danger" wire:click="deleteAttachment({{$attachment}})" {{$task->is_done ? 'disabled' : ''}}>
+                                                                    @if(!$task->is_done)
+                                                                    <button type="button" class="btn btn-danger btn-xs-block" wire:click="deleteAttachment({{$attachment}})">
                                                                         <i class="fas fa-trash"></i>
-                                                                        Delete
                                                                     </button>
-                                                                </div>
-                                                                <div class="d-block d-sm-none">
-                                                                    <button type="button" class="btn btn-block btn-warning" wire:click="downloadAttachment({{$attachment}})">
-                                                                        <i class="fas fa-cloud-download-alt"></i>
-                                                                        Download
-                                                                    </button>
-                                                                    <button type="button" class="btn btn-block btn-danger" wire:click="deleteAttachment({{$attachment}})">
-                                                                        <i class="fas fa-trash"></i>
-                                                                        Delete
-                                                                    </button>
+                                                                    @endif
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -286,39 +279,10 @@
                                             @endif
                                         </div>
                                     @endif
-
                                     <div class="row pt-2">
-                                        <span class="ml-auto">
-                                            @if($showDone)
-                                                <button class="btn btn-success btn-xs-block float-right" wire:key="item-done-normal-{{$item->id}}" wire:click="onDoneClicked({{$item}})" {{$task && $task->attachments()->exists() ? '' : 'disabled'}}>
-                                                    <i class="fas fa-check-circle"></i>
-                                                    Done
-                                                </button>
-                                            @endif
-                                            @if($showUndo)
-                                                <button class="btn btn-warning btn-xs-block float-right" wire:key="item-undo-normal-{{$item->id}}" wire:click="onUndoClicked({{$task}})">
-                                                    <i class="fas fa-undo-alt"></i>
-                                                    Not yet Done
-                                                </button>
-                                            @endif
-                                            @if($showChecked)
-                                                <button class="btn btn-secondary btn-xs-block float-right" wire:key="item-check-normal-{{$item->id}}" wire:click="onCheckedClicked({{$task}})">
-                                                    <i class="fas fa-check-circle"></i>
-                                                    Checked?
-                                                </button>
-                                            @endif
-                                            @if($showUndoChecked)
-                                            <button class="btn btn-info btn-xs-block float-right" wire:key="item-undo-check-{{$item->id}}" wire:click="onUndoCheckedClicked({{$task}})">
-                                                <i class="fas fa-undo-alt"></i>
-                                                Un-Checked
-                                            </button>
-                                        @endif
-                                        </span>
-                                    </div>
-                                    <div class="row">
-                                        <span class="ml-auto" style="font-size: 12px;">
+                                        <span class="ml-auto" style="font-size: 13px;">
                                             @if($showDoneTimeDoneBy)
-                                                By: <span class="font-weight-bold">{{$task->doneBy->name}}</span> <br>
+                                                Done By: <span class="font-weight-bold">{{$task->doneBy->name}}</span> <br>
                                                 On: <span class="font-weight-bold">{{$task->doneTime}}</span> <br>
                                             @endif
                                             @if($showCheckedBy)
@@ -326,6 +290,36 @@
                                             @endif
                                         </span>
                                     </div>
+                                    <div class="row">
+                                        <span class="btn-group ml-auto">
+                                            @if($showDone)
+                                                <button class="btn btn-success btn-xs-block" wire:key="item-done-normal-{{$item->id}}" wire:click="onDoneClicked({{$item}})" {{$task && $task->attachments()->exists() ? '' : 'disabled'}}>
+                                                    <i class="fas fa-check-circle"></i>
+                                                    Done
+                                                </button>
+                                            @endif
+                                            @if($showUndo)
+                                                <button class="btn btn-success btn-xs-block" disabled>
+                                                    <i class="fas fa-check-circle"></i>
+                                                    Done
+                                                </button>
+                                                <button class="btn btn-warning btn-xs-block" wire:key="item-undo-{{$item->id}}" wire:click="onUndoClicked({{$task}})" {{$task->is_checked ? 'disabled' : ''}}>
+                                                    <i class="fas fa-undo-alt"></i>
+                                                </button>
+                                            @endif
+                                            @if($showChecked)
+                                                <button class="btn btn-info btn-xs-block" wire:key="item-check-normal-{{$item->id}}" wire:click="onCheckedClicked({{$task}})" {{$task->is_checked ? 'disabled' : ''}}>
+                                                    <i class="fas fa-check-double"></i>
+                                                </button>
+                                            @endif
+                                            @if($showUndoChecked)
+                                            <button class="btn btn-info btn-xs-block" wire:key="item-undo-check-{{$item->id}}" wire:click="onUndoCheckedClicked({{$task}})">
+                                                <i class="fas fa-undo-alt"></i>
+                                            </button>
+                                        @endif
+                                        </span>
+                                    </div>
+
                                 </div>
                             @endif
                         </li>
@@ -345,79 +339,11 @@
                     </ul>
                 @endif
             @endif
-{{--
-                <x-modal id="edit-scope">
-                    <x-slot name="title">
-                        Edit Scope
-                    </x-slot>
-                    <x-slot name="content">
-                        <x-input type="text" model="form.name">
-                            Name
-                        </x-input>
-                        <div class="form-group">
-                            <label for="remarks">
-                                Remarks
-                            </label>
-                            <textarea name="remarks" wire:model="form.remarks" rows="5" class="form-control"></textarea>
-                        </div>
-                        <hr>
-                        <div class="form-group">
-                            <button wire:click="$toggle('showCreateTitleArea')" class="btn btn-outline-secondary btn-block">
-                                Create Title
-                                @if($showCreateTitleArea)
-                                    <i class="fas fa-caret-right"></i>
-                                @else
-                                    <i class="fas fa-caret-down"></i>
-                                @endif
-                            </button>
-                        </div>
-                        <div>
-                            @if($showCreateTitleArea)
-                                <div class="bg-light">
-                                    <div class="form-group">
-                                        <x-input type="text" model="titleForm.sequence">
-                                            Sequence (Number only)
-                                        </x-input>
-                                    </div>
-                                    <div class="form-group">
-                                        <x-input type="text" model="titleForm.name">
-                                            Name
-                                        </x-input>
-                                    </div>
-                                    <button type="submit" class="btn btn-success d-none d-sm-block" wire:click.prevent="generateTitle">
-                                        Create Title
-                                    </button>
-                                    <button type="submit" class="btn btn-success btn-block d-block d-sm-none" wire:click.prevent="generateTitle">
-                                        Create Title
-                                    </button>
-                                </div>
-                            @endif
-                        </div>
-                        <hr>
-                        @if($form)
-                            <ul class="list-group">
-                                @foreach($form->vmmfgTitles as $title)
-                                <li class="list-group-item" style="background-color: #d3d3d3;">
-                                    {{$title->sequence}}.  {{$title->name}}
-                                </li>
-                                    @foreach($title->vmmfgItems as $item)
-                                    <li class="list-group-item ml-5" style="background-color: #ededed;">
-                                        {{$item->sequence}}.  {{$item->name}}
-                                    </li>
-                                    @endforeach
-                                @endforeach
-                            </ul>
-                        @endif
-                    </x-slot>
-                    <x-slot name="footer">
-                        <button type="submit" class="btn btn-success d-none d-sm-block" wire:click.prevent="save">
-                            Save
-                        </button>
-                        <button type="submit" class="btn btn-success btn-block d-block d-sm-none" wire:click.prevent="save">
-                            Save
-                        </button>
-                    </x-slot>
-                </x-modal> --}}
+            <x-zoom-modal id="zoom-picture-modal">
+                <x-slot name="content">
+                    <img class="img-fluid border border-dark" src="{{$zoomPictureUrl}}" alt="">
+                </x-slot>
+            </x-zoom-modal>
         </div>
     </div>
 
