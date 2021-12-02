@@ -110,6 +110,7 @@
                                 $showDoneTimeDoneBy = false;
                                 $showCheckedBy = false;
                                 $showUndoChecked = false;
+                                $adminClickable = false;
 
                                 $task = $item->vmmfgTasks()->whereVmmfgUnitId($this->unit->id)->first();
                                 if($task) {
@@ -134,11 +135,11 @@
                                             break;
                                         case 2:
                                             $showDone = false;
-                                            $showUndo = true;
-                                            $showChecked = true;
+                                            $showUndo = false;
+                                            $showChecked = false;
                                             $showDoneTimeDoneBy = true;
                                             $showCheckedBy = true;
-                                            $showUndoChecked = true;
+                                            $showUndoChecked = false;
                                             break;
                                     }
                                 }else {
@@ -152,6 +153,9 @@
                                 if(!auth()->user()->hasPermissionTo('vmmfg-ops-checker')) {
                                     $showChecked = false;
                                     $showUndoChecked = false;
+                                }else {
+                                    $showUndo = false;
+                                    $adminClickable = true;
                                 }
 
                             @endphp
@@ -160,6 +164,12 @@
                                 <div class="row">
                                     <span class="mr-auto">
                                         {{$item->sequence}}.  {{$item->name}}
+                                        <br>
+                                        @if($item->remarks)
+                                            <div class="p-2 mb-1 bg-light">
+                                                <p>{{$item->remarks}}</p>
+                                            </div>
+                                        @endif
                                     </span>
                                     <span class="ml-auto">
                                         @if($item->attachments()->exists())
@@ -174,14 +184,32 @@
                                     </span>
                                 </div>
                                 @if(!$item->attachments()->exists())
-                                <div class="row pt-2">
+                                <div class="row pt-1">
                                     <span class="ml-auto" style="font-size: 13px;">
                                         @if($showDoneTimeDoneBy)
-                                            Done By: <span class="font-weight-bold">{{$task->doneBy->name}}</span> <br>
+                                            @if($adminClickable)
+                                                <a href="#" class="badge badge-success" style="font-size: 13px;" wire:click="onUndoClicked({{$task}})">
+                                                    Done
+                                                </a>
+                                            @else
+                                                <span class="badge badge-success" style="font-size: 13px;">
+                                                    Done
+                                                </span>
+                                            @endif
+                                            By: <span class="font-weight-bold">{{$task->doneBy->name}}</span> <br>
                                             On: <span class="font-weight-bold">{{$task->doneTime}}</span> <br>
                                         @endif
                                         @if($showCheckedBy)
-                                            Checked: <span class="font-weight-bold">{{$task->checkedBy->name}}</span>
+                                            @if($adminClickable)
+                                                <a href="#" class="badge badge-primary" style="font-size: 13px;" wire:click="onUndoCheckedClicked({{$task}})">
+                                                    Checked
+                                                </a>
+                                            @else
+                                                <span class="badge badge-primary" style="font-size: 13px;">
+                                                    Checked
+                                                </span>
+                                            @endif
+                                            By: <span class="font-weight-bold">{{$task->checkedBy->name}}</span>
                                         @endif
                                     </span>
                                 </div>
@@ -194,22 +222,14 @@
                                             </button>
                                         @endif
                                         @if($showUndo)
-                                            <button class="btn btn-success btn-xs-block" disabled>
-                                                <i class="fas fa-check-circle"></i>
-                                                Done
-                                            </button>
-                                            <button class="btn btn-warning btn-xs-block" wire:key="item-undo-{{$item->id}}" wire:click="onUndoClicked({{$task}})" {{$task->is_checked ? 'disabled' : ''}}>
+                                            <button class="btn btn-warning btn-xs-block" wire:key="item-undo-{{$item->id}}" wire:click="onUndoClicked({{$task}})">
                                                 <i class="fas fa-undo-alt"></i>
+                                                Undo
                                             </button>
                                         @endif
                                         @if($showChecked)
-                                            <button class="btn btn-info btn-xs-block" wire:key="item-check-{{$item->id}}" wire:click="onCheckedClicked({{$task}})" {{$task->is_checked ? 'disabled' : ''}}>
+                                            <button class="btn btn-info btn-xs-block" wire:key="item-check-{{$item->id}}" wire:click="onCheckedClicked({{$task}})">
                                                 <i class="fas fa-check-double"></i>
-                                            </button>
-                                        @endif
-                                        @if($showUndoChecked)
-                                            <button class="btn btn-danger btn-xs-block float-right" wire:key="item-undo-check-{{$item->id}}" wire:click="onUndoCheckedClicked({{$task}})">
-                                                <i class="fas fa-undo-alt"></i>
                                             </button>
                                         @endif
                                     </div>
@@ -282,11 +302,29 @@
                                     <div class="row pt-2">
                                         <span class="ml-auto" style="font-size: 13px;">
                                             @if($showDoneTimeDoneBy)
-                                                Done By: <span class="font-weight-bold">{{$task->doneBy->name}}</span> <br>
+                                                @if($adminClickable)
+                                                    <a href="#" class="badge badge-success" style="font-size: 13px;" wire:click="onUndoClicked({{$task}})">
+                                                        Done
+                                                    </a>
+                                                @else
+                                                    <span class="badge badge-success" style="font-size: 13px;">
+                                                        Done
+                                                    </span>
+                                                @endif
+                                                By: <span class="font-weight-bold">{{$task->doneBy->name}}</span> <br>
                                                 On: <span class="font-weight-bold">{{$task->doneTime}}</span> <br>
                                             @endif
                                             @if($showCheckedBy)
-                                                Checked: <span class="font-weight-bold">{{$task->checkedBy->name}}</span>
+                                                @if($adminClickable)
+                                                    <a href="#" class="badge badge-primary" style="font-size: 13px;" wire:click="onUndoCheckedClicked({{$task}})">
+                                                        Checked
+                                                    </a>
+                                                @else
+                                                    <span class="badge badge-primary" style="font-size: 13px;">
+                                                        Checked
+                                                    </span>
+                                                @endif
+                                                By: <span class="font-weight-bold">{{$task->checkedBy->name}}</span>
                                             @endif
                                         </span>
                                     </div>
@@ -299,16 +337,13 @@
                                                 </button>
                                             @endif
                                             @if($showUndo)
-                                                <button class="btn btn-success btn-xs-block" disabled>
-                                                    <i class="fas fa-check-circle"></i>
-                                                    Done
-                                                </button>
-                                                <button class="btn btn-warning btn-xs-block" wire:key="item-undo-{{$item->id}}" wire:click="onUndoClicked({{$task}})" {{$task->is_checked ? 'disabled' : ''}}>
+                                                <button class="btn btn-warning btn-xs-block" wire:key="item-undo-{{$item->id}}" wire:click="onUndoClicked({{$task}})">
                                                     <i class="fas fa-undo-alt"></i>
+                                                    Undo
                                                 </button>
                                             @endif
                                             @if($showChecked)
-                                                <button class="btn btn-info btn-xs-block" wire:key="item-check-normal-{{$item->id}}" wire:click="onCheckedClicked({{$task}})" {{$task->is_checked ? 'disabled' : ''}}>
+                                                <button class="btn btn-info btn-xs-block" wire:key="item-check-normal-{{$item->id}}" wire:click="onCheckedClicked({{$task}})">
                                                     <i class="fas fa-check-double"></i>
                                                 </button>
                                             @endif

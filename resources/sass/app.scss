@@ -142,3 +142,8 @@ overflow-y:scroll;
         display: block !important;
     }
 }
+
+// retain same breakline as text
+p {
+    white-space:pre-wrap;
+}

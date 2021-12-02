@@ -46,6 +46,7 @@ class Scope extends Component
             'title.name' => 'required',
             'item.sequence' => 'numeric|required',
             'item.name' => 'required',
+            'item.remarks' => 'sometimes',
             'item.is_required_upload' => 'sometimes',
             'item.is_required' => 'sometimes',
         ];
@@ -213,11 +214,13 @@ class Scope extends Component
             $this->item->update([
                 'sequence' => $this->item->sequence,
                 'name' => $this->item->name,
+                'remarks' => $this->item->remarks,
             ]);
         }else {
             VmmfgItem::create([
                 'sequence' => $this->item->sequence,
                 'name' => $this->item->name,
+                'remarks' => $this->item->remarks,
                 'vmmfg_title_id' => $this->title->id,
             ]);
         }

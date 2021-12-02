@@ -13,6 +13,7 @@ class VmmfgItem extends Model
     protected $fillable = [
         'sequence',
         'name',
+        'remarks',
         'vmmfg_title_id',
         'is_required_upload',
         'is_required',

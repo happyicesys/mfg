@@ -17,6 +17,7 @@ class CreateVmmfgItemsTable extends Migration
             $table->id();
             $table->double('sequence');
             $table->string('name');
+            $table->text('remarks')->nullable();
             $table->bigInteger('vmmfg_title_id');
             $table->boolean('is_required_upload')->default(false);
             $table->boolean('is_required')->default(false);

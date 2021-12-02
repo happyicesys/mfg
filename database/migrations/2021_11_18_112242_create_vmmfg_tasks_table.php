@@ -23,6 +23,7 @@ class CreateVmmfgTasksTable extends Migration
             $table->bigInteger('checked_by')->nullable();
             $table->datetime('done_time')->nullable();
             $table->datetime('checked_time')->nullable();
+            $table->integer('status')->default(0);
             $table->timestamps();
         });
     }

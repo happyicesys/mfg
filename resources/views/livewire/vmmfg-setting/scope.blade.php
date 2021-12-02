@@ -426,6 +426,12 @@
                     <x-input type="text" model="item.name">
                         Name
                     </x-input>
+                    <div class="form-group">
+                        <label for="remarks">
+                            Desc
+                        </label>
+                        <textarea name="remarks" rows="5" wire:model.defer="item.remarks" class="form-control" placeholder="Desc"></textarea>
+                    </div>
                     @if(isset($this->item) and $this->item->id)
                         {{-- <div class="form-group">
                             <div class="form-check form-check-inline">
@@ -441,7 +447,7 @@
                             <label for="file">
                                 Upload File(s)
                             </label>
-                            <input type="file" class="form-control-file" wire:model="file" enctype="multipart/form-data">
+                            <input type="file" class="form-control-file" wire:model="file">
                             {{-- <x-input-file wire:model="file" multiple></x-input-file> --}}
                         </div>
                         <div class="form-group">
