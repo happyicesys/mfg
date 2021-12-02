@@ -317,7 +317,7 @@
                                     @endif --}}
                                 </li>
                                     @foreach($title->vmmfgItems as $item)
-                                    <li class="list-group-item ml-5" style="background-color: #e6f3f7;" wire:key="item-{{$item->id}}">
+                                    <li class="list-group-item ml-2" style="background-color: #e6f3f7;" wire:key="item-{{$item->id}}">
                                         <div class="form-group">
                                             <span class="float-left">
                                                 {{$item->sequence}}.  {{$item->name}}
@@ -427,7 +427,7 @@
                         Name
                     </x-input>
                     @if(isset($this->item) and $this->item->id)
-                        <div class="form-group">
+                        {{-- <div class="form-group">
                             <div class="form-check form-check-inline">
                                 <label class="form-check-label" for="is_required">Required to Response?</label>
                                 <input class="form-check-input ml-2" type="checkbox" name="is_required" wire:model.defer="item.is_required">
@@ -436,23 +436,47 @@
                                 <label class="form-check-label" for="is_required_upload">Required to Upload Image(s)?</label>
                                 <input class="form-check-input ml-2" type="checkbox" name="is_required_upload" wire:model.defer="item.is_required_upload">
                             </div>
-                        </div>
+                        </div> --}}
                         <div class="form-group">
                             <label for="file">
                                 Upload File(s)
                             </label>
                             <input type="file" class="form-control-file" wire:model="file">
-                            {{-- <x-input-file wire:model="files" multiple></x-input-file> --}}
+                            {{-- <x-input-file wire:model="file" multiple></x-input-file> --}}
                         </div>
                         <div class="form-group">
                             @if($this->item->attachments)
                                 @foreach($this->item->attachments as $attachment)
                                     <div class="card" style="max-width:600px;width:100%;" wire:key="attachment-{{$attachment->id}}">
-                                        <img class="card-img-top" src="{{$attachment->full_url}}" alt="">
+                                        @php
+                                            $ext = pathinfo($attachment->full_url, PATHINFO_EXTENSION);
+                                        @endphp
+                                        @if($ext === 'pdf')
+                                            <embed src="{{$attachment->full_url}}" type="application/pdf" class="card-img-top" style="min-height: 500px;">
+                                        @else
+                                            <img class="card-img-top" src="{{$attachment->full_url}}" alt="">
+                                        @endif
                                         <div class="card-body">
-                                            <button type="button" class="btn btn-danger" wire:click="deleteAttachment({{$attachment}})">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
+                                            <div class="btn-group d-none d-sm-block">
+                                                <button type="button" class="btn btn-warning" wire:click="downloadAttachment({{$attachment}})">
+                                                    <i class="fas fa-cloud-download-alt"></i>
+                                                    Download
+                                                </button>
+                                                <button type="button" class="btn btn-danger" wire:click="deleteAttachment({{$attachment}})">
+                                                    <i class="fas fa-trash"></i>
+                                                    Delete
+                                                </button>
+                                            </div>
+                                            <div class="d-block d-sm-none">
+                                                <button type="button" class="btn btn-block btn-warning" wire:click="downloadAttachment({{$attachment}})">
+                                                    <i class="fas fa-cloud-download-alt"></i>
+                                                    Download
+                                                </button>
+                                                <button type="button" class="btn btn-block btn-danger" wire:click="deleteAttachment({{$attachment}})">
+                                                    <i class="fas fa-trash"></i>
+                                                    Delete
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 @endforeach

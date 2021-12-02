@@ -29,7 +29,7 @@ class VmmfgScopeSeeder extends Seeder
 
         VmmfgTitle::create([
             'sequence' => 2,
-            'name' => 'Assembly Category 2',
+            'name' => 'Assembly Task 2 with a really really reallly really reallly reallly reallly really damnnnnnnn looooonnnng naaaaammmmeee',
             'vmmfg_scope_id' => $scope->id,
         ]);
 

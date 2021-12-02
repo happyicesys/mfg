@@ -212,6 +212,7 @@
                     {{-- <th class="text-center">
                         <input type="checkbox" wire:model="selected" value="{{$admin->id}}">
                     </th> --}}
+                    {{-- @dd($loop) --}}
                     <td class="text-center">
                         {{ $index + $from}}
                     </td>

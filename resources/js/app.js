@@ -2,8 +2,6 @@ require('./bootstrap');
 
 //select2
 window.select2 = require('select2');
-// window.moment = require('moment');
-// window.pikaday = require('pikaday');
 
 $(".sidebar-dropdown > a").click(function () {
     $(".sidebar-submenu").slideUp(200);
@@ -45,17 +43,10 @@ $(document).ready(function () {
         $('.modal').modal('hide');
         $('.modal-backdrop').remove();
 
-        // setTimeout(function () {
-        //     $(".alert").hide();
-        // }, 5000);
-
         $(".alert").fadeTo(5000, 500).slideUp(500, function () {
             $(".alert").slideUp(500);
         });
     });
-
-    //select2
-    $('.select2').select2();
 });
 
 

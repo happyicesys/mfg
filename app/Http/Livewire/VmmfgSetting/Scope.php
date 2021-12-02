@@ -266,4 +266,9 @@ class Scope extends Component
         $this->emit('updated');
         session()->flash('success', 'Entry has been removed');
     }
+
+    public function downloadAttachment(Attachment $attachment)
+    {
+        return Storage::disk('digitaloceanspaces')->download($attachment->url);
+    }
 }

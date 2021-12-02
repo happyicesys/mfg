@@ -45,13 +45,17 @@
         <li class="{{ $name == 'customer' ? 'active' : '' }}">
             <a href="{{ route('customer') }}"><i class="fas fa-users"></i>Customers</a>
         </li> --}}
+        @can('profile-access')
         <li class="{{ $name == 'profile' ? 'active' : '' }}">
           <a href="{{ route('profile') }}"><i class="far fa-user-circle"></i>Company Profile</a>
         </li>
+        @endcan
 
+        @can('admin-access')
         <li class="{{ $name == 'admin' ? 'active' : '' }}">
           <a href="{{ route('admin') }}"><i class="fas fa-users-cog"></i>Users</a>
         </li>
+        @endcan
 
 {{--
         <li class="sidebar-dropdown">
@@ -76,11 +80,14 @@
         <li class="header-menu">
           <span>VM Mfg Operations</span>
         </li>
+        @can('vmmfg-ops-access')
         <li class="{{ $name == 'vmmfg-ops' ? 'active' : '' }}">
           <a href="{{ route('vmmfg-ops') }}"><i class="fas fa-wrench"></i>QA/QC</a>
         </li>
+        @endcan
 
 
+        @can('vmmfg-setting-access')
         <li class="header-menu">
           <span>VM Mfg Settings</span>
         </li>
@@ -93,6 +100,7 @@
         <li class="{{ $name == 'vmmfg-setting-scope' ? 'active' : '' }}">
           <a href="{{ route('vmmfg-setting-scope') }}"><i class="fas fa-cog"></i>Scopes</a>
         </li>
+        @endcan
 {{--
         <li class="{{ $name == 'app-setting' ? 'active' : '' }}">
           <a href="{{ route('app-setting') }}"><i class="fas fa-mobile-alt"></i>App Setting</a>
@@ -105,7 +113,7 @@
         <li class="{{ $name == 'voucher.index' ? 'active' : '' }}">
           <a href="{{ route('voucher.index') }}"><i class="fas fa-ticket-alt"></i>Voucher</a>
         </li> --}}
-
+        @can('self-access')
         <li class="header-menu">
           <span>Self Setting</span>
         </li>
@@ -116,6 +124,7 @@
             User Account
           </a>
         </li>
+        @endcan
 
       </ul>
     </div>

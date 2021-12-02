@@ -34,4 +34,5 @@ class VmmfgItem extends Model
     {
         return $value + 0;
     }
+
 }

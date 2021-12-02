@@ -19,17 +19,34 @@ Auth::routes();
 // Auth::loginUsingId(1);
 Route::middleware(['auth'])->group(function () {
     Route::get('/', Home::class)->name('home');
-    Route::get('/admin', Admin::class)->name('admin');
+
+    Route::group(['middleware' => ['permission:admin-access']], function() {
+        Route::get('/admin', Admin::class)->name('admin');
+    });
+
+    Route::group(['middleware' => ['permission:profile-access']], function() {
+        Route::get('/profile', Profile::class)->name('profile');
+    });
+
     Route::get('/customer', Customer::class)->name('customer');
     Route::get('/product', Product::class)->name('product');
-    Route::get('/profile', Profile::class)->name('profile');
     Route::get('/app-setting', AppSetting::class)->name('app-setting');
-    Route::get('/self-setting', SelfSetting::class)->name('self-setting');
+
+    Route::group(['middleware' => ['permission:self-access']], function() {
+        Route::get('/self-setting', SelfSetting::class)->name('self-setting');
+    });
+
     Route::get('/setting', Setting::class)->name('setting');
-    Route::get('/vmmfg-ops', VmmfgOps::class)->name('vmmfg-ops');
-    Route::get('/vmmfg-setting-job', VmmfgSettingJob::class)->name('vmmfg-setting-job');
-    Route::get('/vmmfg-setting-unit', VmmfgSettingUnit::class)->name('vmmfg-setting-unit');
-    Route::get('/vmmfg-setting-scope', VmmfgSettingScope::class)->name('vmmfg-setting-scope');
+
+    Route::group(['middleware' => ['permission:vmmfg-ops-access']], function() {
+        Route::get('/vmmfg-ops', VmmfgOps::class)->name('vmmfg-ops');
+    });
+
+    Route::group(['middleware' => ['permission:vmmfg-setting-access']], function() {
+        Route::get('/vmmfg-setting-job', VmmfgSettingJob::class)->name('vmmfg-setting-job');
+        Route::get('/vmmfg-setting-unit', VmmfgSettingUnit::class)->name('vmmfg-setting-unit');
+        Route::get('/vmmfg-setting-scope', VmmfgSettingScope::class)->name('vmmfg-setting-scope');
+    });
 });
 
 
