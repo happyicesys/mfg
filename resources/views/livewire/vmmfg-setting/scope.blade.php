@@ -441,7 +441,7 @@
                             <label for="file">
                                 Upload File(s)
                             </label>
-                            <input type="file" class="form-control-file" wire:model="file">
+                            <input type="file" class="form-control-file" wire:model="file" enctype="multipart/form-data">
                             {{-- <x-input-file wire:model="file" multiple></x-input-file> --}}
                         </div>
                         <div class="form-group">

@@ -236,7 +236,7 @@
 
                                         <div class="row">
                                             <div class="form-group pt-2">
-                                                <form wire:submit.prevent="uploadAttachment({{$item->id}})">
+                                                <form wire:submit.prevent="uploadAttachment({{$item->id}})" enctype="multipart/form-data">
                                                     <label for="file">
                                                         Upload File(s)
                                                     </label>
