@@ -250,7 +250,7 @@
                                 <button type="button" wire:click="edit({{$job->id}})" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#edit-job">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button type="button" wire:click="delete({{$job->id}})" class="btn btn-danger btn-sm" onclick="confirm('Are you sure you want to remove this entry?') || event.stopImmediatePropagation()">
+                                <button type="button" onclick="confirm('Are you sure you want to remove this entry?') || event.stopImmediatePropagation()" wire:click="delete({{$job->id}})" class="btn btn-danger btn-sm" >
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>

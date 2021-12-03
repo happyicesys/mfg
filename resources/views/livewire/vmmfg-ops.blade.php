@@ -186,7 +186,7 @@
                                     <span class="ml-auto" style="font-size: 13px;">
                                         @if($showDoneTimeDoneBy)
                                             @if($adminClickable)
-                                                <a href="#" class="badge badge-success" style="font-size: 13px;" onclick="return confirm('Are you sure you want to Undo the Task?');" wire:click="onUndoClicked({{$task}})">
+                                                <a href="#" class="badge badge-success" style="font-size: 13px;" onclick="return confirm('Are you sure you want to Undo the Task?') || event.stopImmediatePropagation()" wire:click="onUndoClicked({{$task}})">
                                                     <i class="fas fa-check-circle"></i>
                                                     Done
                                                 </a>
@@ -231,7 +231,7 @@
                                             </button>
                                         @endif
                                         @if($showUndo)
-                                            <button class="btn btn-warning btn-xs-block" onclick="return confirm('Are you sure you want to Undo the Task?');" wire:key="item-undo-{{$item->id}}" wire:click="onUndoClicked({{$task}})">
+                                            <button class="btn btn-warning btn-xs-block" onclick="return confirm('Are you sure you want to Undo the Task?') || event.stopImmediatePropagation()" wire:key="item-undo-{{$item->id}}" wire:click="onUndoClicked({{$task}})">
                                                 <i class="fas fa-undo-alt"></i>
                                             </button>
                                         @endif
@@ -311,7 +311,7 @@
                                         <span class="ml-auto" style="font-size: 13px;">
                                             @if($showDoneTimeDoneBy)
                                                 @if($adminClickable)
-                                                    <a href="#" class="badge badge-success" style="font-size: 13px;" onclick="return confirm('Are you sure you want to Undo the Task?');" wire:click="onUndoClicked({{$task}})">
+                                                    <a href="#" class="badge badge-success" style="font-size: 13px;" onclick="return confirm('Are you sure you want to Undo the Task?') || event.stopImmediatePropagation()" wire:click="onUndoClicked({{$task}})">
                                                         <i class="fas fa-check-circle"></i>
                                                         Done
                                                     </a>
@@ -356,7 +356,7 @@
                                                 </button>
                                             @endif
                                             @if($showUndo)
-                                                <button class="btn btn-warning btn-xs-block" onclick="return confirm('Are you sure you want to Undo the Task?');" wire:key="item-undo-{{$item->id}}" wire:click="onUndoClicked({{$task}})">
+                                                <button class="btn btn-warning btn-xs-block" onclick="return confirm('Are you sure you want to Undo the Task?') || event.stopImmediatePropagation()" wire:key="item-undo-{{$item->id}}" wire:click="onUndoClicked({{$task}})">
                                                     <i class="fas fa-undo-alt"></i>
                                                 </button>
                                             @endif
