@@ -14,6 +14,7 @@ class VmmfgTask extends Model
     const STATUS_NEW = 0;
     const STATUS_DONE = 1;
     const STATUS_CHECKED = 2;
+    const STATUS_UNDONE = 99;
 
 
     protected $fillable = [
@@ -26,6 +27,8 @@ class VmmfgTask extends Model
         'done_time',
         'checked_time',
         'status',
+        'undo_done_by',
+        'undo_done_time',
     ];
 
     //relationships
@@ -54,16 +57,25 @@ class VmmfgTask extends Model
         return $this->belongsTo(User::class, 'checked_by');
     }
 
+    public function undoDoneBy()
+    {
+        return $this->belongsTo(User::class, 'undo_done_by');
+    }
 
     // getter
-    public function getDoneTimeAttribute($value)
-    {
-        return Carbon::parse($value)->format('Y-m-d h:ia');
-    }
+    // public function getDoneTimeAttribute($value)
+    // {
+    //     return Carbon::parse($value)->format('Y-m-d h:ia');
+    // }
 
-    public function getCheckedTimeAttribute($value)
-    {
-        return Carbon::parse($value)->format('Y-m-d h:ia');
-    }
+    // public function getCheckedTimeAttribute($value)
+    // {
+    //     return Carbon::parse($value)->format('Y-m-d h:ia');
+    // }
+
+    // public function getUndoDoneTimeAttribute($value)
+    // {
+    //     return Carbon::parse($value)->format('Y-m-d h:ia');
+    // }
 
 }

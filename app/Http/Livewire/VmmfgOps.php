@@ -124,16 +124,18 @@ class VmmfgOps extends Component
 
     public function onUndoClicked(VmmfgTask $task)
     {
-        if($task->attachments()) {
+        // if($task->attachments()) {
             $task->update([
                 'is_done' => 0,
                 'done_by' => null,
                 'done_time' => null,
-                'status' => VmmfgTask::STATUS_NEW,
+                'undo_done_by' => auth()->user()->id,
+                'undo_done_time' => Carbon::now(),
+                'status' => VmmfgTask::STATUS_UNDONE,
             ]);
-        }else {
-            $task->delete();
-        }
+        // }else {
+        //     $task->delete();
+        // }
 
         // $this->emit('updated');
         session()->flash('success', 'Your entry has been updated');

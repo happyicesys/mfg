@@ -104,42 +104,41 @@
                         @foreach($title->vmmfgItems as $item)
 
                             @php
-                                $showDone = true;
+                                $showDone = false;
                                 $showUndo = false;
                                 $showChecked = false;
                                 $showDoneTimeDoneBy = false;
                                 $showCheckedBy = false;
-                                $showUndoChecked = false;
                                 $adminClickable = false;
+                                $showUndoDoneBy = false;
+                                $doneTime = '';
 
                                 $task = $item->vmmfgTasks()->whereVmmfgUnitId($this->unit->id)->first();
                                 if($task) {
-                                    $status = $task->status;
+                                    $doneBy = $task->doneBy ? $task->doneBy->name : null;
+                                    $doneTime = \Carbon\Carbon::parse($task->done_time)->format('Y-m-d h:ia');
+                                    $checkedBy = $task->checkedBy ? $task->checkedBy->name : null;
+                                    $checkedTime = \Carbon\Carbon::parse($task->checked_time)->format('Y-m-d h:ia');
+                                    $undoDoneBy = $task->undoDoneBy ? $task->undoDoneBy->name : null;
+                                    $undoDoneTime = \Carbon\Carbon::parse($task->undo_done_time)->format('Y-m-d h:ia');
 
+                                    $status = $task->status;
                                     switch($status) {
                                         case 0:
                                             $showDone = true;
-                                            $showUndo = false;
-                                            $showChecked = false;
-                                            $showDoneTimeDoneBy = false;
-                                            $showCheckedBy = false;
-                                            $showUndoChecked = false;
                                             break;
                                         case 1:
-                                            $showDone = false;
                                             $showUndo = true;
                                             $showChecked = true;
                                             $showDoneTimeDoneBy = true;
-                                            $showCheckedBy = false;
-                                            $showUndoChecked = false;
                                             break;
                                         case 2:
-                                            $showDone = false;
-                                            $showUndo = false;
-                                            $showChecked = false;
                                             $showDoneTimeDoneBy = true;
                                             $showCheckedBy = true;
-                                            $showUndoChecked = false;
+                                            break;
+                                        case 99:
+                                            $showDone = true;
+                                            $showUndoDoneBy = true;
                                             break;
                                     }
                                 }else {
@@ -148,7 +147,6 @@
                                     $showChecked = false;
                                     $showDoneTimeDoneBy = false;
                                     $showCheckedBy = false;
-                                    $showUndoChecked = false;
                                 }
                                 if(!auth()->user()->hasPermissionTo('vmmfg-ops-checker')) {
                                     // $showChecked = false;
@@ -188,7 +186,7 @@
                                     <span class="ml-auto" style="font-size: 13px;">
                                         @if($showDoneTimeDoneBy)
                                             @if($adminClickable)
-                                                <a href="#" class="badge badge-success" style="font-size: 13px;" wire:click="onUndoClicked({{$task}})">
+                                                <a href="#" class="badge badge-success" style="font-size: 13px;" onclick="return confirm('Are you sure you want to Undo the Task?');" wire:click="onUndoClicked({{$task}})">
                                                     <i class="fas fa-check-circle"></i>
                                                     Done
                                                 </a>
@@ -198,8 +196,8 @@
                                                     Done
                                                 </span>
                                             @endif
-                                            By: <span class="font-weight-bold">{{$task->doneBy->name}}</span> <br>
-                                            On: <span class="font-weight-bold">{{$task->doneTime}}</span> <br>
+                                            By: <span class="font-weight-bold">{{$doneBy}}</span> <br>
+                                            On: <span class="font-weight-bold">{{$doneTime}}</span> <br>
                                         @endif
                                         @if($showCheckedBy)
                                             @if($adminClickable)
@@ -213,8 +211,15 @@
                                                     Checked
                                                 </span>
                                             @endif
-                                            By: <span class="font-weight-bold">{{$task->checkedBy->name}}</span> <br>
-                                            On: <span class="font-weight-bold">{{$task->checkedTime}}</span> <br>
+                                            By: <span class="font-weight-bold">{{$checkedBy}}</span> <br>
+                                            On: <span class="font-weight-bold">{{$checkedTime}}</span> <br>
+                                        @endif
+                                        @if($showUndoDoneBy)
+                                            <span class="badge badge-warning" style="font-size: 13px;">
+                                                Undo
+                                            </span>
+                                            By: <span class="font-weight-bold">{{$undoDoneBy}}</span> <br>
+                                            On: <span class="font-weight-bold">{{$undoDoneTime}}</span> <br>
                                         @endif
                                     </span>
                                 </div>
@@ -226,7 +231,7 @@
                                             </button>
                                         @endif
                                         @if($showUndo)
-                                            <button class="btn btn-warning btn-xs-block" wire:key="item-undo-{{$item->id}}" wire:click="onUndoClicked({{$task}})">
+                                            <button class="btn btn-warning btn-xs-block" onclick="return confirm('Are you sure you want to Undo the Task?');" wire:key="item-undo-{{$item->id}}" wire:click="onUndoClicked({{$task}})">
                                                 <i class="fas fa-undo-alt"></i>
                                             </button>
                                         @endif
@@ -306,7 +311,7 @@
                                         <span class="ml-auto" style="font-size: 13px;">
                                             @if($showDoneTimeDoneBy)
                                                 @if($adminClickable)
-                                                    <a href="#" class="badge badge-success" style="font-size: 13px;" wire:click="onUndoClicked({{$task}})">
+                                                    <a href="#" class="badge badge-success" style="font-size: 13px;" onclick="return confirm('Are you sure you want to Undo the Task?');" wire:click="onUndoClicked({{$task}})">
                                                         <i class="fas fa-check-circle"></i>
                                                         Done
                                                     </a>
@@ -316,8 +321,8 @@
                                                         Done
                                                     </span>
                                                 @endif
-                                                By: <span class="font-weight-bold">{{$task->doneBy->name}}</span> <br>
-                                                On: <span class="font-weight-bold">{{$task->doneTime}}</span> <br>
+                                                By: <span class="font-weight-bold">{{$doneBy}}</span> <br>
+                                                On: <span class="font-weight-bold">{{$doneTime}}</span> <br>
                                             @endif
                                             @if($showCheckedBy)
                                                 @if($adminClickable)
@@ -331,8 +336,15 @@
                                                         Checked
                                                     </span>
                                                 @endif
-                                                By: <span class="font-weight-bold">{{$task->checkedBy->name}}</span> <br>
-                                                On: <span class="font-weight-bold">{{$task->checkedTime}}</span> <br>
+                                                By: <span class="font-weight-bold">{{$checkedBy}}</span> <br>
+                                                On: <span class="font-weight-bold">{{$checkedTime}}</span> <br>
+                                            @endif
+                                            @if($showUndoDoneBy)
+                                                <span class="badge badge-warning" style="font-size: 13px;">
+                                                    Undo
+                                                </span>
+                                                By: <span class="font-weight-bold">{{$undoDoneBy}}</span> <br>
+                                                On: <span class="font-weight-bold">{{$undoDoneTime}}</span> <br>
                                             @endif
                                         </span>
                                     </div>
@@ -344,7 +356,7 @@
                                                 </button>
                                             @endif
                                             @if($showUndo)
-                                                <button class="btn btn-warning btn-xs-block" wire:key="item-undo-{{$item->id}}" wire:click="onUndoClicked({{$task}})">
+                                                <button class="btn btn-warning btn-xs-block" onclick="return confirm('Are you sure you want to Undo the Task?');" wire:key="item-undo-{{$item->id}}" wire:click="onUndoClicked({{$task}})">
                                                     <i class="fas fa-undo-alt"></i>
                                                 </button>
                                             @endif
@@ -353,11 +365,6 @@
                                                     <i class="fas fa-check-double"></i>
                                                 </button>
                                             @endif
-                                            @if($showUndoChecked)
-                                            <button class="btn btn-info btn-xs-block" wire:key="item-undo-check-{{$item->id}}" wire:click="onUndoCheckedClicked({{$task}})">
-                                                <i class="fas fa-undo-alt"></i>
-                                            </button>
-                                        @endif
                                         </span>
                                     </div>
 
