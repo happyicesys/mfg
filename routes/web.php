@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 
 
 Auth::routes();
-Auth::loginUsingId(12);
+// Auth::loginUsingId(12);
 Route::middleware(['auth'])->group(function () {
     Route::get('/', Home::class)->name('home');
 
