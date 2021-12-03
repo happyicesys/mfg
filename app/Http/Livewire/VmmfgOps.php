@@ -127,8 +127,6 @@ class VmmfgOps extends Component
         // if($task->attachments()) {
             $task->update([
                 'is_done' => 0,
-                'done_by' => null,
-                'done_time' => null,
                 'undo_done_by' => auth()->user()->id,
                 'undo_done_time' => Carbon::now(),
                 'status' => VmmfgTask::STATUS_UNDONE,

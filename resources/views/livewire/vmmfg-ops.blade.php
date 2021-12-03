@@ -138,6 +138,7 @@
                                             break;
                                         case 99:
                                             $showDone = true;
+                                            $showDoneTimeDoneBy = true;
                                             $showUndoDoneBy = true;
                                             break;
                                     }
@@ -185,16 +186,20 @@
                                 <div class="row pt-1">
                                     <span class="ml-auto" style="font-size: 13px;">
                                         @if($showDoneTimeDoneBy)
-                                            @if($adminClickable)
-                                                <a href="#" class="badge badge-success" style="font-size: 13px;" onclick="return confirm('Are you sure you want to Undo the Task?') || event.stopImmediatePropagation()" wire:click="onUndoClicked({{$task}})">
-                                                    <i class="fas fa-check-circle"></i>
-                                                    Done
-                                                </a>
+                                            @if(!$showUndoDoneBy)
+                                                @if($adminClickable)
+                                                    <a href="#" class="badge badge-success" style="font-size: 13px;" onclick="return confirm('Are you sure you want to Undo the Task?') || event.stopImmediatePropagation()" wire:click="onUndoClicked({{$task}})">
+                                                        <i class="fas fa-check-circle"></i>
+                                                        Done
+                                                    </a>
+                                                @else
+                                                    <span class="badge badge-success" style="font-size: 13px;">
+                                                        <i class="fas fa-check-circle"></i>
+                                                        Done
+                                                    </span>
+                                                @endif
                                             @else
-                                                <span class="badge badge-success" style="font-size: 13px;">
-                                                    <i class="fas fa-check-circle"></i>
-                                                    Done
-                                                </span>
+                                                P.Done
                                             @endif
                                             By: <span class="font-weight-bold">{{$doneBy}}</span> <br>
                                             On: <span class="font-weight-bold">{{$doneTime}}</span> <br>
@@ -310,16 +315,20 @@
                                     <div class="row pt-2">
                                         <span class="ml-auto" style="font-size: 13px;">
                                             @if($showDoneTimeDoneBy)
-                                                @if($adminClickable)
-                                                    <a href="#" class="badge badge-success" style="font-size: 13px;" onclick="return confirm('Are you sure you want to Undo the Task?') || event.stopImmediatePropagation()" wire:click="onUndoClicked({{$task}})">
-                                                        <i class="fas fa-check-circle"></i>
-                                                        Done
-                                                    </a>
+                                                @if(!$showUndoDoneBy)
+                                                    @if($adminClickable)
+                                                        <a href="#" class="badge badge-success" style="font-size: 13px;" onclick="return confirm('Are you sure you want to Undo the Task?') || event.stopImmediatePropagation()" wire:click="onUndoClicked({{$task}})">
+                                                            <i class="fas fa-check-circle"></i>
+                                                            Done
+                                                        </a>
+                                                    @else
+                                                        <span class="badge badge-success" style="font-size: 13px;">
+                                                            <i class="fas fa-check-circle"></i>
+                                                            Done
+                                                        </span>
+                                                    @endif
                                                 @else
-                                                    <span class="badge badge-success" style="font-size: 13px;">
-                                                        <i class="fas fa-check-circle"></i>
-                                                        Done
-                                                    </span>
+                                                    P.Done
                                                 @endif
                                                 By: <span class="font-weight-bold">{{$doneBy}}</span> <br>
                                                 On: <span class="font-weight-bold">{{$doneTime}}</span> <br>
