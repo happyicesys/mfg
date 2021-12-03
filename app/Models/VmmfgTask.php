@@ -61,4 +61,9 @@ class VmmfgTask extends Model
         return Carbon::parse($value)->format('Y-m-d h:ia');
     }
 
+    public function getCheckedTimeAttribute($value)
+    {
+        return Carbon::parse($value)->format('Y-m-d h:ia');
+    }
+
 }

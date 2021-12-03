@@ -213,7 +213,8 @@
                                                     Checked
                                                 </span>
                                             @endif
-                                            By: <span class="font-weight-bold">{{$task->checkedBy->name}}</span>
+                                            By: <span class="font-weight-bold">{{$task->checkedBy->name}}</span> <br>
+                                            On: <span class="font-weight-bold">{{$task->checkedTime}}</span> <br>
                                         @endif
                                     </span>
                                 </div>
@@ -330,7 +331,8 @@
                                                         Checked
                                                     </span>
                                                 @endif
-                                                By: <span class="font-weight-bold">{{$task->checkedBy->name}}</span>
+                                                By: <span class="font-weight-bold">{{$task->checkedBy->name}}</span> <br>
+                                                On: <span class="font-weight-bold">{{$task->checkedTime}}</span> <br>
                                             @endif
                                         </span>
                                     </div>
