@@ -15,7 +15,7 @@ class CreateVmmfgItemsTable extends Migration
     {
         Schema::create('vmmfg_items', function (Blueprint $table) {
             $table->id();
-            $table->double('sequence');
+            $table->string('sequence');
             $table->string('name');
             $table->text('remarks')->nullable();
             $table->bigInteger('vmmfg_title_id');

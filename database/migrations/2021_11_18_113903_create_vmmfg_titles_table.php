@@ -15,7 +15,7 @@ class CreateVmmfgTitlesTable extends Migration
     {
         Schema::create('vmmfg_titles', function (Blueprint $table) {
             $table->id();
-            $table->double('sequence');
+            $table->string('sequence');
             $table->string('name');
             $table->bigInteger('vmmfg_scope_id');
             $table->timestamps();

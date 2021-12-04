@@ -106,9 +106,12 @@ class Scope extends Component
 
     public function save()
     {
-        $this->validate();
+        $this->validate([
+            'scope.name' => 'required',
+            'scope.remarks' => 'sometimes',
+        ]);
         $this->scope->save();
-        // $this->emit('updated');
+        $this->emit('updated');
         session()->flash('success', 'Your entry has been updated');
     }
 
@@ -249,7 +252,7 @@ class Scope extends Component
     public function updatedFile()
     {
         $this->validate([
-            'file' => 'mimes:pdf,png,jpg,jpeg',
+            'file' => 'sometimes',
         ]);
 
         $url = $this->file->storePublicly('items', 'digitaloceanspaces');

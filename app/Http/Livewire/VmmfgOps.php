@@ -142,7 +142,7 @@ class VmmfgOps extends Component
     public function uploadAttachment($itemId)
     {
         $this->validate([
-            'file' => 'mimes:pdf,png,jpg,jpeg',
+            'file' => 'sometimes',
         ]);
         $task = VmmfgTask::where('vmmfg_item_id', $itemId)->where('vmmfg_unit_id', $this->unit->id)->first();
 

@@ -205,7 +205,7 @@
                             {{ $scope->remarks }}
                         </td>
                         <td class="text-center">
-                            <button type="button" wire:click="edit({{$scope}})" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#edit-scope">
+                            <button type="button" wire:key="edit-scope-{{$scope->id}}" wire:click="edit({{$scope}})" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#edit-scope">
                                 <i class="fas fa-edit"></i>
                             </button>
                         </td>
@@ -272,15 +272,15 @@
                             @endif
                         </div>
                         <hr> --}}
-                        @if($scope)
+                        @if(isset($this->scope))
                         <div class="form-group">
-                            <button type="button" class="btn btn-success btn-md" data-toggle="modal" data-target="#title-modal" wire:click="createTitle({{$scope}})">
+                            <button type="button" class="btn btn-success btn-md" data-toggle="modal" data-target="#title-modal" wire:click="createTitle({{$this->scope}})">
                                 <i class="fas fa-plus-circle"></i>
                                 Title
                             </button>
                         </div>
                             <ul class="list-group">
-                                @foreach($scope->vmmfgTitles as $title)
+                                @foreach($this->scope->vmmfgTitles as $title)
                                 <li class="list-group-item mt-2" style="background-color: #9bc2cf;" wire:key="title-{{$title->id}}">
                                     <div class="form-group">
                                         <span class="float-left">
@@ -459,6 +459,13 @@
                                         @endphp
                                         @if($ext === 'pdf')
                                             <embed src="{{$attachment->full_url}}" type="application/pdf" class="card-img-top" style="min-height: 500px;">
+                                        @elseif($ext === 'mov' or $ext === 'mp4')
+                                            <div class="embed-responsive embed-responsive-16by9">
+                                                <video class=" embed-responsive-item video-js" controls>
+                                                    <source src="{{$attachment->full_url}}">
+                                                    Your browser does not support the video tag.
+                                                </video>
+                                            </div>
                                         @else
                                             <img class="card-img-top" src="{{$attachment->full_url}}" alt="">
                                         @endif

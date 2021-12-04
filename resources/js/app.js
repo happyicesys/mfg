@@ -3,6 +3,9 @@ require('./bootstrap');
 //select2
 window.select2 = require('select2');
 
+// videojs
+require('video.js');
+
 $(".sidebar-dropdown > a").click(function () {
     $(".sidebar-submenu").slideUp(200);
     if (
