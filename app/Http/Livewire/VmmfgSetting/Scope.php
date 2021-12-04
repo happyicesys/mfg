@@ -42,9 +42,9 @@ class Scope extends Component
         return [
             'scope.name' => 'required',
             'scope.remarks' => 'sometimes',
-            'title.sequence' => 'numeric|required',
+            'title.sequence' => 'required',
             'title.name' => 'required',
-            'item.sequence' => 'numeric|required',
+            'item.sequence' => 'required',
             'item.name' => 'required',
             'item.remarks' => 'sometimes',
             'item.is_required_upload' => 'sometimes',

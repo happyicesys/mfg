@@ -386,7 +386,7 @@
                     @if(isset($this->title) and $this->title->id) Edit Title: {{$this->title->sequence}}. {{$this->title->name}} @else Create Title @endif
                 </x-slot>
                 <x-slot name="content">
-                    <x-input type="number" model="title.sequence">
+                    <x-input type="text" model="title.sequence">
                         Sequence (Number only)
                     </x-input>
                     <x-input type="text" model="title.name">
@@ -420,7 +420,7 @@
                     @if(isset($this->item) and $this->item->id) Edit Task: {{$this->item->sequence}}. {{$this->item->name}} @else Create Task @endif
                 </x-slot>
                 <x-slot name="content">
-                    <x-input type="number" model="item.sequence">
+                    <x-input type="text" model="item.sequence">
                         Sequence (Number only)
                     </x-input>
                     <x-input type="text" model="item.name">
