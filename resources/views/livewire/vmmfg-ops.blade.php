@@ -172,8 +172,53 @@
                                     </span>
                                     <span class="ml-auto">
                                         @if($item->attachments()->exists())
-                                            <button class="btn btn-secondary" wire:key="item-area-{{$item->id}}" wire:click="showEditArea({{$item->id}})">
-                                                @if($editArea === $item->id)
+                                            @if($this->editArea !== $item->id)
+                                                <span class="" style="font-size: 13px;">
+                                                    @if($showDoneTimeDoneBy)
+                                                        @if(!$showUndoDoneBy)
+                                                            @if($adminClickable)
+                                                                <a href="#" class="badge badge-success" style="font-size: 13px;" onclick="return confirm('Are you sure you want to Undo the Task?') || event.stopImmediatePropagation()" wire:click="onUndoClicked({{$task}})">
+                                                                    <i class="fas fa-check-circle"></i>
+                                                                    Done
+                                                                </a>
+                                                            @else
+                                                                <span class="badge badge-success" style="font-size: 13px;">
+                                                                    <i class="fas fa-check-circle"></i>
+                                                                    Done
+                                                                </span>
+                                                            @endif
+                                                        @else
+                                                            P.Done
+                                                        @endif
+                                                        By: <span class="font-weight-bold">{{$doneBy}}</span> <br>
+                                                        On: <span class="font-weight-bold">{{$doneTime}}</span> <br>
+                                                    @endif
+                                                    @if($showCheckedBy)
+                                                        @if($adminClickable)
+                                                            <a href="#" class="badge badge-primary" style="font-size: 13px;" wire:click="onUndoCheckedClicked({{$task}})">
+                                                                <i class="fas fa-check-circle"></i>
+                                                                Checked
+                                                            </a>
+                                                        @else
+                                                            <span class="badge badge-primary" style="font-size: 13px;">
+                                                                <i class="fas fa-check-circle"></i>
+                                                                Checked
+                                                            </span>
+                                                        @endif
+                                                        By: <span class="font-weight-bold">{{$checkedBy}}</span> <br>
+                                                        On: <span class="font-weight-bold">{{$checkedTime}}</span> <br>
+                                                    @endif
+                                                    @if($showUndoDoneBy)
+                                                        <span class="badge badge-warning" style="font-size: 13px;">
+                                                            Undo
+                                                        </span>
+                                                        By: <span class="font-weight-bold">{{$undoDoneBy}}</span> <br>
+                                                        On: <span class="font-weight-bold">{{$undoDoneTime}}</span> <br>
+                                                    @endif
+                                                </span>
+                                            @endif
+                                            <button class="btn btn-secondary float-right" wire:key="item-area-{{$item->id}}" wire:click="showEditArea({{$item->id}})">
+                                                @if($this->editArea === $item->id)
                                                     <i class="fas fa-caret-right"></i>
                                                 @else
                                                     <i class="fas fa-caret-down"></i>
@@ -251,7 +296,7 @@
                                 @endif
 
                             {{-- </div> --}}
-                            @if($editArea === $item->id)
+                            @if($this->editArea === $item->id)
                                 <div class="form-group">
                                     @if($item->attachments)
                                         @foreach($item->attachments as $attachment)
