@@ -14,14 +14,15 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
        $this->call([
-        FirstUserSeeder::class,
-        CountrySeeder::class,
-        StateSeeder::class,
-        ProfileSeeder::class,
-        AddressSeeder::class,
-        VmmfgScopeSeeder::class,
-        VmmfgJobSeeder::class,
-        RolePermissionSeeder::class,
+        // FirstUserSeeder::class,
+        // CountrySeeder::class,
+        // StateSeeder::class,
+        // ProfileSeeder::class,
+        // AddressSeeder::class,
+        // VmmfgScopeSeeder::class,
+        // VmmfgJobSeeder::class,
+        // RolePermissionSeeder::class,
+        StaffPermission::class,
        ]);
     //    \App\Models\User::factory(150)->create();
     }
