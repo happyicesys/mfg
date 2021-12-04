@@ -31,9 +31,9 @@ class VmmfgItem extends Model
     }
 
     // getter
-    public function getSequenceAttribute($value)
-    {
-        return $value + 0;
-    }
+    // public function getSequenceAttribute($value)
+    // {
+    //     return $value + 0;
+    // }
 
 }

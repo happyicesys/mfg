@@ -387,7 +387,7 @@
                 </x-slot>
                 <x-slot name="content">
                     <x-input type="text" model="title.sequence">
-                        Sequence (Number only)
+                        Sequence
                     </x-input>
                     <x-input type="text" model="title.name">
                         Name
@@ -421,7 +421,7 @@
                 </x-slot>
                 <x-slot name="content">
                     <x-input type="text" model="item.sequence">
-                        Sequence (Number only)
+                        Sequence
                     </x-input>
                     <x-input type="text" model="item.name">
                         Name

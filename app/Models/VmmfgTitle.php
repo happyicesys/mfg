@@ -22,9 +22,9 @@ class VmmfgTitle extends Model
         return $this->hasMany(VmmfgItem::class)->orderBy('sequence', 'asc')->orderBy('created_at', 'desc');
     }
 
-    // getter
-    public function getSequenceAttribute($value)
-    {
-        return $value + 0;
-    }
+    // // getter
+    // public function getSequenceAttribute($value)
+    // {
+    //     return $value + 0;
+    // }
 }
