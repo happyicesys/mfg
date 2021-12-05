@@ -20,7 +20,7 @@ class VmmfgUnit extends Model
     //relationships
     public function vmmfgJob()
     {
-        return $this->belongsTo(VmmfgJob::class);
+        return $this->belongsTo(VmmfgJob::class)->orderBy('batch_no', 'desc');
     }
 
     public function vmmfgScope()

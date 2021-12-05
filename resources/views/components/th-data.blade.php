@@ -1,7 +1,7 @@
 @props(['model', 'sortKey', 'sortAscending'])
 
 <th class="text-center" >
-    <a href="#" wire:click="sortBy('{{$model}}')">
+    <a href="#" wire:click.prevent="sortBy('{{$model}}')">
         {{$slot}}
     </a>
     @if(isset($sortKey) and isset($sortAscending))

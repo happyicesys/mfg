@@ -25,6 +25,11 @@ class VmmfgItem extends Model
         return $this->hasMany(VmmfgTask::class);
     }
 
+    public function vmmfgTitle()
+    {
+        return $this->belongsTo(VmmfgTitle::class)->orderBy('sequence', 'asc');
+    }
+
     public function attachments()
     {
         return $this->morphMany(Attachment::class, 'modelable');

@@ -28,7 +28,7 @@ class VmmfgOps extends Component
     public $job_id = '';
     public $unit_id = '';
     public $job;
-    public $unit;
+    // public $unit;
     public $form = [
         'job_id' => '',
         'unit_id' => '',
@@ -54,7 +54,7 @@ class VmmfgOps extends Component
     {
         if($value) {
             $this->job = VmmfgJob::find($value);
-            $this->form['job_id'] = $this->job->id;
+            $this->form['job_id'] = $this->job_id;
         }
         $this->reset('unit_id');
     }
@@ -62,8 +62,8 @@ class VmmfgOps extends Component
     public function updatedUnitId($value)
     {
         if($value) {
-            $this->unit = VmmfgUnit::find($value);
-            $this->form['unit_id'] = $this->unit->id;
+            // $this->unit = VmmfgUnit::find($value);
+            $this->form['unit_id'] = $this->unit_id;
         }
     }
 
@@ -80,12 +80,11 @@ class VmmfgOps extends Component
     {
         $userId = $this->form['user_id'];
         $unitId = $this->form['unit_id'];
-        $jobId = $this->form['job_id'];
         $dateFrom = $this->form['date_from'];
         $dateTo = $this->form['date_to'];
         $vmmfgUnit = '';
 
-        if($unitId and $jobId) {
+        if($unitId) {
             $vmmfgUnit = VmmfgUnit::query();
             $vmmfgUnit = $vmmfgUnit
                         ->with([
@@ -94,41 +93,28 @@ class VmmfgOps extends Component
                             'vmmfgScope.vmmfgTitles.vmmfgItems',
                             'vmmfgScope.vmmfgTitles.vmmfgItems.attachments',
                             'vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks'
-                                => function($query) use ($userId, $dateFrom, $dateTo){
-                                    $query->when($userId, fn($query, $input) =>
-                                            $query->search('done_by', $input)
-                                                ->orSearch('checked_by', $input)
-                                                ->orSearch('undo_done_by', $input))
-                                        ->when($dateFrom, fn($query, $input) =>
-                                            $query->searchFromDate('done_time', $input)
-                                                ->orSearchFromDate('checked_time', $input)
-                                                ->orSearchFromDate('undo_done_time', $input))
-                                        ->when($dateTo, fn($query, $input) =>
-                                            $query->searchToDate('done_time', $input)
-                                                ->orSearchToDate('checked_time', $input)
-                                                ->orSearchToDate('undo_done_time', $input)
-                                    );
+                                => function($query) use ($unitId){
+                                    $query->when($unitId, fn($query, $input) => $query->search('vmmfg_unit_id', $input));
                                 },
                             'vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks.attachments',
                         ])
-                        ->whereHas('vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks', function($query) use ($userId, $dateFrom, $dateTo){
-                            $query->when($userId, fn($query, $input) =>
-                                    $query->search('done_by', $input)
-                                        ->orSearch('checked_by', $input)
-                                        ->orSearch('undo_done_by', $input))
-                                ->when($dateFrom, fn($query, $input) =>
-                                    $query->searchFromDate('done_time', $input)
-                                        ->orSearchFromDate('checked_time', $input)
-                                        ->orSearchFromDate('undo_done_time', $input))
-                                ->when($dateTo, fn($query, $input) =>
-                                    $query->searchToDate('done_time', $input)
-                                        ->orSearchToDate('checked_time', $input)
-                                        ->orSearchToDate('undo_done_time', $input)
-                            );
-                        })
+                        // ->whereHas('vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks', function($query) use ($userId, $dateFrom, $dateTo){
+                        //     $query->when($userId, fn($query, $input) =>
+                        //             $query->search('done_by', $input)
+                        //                 ->orSearch('checked_by', $input)
+                        //                 ->orSearch('undo_done_by', $input))
+                        //         ->when($dateFrom, fn($query, $input) =>
+                        //             $query->searchFromDate('done_time', $input)
+                        //                 ->orSearchFromDate('checked_time', $input)
+                        //                 ->orSearchFromDate('undo_done_time', $input))
+                        //         ->when($dateTo, fn($query, $input) =>
+                        //             $query->searchToDate('done_time', $input)
+                        //                 ->orSearchToDate('checked_time', $input)
+                        //                 ->orSearchToDate('undo_done_time', $input)
+                        //     );
+                        // })
                         ->when($unitId, fn($query, $input) => $query->search('id', $input))
-                        ->when($jobId, fn($query, $input) => $query->search('id', $input))
-                        ->first();
+                        ->get();
                         // dd($this->form, $vmmfgUnit->toArray());
         }
 
@@ -180,7 +166,7 @@ class VmmfgOps extends Component
     {
         VmmfgTask::updateOrCreate([
             'vmmfg_item_id' => $item->id,
-            'vmmfg_unit_id' => $this->unit->id,
+            'vmmfg_unit_id' => $this->form['unit_id'],
         ], [
             'is_done' => 1,
             'done_by' => auth()->user()->id,
@@ -216,12 +202,12 @@ class VmmfgOps extends Component
         $this->validate([
             'file' => 'sometimes',
         ]);
-        $task = VmmfgTask::where('vmmfg_item_id', $itemId)->where('vmmfg_unit_id', $this->unit->id)->first();
+        $task = VmmfgTask::where('vmmfg_item_id', $itemId)->where('vmmfg_unit_id', $this->form['unit_id'])->first();
 
         if(!$task) {
             $task = VmmfgTask::create([
                 'vmmfg_item_id' => $itemId,
-                'vmmfg_unit_id' => $this->unit->id,
+                'vmmfg_unit_id' => $this->form['unit_id'],
                 'status' => VmmfgTask::STATUS_NEW,
             ]);
         }

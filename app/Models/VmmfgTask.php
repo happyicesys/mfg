@@ -31,6 +31,12 @@ class VmmfgTask extends Model
         'undo_done_time',
     ];
 
+    // protected $casts = [
+    //     'done_time' => 'datetime:Y-m-d h:ia',
+    //     'checked_time' => 'datetime:Y-m-d h:ia',
+    //     'undo_done_time' => 'datetime:Y-m-d h:ia',
+    // ];
+
     //relationships
     public function attachments()
     {
@@ -39,12 +45,12 @@ class VmmfgTask extends Model
 
     public function vmmfgUnit()
     {
-        return $this->belongsTo(VmmfgUnit::class);
+        return $this->belongsTo(VmmfgUnit::class)->orderBy('unit_no', 'asc');
     }
 
     public function vmmfgItem()
     {
-        return $this->belongsTo(VmmfgItem::class);
+        return $this->belongsTo(VmmfgItem::class)->orderBy('sequence', 'asc');
     }
 
     public function doneBy()

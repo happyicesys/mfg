@@ -7,7 +7,7 @@
 
             <div class="">
                 <div>
-                    <div class="p-3" style="background-color: #d8d8d8;">
+                    {{-- <div class="p-3" style="background-color: #d8d8d8;">
                         <label for="filter" class="font-weight-bold"><u>Filters</u></label>
                         <div class="form-row">
                             <div class="form-group col-md-4 col-xs-12">
@@ -37,7 +37,7 @@
                                 <input wire:model="form.date_to" type="date" class="form-control" placeholder="Date To">
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
 
                     <div class="bg-light p-3">
                         {{-- <div class="form-row"> --}}
@@ -101,8 +101,9 @@
             </div>
 
             @if($vmmfgUnit)
+            {{-- @dd($vmmfgUnit->toArray()) --}}
                 <ul class="list-group">
-                    @forelse($vmmfgUnit->vmmfgScope->vmmfgTitles as $title)
+                    @forelse($vmmfgUnit->first()->vmmfgScope->vmmfgTitles as $title)
                         @php
                             $sumItem = 0;
                             $sumDoneTask = 0;
@@ -155,10 +156,13 @@
                                 if($task) {
                                     $doneBy = $task->doneBy ? $task->doneBy->name : null;
                                     $doneTime = \Carbon\Carbon::parse($task->done_time)->format('Y-m-d h:ia');
+                                    // $doneTime = $task->done_time;
                                     $checkedBy = $task->checkedBy ? $task->checkedBy->name : null;
                                     $checkedTime = \Carbon\Carbon::parse($task->checked_time)->format('Y-m-d h:ia');
+                                    // $checkedTime = $task->checked_time;
                                     $undoDoneBy = $task->undoDoneBy ? $task->undoDoneBy->name : null;
                                     $undoDoneTime = \Carbon\Carbon::parse($task->undo_done_time)->format('Y-m-d h:ia');
+                                    // $undoDoneTime = $task->undo_done_time;
 
                                     $status = $task->status;
                                     switch($status) {
@@ -196,7 +200,7 @@
                                 }
 
                             @endphp
-                        @if((!$this->form['user_id'] or ($this->form['user_id'] and $task)) and ((!$this->form['date_from'] and !$this->form['date_to']) or ($this->form['date_from'] or $this->form['date_to']) and $task))
+                        {{-- @if((!$this->form['user_id'] or ($this->form['user_id'] and $task)) and ((!$this->form['date_from'] and !$this->form['date_to']) or ($this->form['date_from'] or $this->form['date_to']) and $task)) --}}
                         <li class="list-group-item ml-2 clearfix" style="background-color: #e6f3f7;">
                             {{-- <div class="form-group"> --}}
                                 <div class="row">
@@ -471,7 +475,7 @@
                                 </div>
                             @endif
                         </li>
-                        @endif
+                        {{-- @endif --}}
                         @endforeach
                     @empty
                         <li class="list-group-item text-center">

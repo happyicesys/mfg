@@ -3,7 +3,7 @@
   <div class="sidebar-content">
     <div class="sidebar-brand" style="background-color:#F5F5F5; border:solid black 1px;">
       <a href="/" class="text-center">
-        <img src="/img/icon.png" height="100" width="100">
+        <img src="/img/logo.png" height="100" width="100">
       </a>
       <div id="close-sidebar">
         <i class="far fa-arrow-alt-circle-left"></i>
@@ -83,6 +83,9 @@
         @can('vmmfg-ops-access')
         <li class="{{ $name == 'vmmfg-ops' ? 'active' : '' }}">
           <a href="{{ route('vmmfg-ops') }}"><i class="fas fa-wrench"></i>QA/QC</a>
+        </li>
+        <li class="{{ $name == 'vmmfg-ops-dailyreport' ? 'active' : '' }}">
+          <a href="{{ route('vmmfg-ops-dailyreport') }}"><i class="far fa-list-alt"></i>Daily Report</a>
         </li>
         @endcan
 
