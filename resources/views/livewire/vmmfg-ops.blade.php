@@ -66,7 +66,7 @@
                             </div>
                             {{-- @dd($this->batch_no) --}}
 
-                            @if($this->job)
+                            @if($this->form['job_id'])
                                 <div class="form-group">
                                     <label>
                                         Unit No
