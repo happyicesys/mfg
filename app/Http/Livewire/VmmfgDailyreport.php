@@ -38,7 +38,7 @@ class VmmfgDailyreport extends Component
         $this->jobs = VmmfgJob::latest()->get();
         $this->units = VmmfgUnit::latest()->get();
         $this->users = User::whereHas('roles', function($query) {
-                            // $query->whereNotIn('name', ['superadmin']);
+                            $query->whereNotIn('name', ['superadmin']);
                         })->orderBy('name', 'asc')->get();
         $this->filters['date_from'] = Carbon::today()->toDateString();
         $this->filters['date_to'] = Carbon::today()->toDateString();
