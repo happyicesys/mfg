@@ -33,4 +33,14 @@ trait HasSearch
     {
         return $query->whereDate($columnName, '<=', $value);
     }
+
+    public function scopeOrSearchFromDate($query, $columnName, $value)
+    {
+        return $query->orWhereDate($columnName, '>=', $value);
+    }
+
+    public function scopeOrSearchToDate($query, $columnName, $value)
+    {
+        return $query->orWhereDate($columnName, '<=', $value);
+    }
 }

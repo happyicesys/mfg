@@ -7,6 +7,38 @@
 
             <div class="">
                 <div>
+                    <div class="p-3" style="background-color: #d8d8d8;">
+                        <label for="filter" class="font-weight-bold"><u>Filters</u></label>
+                        <div class="form-row">
+                            <div class="form-group col-md-4 col-xs-12">
+                                <label>
+                                    User
+                                </label>
+                                <select name="user_id" wire:model="form.user_id" class="select form-control">
+                                    <option value="">Select...</option>
+                                    @foreach($users as $user)
+                                        <option value="{{$user->id}}">
+                                            {{$user->name}} ({{$user->roles[0]->name}})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group col-md-4 col-xs-12">
+                                <label>
+                                    Date From
+                                </label>
+
+                                <input wire:model="form.date_from" type="date" class="form-control" placeholder="Date From">
+                            </div>
+                            <div class="form-group col-md-4 col-xs-12">
+                                <label>
+                                    Date To
+                                </label>
+                                <input wire:model="form.date_to" type="date" class="form-control" placeholder="Date To">
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="bg-light p-3">
                         {{-- <div class="form-row"> --}}
                             <div class="form-group">
@@ -22,7 +54,7 @@
                                         </option>
                                     @endforeach
                                 </x-input-select2> --}}
-                                <select name="batch_no" wire:model="batch_no" class="select form-control">
+                                <select name="batch_no" wire:model="job_id" class="select form-control">
                                     <option value="">Select...</option>
                                     @foreach($jobs as $job)
                                         <option value="{{$job->id}}">
@@ -34,12 +66,12 @@
                             </div>
                             {{-- @dd($this->batch_no) --}}
 
-                            @if($this->batch_no)
+                            @if($this->job)
                                 <div class="form-group">
                                     <label>
                                         Unit No
                                     </label>
-                                    <select name="unit_no" wire:model="unit_no" class="select form-control">
+                                    <select name="unit_no" wire:model="unit_id" class="select form-control">
                                         <option value="">Select...</option>
                                         @foreach($this->job->vmmfgUnits as $unit)
                                             <option value="{{$unit->id}}">
@@ -68,17 +100,22 @@
                 </div>
             </div>
 
-            @if($this->unit_no and $this->unit->vmmfgScope)
+            @if($vmmfgUnit)
                 <ul class="list-group">
-                    @forelse($this->unit->vmmfgScope->vmmfgTitles as $title)
+                    @forelse($vmmfgUnit->vmmfgScope->vmmfgTitles as $title)
                         @php
                             $sumItem = 0;
                             $sumDoneTask = 0;
                             $sumItem = count($title->vmmfgItems);
                             if($title->vmmfgItems) {
+                                // @dd($title->vmmfgItems->toArray());
                                 foreach($title->vmmfgItems as $item) {
-                                    if($task = $item->vmmfgTasks()->whereVmmfgUnitId($this->unit->id)->first() and ($task->status === 1 or $task->status === 2)) {
-                                        $sumDoneTask += 1;
+                                    if($item->vmmfgTasks) {
+                                        foreach($item->vmmfgTasks as $task) {
+                                            if($task->status === 1 or $task->status === 2) {
+                                                $sumDoneTask += 1;
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -113,7 +150,8 @@
                                 $showUndoDoneBy = false;
                                 $doneTime = '';
 
-                                $task = $item->vmmfgTasks()->whereVmmfgUnitId($this->unit->id)->first();
+                                // dd($item->vmmfgTasks);
+                                $task = $item->vmmfgTasks ? $item->vmmfgTasks->first() : null;
                                 if($task) {
                                     $doneBy = $task->doneBy ? $task->doneBy->name : null;
                                     $doneTime = \Carbon\Carbon::parse($task->done_time)->format('Y-m-d h:ia');
@@ -158,6 +196,7 @@
                                 }
 
                             @endphp
+                        @if((!$this->form['user_id'] or ($this->form['user_id'] and $task)) and ((!$this->form['date_from'] and !$this->form['date_to']) or ($this->form['date_from'] or $this->form['date_to']) and $task))
                         <li class="list-group-item ml-2 clearfix" style="background-color: #e6f3f7;">
                             {{-- <div class="form-group"> --}}
                                 <div class="row">
@@ -432,6 +471,7 @@
                                 </div>
                             @endif
                         </li>
+                        @endif
                         @endforeach
                     @empty
                         <li class="list-group-item text-center">
@@ -440,7 +480,7 @@
                     @endforelse
                 </ul>
             @else
-                @if($this->unit_no)
+                @if($vmmfgUnit)
                     <ul class="list-group">
                         <li class="list-group-item text-center">
                             No Scope Attached to this Unit.

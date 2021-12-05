@@ -3,14 +3,19 @@
 namespace App\Http\Livewire;
 
 use App\Models\Attachment;
+use App\Models\User;
 use App\Models\VmmfgItem;
 use App\Models\VmmfgJob;
+use App\Models\VmmfgScope;
 use App\Models\VmmfgTask;
 use App\Models\VmmfgUnit;
 use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 use Storage;
+
 
 class VmmfgOps extends Component
 {
@@ -20,51 +25,115 @@ class VmmfgOps extends Component
     public $itemPerPage = 100;
     public $showEditModal = false;
     public $selected = [];
-    public $batch_no = '';
-    public $unit_no = '';
+    public $job_id = '';
+    public $unit_id = '';
     public $job;
     public $unit;
     public $form = [
-        'batch_no' => '',
-        'model' => '',
-        'order_date' => '',
+        'job_id' => '',
+        'unit_id' => '',
         'item_id' => '',
+        'date_from' => '',
+        'date_to' => '',
+        'user_id' => '',
     ];
     public $editArea = '';
     public $file;
     public $zoomPictureUrl = '';
+    public $users;
 
     public function mount()
     {
         $this->jobs = VmmfgJob::all();
+        $this->users = User::whereHas('roles', function($query) {
+            // $query->whereNotIn('name', ['superadmin']);
+        })->orderBy('name', 'asc')->get();
     }
 
-    public function updatedBatchNo($value)
+    public function updatedJobId($value)
     {
-        $this->job = VmmfgJob::find($value);
-        $this->reset('unit_no');
+        if($value) {
+            $this->job = VmmfgJob::find($value);
+            $this->form['job_id'] = $this->job->id;
+        }
+        $this->reset('unit_id');
     }
 
-    public function updatedUnitNo($value)
+    public function updatedUnitId($value)
     {
-        $this->unit = VmmfgUnit::find($value);
-
+        if($value) {
+            $this->unit = VmmfgUnit::find($value);
+            $this->form['unit_id'] = $this->unit->id;
+        }
     }
 
     public function rules()
     {
         return [
-            // 'form.id' => 'sometimes|same:id',
-            'form.batch_no' => 'required',
-            'form.model' => 'sometimes',
-            'form.order_date' => 'required',
+            'form.job_id' => 'sometimes',
+            'form.unit_id' => 'sometimes',
         ];
     }
 
 
     public function render()
     {
-        return view('livewire.vmmfg-ops');
+        $userId = $this->form['user_id'];
+        $unitId = $this->form['unit_id'];
+        $jobId = $this->form['job_id'];
+        $dateFrom = $this->form['date_from'];
+        $dateTo = $this->form['date_to'];
+        $vmmfgUnit = '';
+
+        if($unitId and $jobId) {
+            $vmmfgUnit = VmmfgUnit::query();
+            $vmmfgUnit = $vmmfgUnit
+                        ->with([
+                            'vmmfgScope',
+                            'vmmfgScope.vmmfgTitles',
+                            'vmmfgScope.vmmfgTitles.vmmfgItems',
+                            'vmmfgScope.vmmfgTitles.vmmfgItems.attachments',
+                            'vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks'
+                                => function($query) use ($userId, $dateFrom, $dateTo){
+                                    $query->when($userId, fn($query, $input) =>
+                                            $query->search('done_by', $input)
+                                                ->orSearch('checked_by', $input)
+                                                ->orSearch('undo_done_by', $input))
+                                        ->when($dateFrom, fn($query, $input) =>
+                                            $query->searchFromDate('done_time', $input)
+                                                ->orSearchFromDate('checked_time', $input)
+                                                ->orSearchFromDate('undo_done_time', $input))
+                                        ->when($dateTo, fn($query, $input) =>
+                                            $query->searchToDate('done_time', $input)
+                                                ->orSearchToDate('checked_time', $input)
+                                                ->orSearchToDate('undo_done_time', $input)
+                                    );
+                                },
+                            'vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks.attachments',
+                        ])
+                        ->whereHas('vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks', function($query) use ($userId, $dateFrom, $dateTo){
+                            $query->when($userId, fn($query, $input) =>
+                                    $query->search('done_by', $input)
+                                        ->orSearch('checked_by', $input)
+                                        ->orSearch('undo_done_by', $input))
+                                ->when($dateFrom, fn($query, $input) =>
+                                    $query->searchFromDate('done_time', $input)
+                                        ->orSearchFromDate('checked_time', $input)
+                                        ->orSearchFromDate('undo_done_time', $input))
+                                ->when($dateTo, fn($query, $input) =>
+                                    $query->searchToDate('done_time', $input)
+                                        ->orSearchToDate('checked_time', $input)
+                                        ->orSearchToDate('undo_done_time', $input)
+                            );
+                        })
+                        ->when($unitId, fn($query, $input) => $query->search('id', $input))
+                        ->when($jobId, fn($query, $input) => $query->search('id', $input))
+                        ->first();
+                        // dd($this->form, $vmmfgUnit->toArray());
+        }
+
+
+        return view('livewire.vmmfg-ops', ['vmmfgUnit' => $vmmfgUnit]);
     }
 
     public function edit(VmmfgJob $job)
@@ -88,8 +157,9 @@ class VmmfgOps extends Component
 
     public function resetFilters()
     {
-        $this->reset('batch_no');
-        $this->reset('unit_no');
+        $this->reset('job_id');
+        $this->reset('unit_id');
+        $this->reset('form');
     }
 
     public function updatedFilters()
@@ -116,6 +186,8 @@ class VmmfgOps extends Component
             'done_by' => auth()->user()->id,
             'done_time' => Carbon::now(),
             'status' => VmmfgTask::STATUS_DONE,
+            'undo_done_by' => null,
+            'undo_done_time' => null,
         ]);
 
         // $this->emit('updated');

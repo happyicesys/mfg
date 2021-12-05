@@ -69,8 +69,14 @@
             @else
                 <div class="container-fluid">
             @endauth
-                    <main class="page-content" style="margin-top: 10px;">
+                    <main class="page-content" style="margin-top: 3px;">
                         @auth
+                            <div class="row">
+                                <span class="ml-auto badge badge-pill badge-light mr-3 mb-2" style="font-size: 18px;">
+                                    <i class="fas fa-user"></i>
+                                    {{auth()->user()->name}}
+                                </span>
+                            </div>
                             {{ $slot }}
                         @else
                             @yield('content')
