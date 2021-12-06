@@ -36,13 +36,13 @@ class Unit extends Component
 
     public function render()
     {
-        $units = VmmfgUnit::with('vmmfgJob');
+        $units = VmmfgUnit::with('vmmfgJob')
+                        ->leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id');
 
         // advance search
         $units = $units
                 ->when($this->filters['unit_no'], fn($query, $input) => $query->searchLike('unit_no', $input))
                 ->when($this->filters['search'], fn($query, $input) => $query->searchLike('unit_no', $input)->orWhereHas('vmmfgJob', fn($query, $input) => $query->searchLike('batch_no', $input)));
-                // ->when($this->filters['status'], fn($query, $input) => $query->where('status', 'LIKE', '%'.$input.'%'));
 
         if($input = $this->filters['batch_no']) {
             $units = $units->whereHas('vmmfgJob', function($query) use ($input) {

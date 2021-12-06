@@ -17,6 +17,7 @@ class VmmfgJob extends Model
         'racking_name',
         'order_date',
         'due_date',
+        'completion_date',
     ];
 
     // getter

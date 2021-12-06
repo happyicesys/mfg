@@ -59,16 +59,16 @@
                                 </div>
                                 <div class="form-group col-4">
                                     <label>
-                                        Order Date From
+                                        Start Date From
                                     </label>
 
-                                    <input wire:model="filters.order_date_from" type="date" class="form-control" placeholder="Order Date From">
+                                    <input wire:model="filters.order_date_from" type="date" class="form-control" placeholder="Start Date From">
                                 </div>
                                 <div class="form-group col-4">
                                     <label>
-                                        Order Date To
+                                        Start Date To
                                     </label>
-                                    <input wire:model="filters.order_date_to" type="date" class="form-control" placeholder="Order Date To">
+                                    <input wire:model="filters.order_date_to" type="date" class="form-control" placeholder="Start Date To">
                                 </div>
                             </div>
                             <div class="form-row d-flex justify-content-end">
@@ -163,15 +163,15 @@
                                 </div>
                                 <div class="form-group">
                                     <label>
-                                        Order Date From
+                                        Start Date From
                                     </label>
-                                    <input wire:model="filters.order_date_from" type="text" class="form-control" placeholder="Order Date From">
+                                    <input wire:model="filters.order_date_from" type="text" class="form-control" placeholder="Start Date From">
                                 </div>
                                 <div class="form-group">
                                     <label>
-                                        Order Date To
+                                        Start Date To
                                     </label>
-                                    <input wire:model="filters.order_date_to" type="text" class="form-control" placeholder="Order Date To">
+                                    <input wire:model="filters.order_date_to" type="text" class="form-control" placeholder="Start Date To">
                                 </div>
                             {{-- </div> --}}
                             <div class="form-group">
@@ -218,7 +218,7 @@
                             Model
                         </x-th-data>
                         <x-th-data model="order_date" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
-                            Order Date
+                            Start Date
                         </x-th-data>
                         <th class="text-center text-dark">
                             Total Units
@@ -280,7 +280,7 @@
                             Model
                         </x-input>
                         <x-input type="date" model="form.order_date">
-                            Order Date
+                            Start Date
                         </x-input>
                         {{-- <x-input type="text" model="form.id">
                             ID
@@ -394,7 +394,7 @@
                         Model
                     </x-input>
                     <x-input type="date" model="form.order_date">
-                        Order Date
+                        Start Date
                     </x-input>
                 </x-slot>
                 <x-slot name="footer">

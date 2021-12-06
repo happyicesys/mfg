@@ -65,8 +65,17 @@
                 <th align="center">
                     Unit No
                 </th>
+                <th align="center">
+                    Model
+                </th>
+                <th align="left">
+                    Title No
+                </th>
                 <th align="left">
                     Title Name
+                </th>
+                <th align="left">
+                    Task No
                 </th>
                 <th align="left">
                     Task Name
@@ -107,8 +116,17 @@
                     <td align="center">
                         {{ $item->vmmfgUnit->unit_no }}
                     </td>
+                    <td align="center">
+                        {{ $item->vmmfgUnit->vmmfgJob->model }}
+                    </td>
+                    <td align="left">
+                        {{ $item->vmmfgItem->vmmfgTitle->sequence }}
+                    </td>
                     <td align="left">
                         {{ $item->vmmfgItem->vmmfgTitle->name }}
+                    </td>
+                    <td align="left">
+                        {{ $item->vmmfgItem->sequence }}
                     </td>
                     <td align="left">
                         {{ $item->vmmfgItem->name }}
@@ -141,7 +159,7 @@
             <tfoot>
                 <tr>
                     <td align="right" colspan="4">Total </td>
-                    <td align="right" colspan="7">{{ count($tasks) }}</td>
+                    <td align="right" colspan="10">{{ count($tasks) }}</td>
                 </tr>
             </tfoot>
         </table>

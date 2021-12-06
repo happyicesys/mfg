@@ -176,18 +176,18 @@
                             #
                         </th>
                         <x-th-data model="batch_no" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
+                            Batch No
+                        </x-th-data>
+                        <x-th-data model="unit_no" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Unit No
                         </x-th-data>
-                        <th class="text-center text-dark">
-                            Batch No
-                        </th>
-                        <th class="text-center text-dark">
+                        <x-th-data model="unit_no" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Model
-                        </th>
+                        </x-th-data>
                         <th></th>
                     </tr>
                     @forelse($units as $index => $unit)
-                    <tr class="row_edit" wire:loading.class.delay="opacity-2" wire:key="row-{{$unit->id}}">
+                    <tr class="row_edit" wire:loading.class.delay="opacity-2" wire:key="row-{{$index}}">
                         {{-- <th class="text-center">
                             <input type="checkbox" wire:model="selected" value="{{$admin->id}}">
                         </th> --}}
@@ -195,10 +195,10 @@
                             {{ $index + $from}}
                         </td>
                         <td class="text-center">
-                            {{ $unit->unit_no }}
+                            {{ $unit->vmmfgJob->batch_no }}
                         </td>
                         <td class="text-center">
-                            {{ $unit->vmmfgJob->batch_no }}
+                            {{ $unit->unit_no }}
                         </td>
                         <td class="text-center">
                             {{ $unit->vmmfgJob->model }}

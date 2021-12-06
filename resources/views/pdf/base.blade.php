@@ -13,53 +13,47 @@
         body {
             margin: 0px;
         }
-    /* @font-face {
-      font-family: 'Firefly Sung';
-      font-style: normal;
-      font-weight: 400;
-      src: url(http://eclecticgeek.com/dompdf/fonts/cjk/fireflysung.ttf) format('truetype');
-    }         */
         * {
-            font-family: Verdana, Arial, sans-serif;
+            font-family: 'Firefly Sung', Verdana, Arial, sans-serif;
         }
         a {
             color: #fff;
             text-decoration: none;
         }
         .container {
-            margin: 20px;
-        }
-        .container table tr td {
             margin: 12px;
         }
+        .container table tr td {
+            margin: 10px;
+        }
         .container .text {
-            font-size: 12px;
+            font-size: 11px;
         }
         .container .text div {
             padding-bottom: 5px;
         }
         .items {
-            margin-top: 40px;
+            margin-top: 30px;
         }
         .items table {
             border-collapse: collapse;
         }
         .items table tr th {
-            font-size: 12px;
-            padding: 10px;
+            font-size: 10px;
+            padding: 8px;
             border: 1px solid black;
             background-color: #ededed;
         }
         .items table tr td {
             font-size: 12px;
-            padding: 10px;
+            padding: 5px;
             border: 1px solid black;
         }
         .items tfoot tr td {
-            font-size: 12px;
+            font-size: 11px;
         }
         .footer {
-            font-size: 12px;
+            font-size: 11px;
         }
     </style>
 

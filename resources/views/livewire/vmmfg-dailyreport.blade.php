@@ -147,8 +147,17 @@
                         <x-th-data model="unit_no" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Unit No
                         </x-th-data>
+                        <x-th-data model="model" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
+                            Model
+                        </x-th-data>
+                        <x-th-data model="vmmfg_titles.sequence" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
+                            Title No
+                        </x-th-data>
                         <x-th-data model="vmmfg_titles.name" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Title Name
+                        </x-th-data>
+                        <x-th-data model="vmmfg_items.sequence" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
+                            Task No
                         </x-th-data>
                         <x-th-data model="vmmfg_items.name" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Task Name
@@ -188,8 +197,17 @@
                         <td class="text-center">
                             {{ $task->vmmfgUnit->unit_no }}
                         </td>
+                        <td class="text-center">
+                            {{ $task->vmmfgUnit->vmmfgJob->model }}
+                        </td>
+                        <td class="text-left" style="min-width: 100px;">
+                            {{ $task->vmmfgItem->vmmfgTitle->sequence }}
+                        </td>
                         <td class="text-left" style="min-width: 200px;">
                             {{ $task->vmmfgItem->vmmfgTitle->name }}
+                        </td>
+                        <td class="text-left" style="min-width: 120px;">
+                            {{ $task->vmmfgItem->sequence }}
                         </td>
                         <td class="text-left" style="min-width: 200px;">
                             {{ $task->vmmfgItem->name }}
