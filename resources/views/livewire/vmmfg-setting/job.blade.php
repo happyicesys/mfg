@@ -220,13 +220,19 @@
                         <x-th-data model="order_date" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Start Date
                         </x-th-data>
+                        <x-th-data model="completion_date" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
+                            Completion Date
+                        </x-th-data>
+                        <th class="text-center text-dark">
+                            Remarks
+                        </th>
                         <th class="text-center text-dark">
                             Total Units
                         </th>
                         <th></th>
                     </tr>
                     @forelse($jobs as $index => $job)
-                    <tr class="row_edit" wire:loading.class.delay="opacity-2" wire:key="row-{{$job->id}}">
+                    <tr class="row_edit" wire:loading.class.delay="opacity-2" wire:key="row-{{$index}}">
                         {{-- <th class="text-center">
                             <input type="checkbox" wire:model="selected" value="{{$admin->id}}">
                         </th> --}}
@@ -241,6 +247,12 @@
                         </td>
                         <td class="text-center">
                             {{ $job->order_date }}
+                        </td>
+                        <td class="text-center">
+                            {{ $job->completion_date }}
+                        </td>
+                        <td class="text-left">
+                            {{ $job->remarks }}
                         </td>
                         <td class="text-center">
                             {{ $job->vmmfgUnits->count() }}
@@ -282,6 +294,15 @@
                         <x-input type="date" model="form.order_date">
                             Start Date
                         </x-input>
+                        <x-input type="date" model="form.completion_date">
+                            Completion Date
+                        </x-input>
+                        <div class="form-group">
+                            <label for="remarks">
+                                Remarks
+                            </label>
+                            <textarea name="remarks" wire:model.defer="form.remarks" class="form-control" rows="5"></textarea>
+                        </div>
                         {{-- <x-input type="text" model="form.id">
                             ID
                         </x-input> --}}
@@ -396,6 +417,15 @@
                     <x-input type="date" model="form.order_date">
                         Start Date
                     </x-input>
+                    <x-input type="date" model="form.completion_date">
+                        Completion Date
+                    </x-input>
+                    <div class="form-group">
+                        <label for="remarks">
+                            Remarks
+                        </label>
+                        <textarea name="remarks" wire:model.defer="form.remarks" class="form-control" rows="5"></textarea>
+                    </div>
                 </x-slot>
                 <x-slot name="footer">
                     <button type="submit" class="btn btn-success d-none d-sm-block" wire:click.prevent="save">

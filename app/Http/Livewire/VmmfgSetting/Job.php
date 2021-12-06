@@ -45,6 +45,8 @@ class Job extends Component
             'form.batch_no' => 'required',
             'form.model' => 'sometimes',
             'form.order_date' => 'required',
+            'form.completion_date' => 'sometimes',
+            'form.remarks' => 'sometimes',
         ];
     }
 

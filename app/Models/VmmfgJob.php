@@ -18,12 +18,22 @@ class VmmfgJob extends Model
         'order_date',
         'due_date',
         'completion_date',
+        'remarks',
     ];
 
     // getter
     public function getOrderDateAttribute($value)
     {
-        return Carbon::parse($value)->format('Y-m-d');
+        if($value) {
+            return Carbon::parse($value)->format('Y-m-d');
+        }
+    }
+
+    public function getCompletionDateAttribute($value)
+    {
+        if($value) {
+            return Carbon::parse($value)->format('Y-m-d');
+        }
     }
 
     //relationships
