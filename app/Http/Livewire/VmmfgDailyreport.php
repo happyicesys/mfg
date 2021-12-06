@@ -10,6 +10,8 @@ use App\Models\VmmfgUnit;
 use DB;
 use Livewire\Component;
 use Livewire\WithPagination;
+use PDF;
+use Excel;
 
 class VmmfgDailyreport extends Component
 {
@@ -38,7 +40,7 @@ class VmmfgDailyreport extends Component
         $this->jobs = VmmfgJob::latest()->get();
         $this->units = VmmfgUnit::latest()->get();
         $this->users = User::whereHas('roles', function($query) {
-                            $query->whereNotIn('name', ['superadmin']);
+                            // $query->whereNotIn('name', ['superadmin']);
                         })->orderBy('name', 'asc')->get();
         $this->filters['date_from'] = Carbon::today()->toDateString();
         $this->filters['date_to'] = Carbon::today()->toDateString();
@@ -48,31 +50,10 @@ class VmmfgDailyreport extends Component
 
     public function render()
     {
-        $tasks = VmmfgTask::with([
-                            'attachments',
-                            'vmmfgUnit',
-                            'vmmfgUnit.vmmfgJob',
-                            'vmmfgItem',
-                            'vmmfgItem.attachments',
-                            'vmmfgItem.vmmfgTitle',
-                            'doneBy',
-                            'checkedBy',
-                            'undoDoneBy'
-                ]);
-                // dd($this->filters['user_id']);
-        // advance search
-        $tasks = $tasks
-                ->leftJoin('vmmfg_units', 'vmmfg_units.id', '=', 'vmmfg_tasks.vmmfg_unit_id')
-                ->leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')
-                ->leftJoin('vmmfg_items', 'vmmfg_items.id', '=', 'vmmfg_tasks.vmmfg_item_id')
-                ->leftJoin('vmmfg_titles', 'vmmfg_titles.id', '=', 'vmmfg_items.vmmfg_title_id')
-                ->leftJoin('users as done_users', 'done_users.id', '=', 'vmmfg_tasks.done_by')
-                ->leftJoin('users as checked_users', 'checked_users.id', '=', 'vmmfg_tasks.checked_by')
-                ->leftJoin('users as undo_done_users', 'undo_done_users.id', '=', 'vmmfg_tasks.undo_done_by');
 
+        $tasks = $this->mainQuery();
 
         $tasks = $this->queryFilter($tasks, $this->filters);
-
 
         if($sortKey = $this->sortKey) {
             $tasks = $tasks->orderBy($sortKey, $this->sortAscending ? 'asc' : 'desc');
@@ -98,6 +79,69 @@ class VmmfgDailyreport extends Component
         }
 
         $this->sortKey = $key;
+    }
+
+    public function exportPdf()
+    {
+        $tasks = $this->mainQuery();
+
+        $tasks = $this->queryFilter($tasks, $this->filters);
+
+        if($sortKey = $this->sortKey) {
+            $tasks = $tasks->orderBy($sortKey, $this->sortAscending ? 'asc' : 'desc');
+        }
+
+        $tasks = $tasks->get();
+
+        $pdf = PDF::loadView('pdf.vmmfg.dailyreport', [
+            'tasks' => $tasks,
+            'filtersData' => $this->getFilterInfo(),
+        ])->output();
+
+        return response()->streamDownload(
+            fn () => print($pdf),
+            Carbon::now()->format('ymdHis')."_dailyreport.pdf"
+       );
+    }
+
+    public function getFilterInfo()
+    {
+        $filtersData = [
+            'isDone' => $this->filters['is_done'] == 1 ? 'Yes' : 'No',
+            'isChecked' => $this->filters['is_checked'] == 1 ? 'Yes' : 'No',
+            'userName' => $this->filters['user_id'] ? User::find($this->filters['user_id'])->name : '',
+            'dateFrom' => $this->filters['date_from'],
+            'dateTo' => $this->filters['date_to'],
+            'jobBatchNo' => $this->filters['job_id'] ? VmmfgJob::find($this->filters['job_id'])->batch_no : '',
+            'unitNo' => $this->filters['unit_id'] ? VmmfgUnit::find($this->filters['unit_id'])->unit_no : '',
+        ];
+
+        return $filtersData;
+    }
+
+    private function mainQuery()
+    {
+        $query = VmmfgTask::with([
+                            'attachments',
+                            'vmmfgUnit',
+                            'vmmfgUnit.vmmfgJob',
+                            'vmmfgItem',
+                            'vmmfgItem.attachments',
+                            'vmmfgItem.vmmfgTitle',
+                            'doneBy',
+                            'checkedBy',
+                            'undoDoneBy'
+                ]);
+        $query = $query
+                ->leftJoin('vmmfg_units', 'vmmfg_units.id', '=', 'vmmfg_tasks.vmmfg_unit_id')
+                ->leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')
+                ->leftJoin('vmmfg_items', 'vmmfg_items.id', '=', 'vmmfg_tasks.vmmfg_item_id')
+                ->leftJoin('vmmfg_titles', 'vmmfg_titles.id', '=', 'vmmfg_items.vmmfg_title_id')
+                ->leftJoin('users as done_users', 'done_users.id', '=', 'vmmfg_tasks.done_by')
+                ->leftJoin('users as checked_users', 'checked_users.id', '=', 'vmmfg_tasks.checked_by')
+                ->leftJoin('users as undo_done_users', 'undo_done_users.id', '=', 'vmmfg_tasks.undo_done_by');
+
+        return $query;
     }
 
     private function queryFilter($query, $filters)

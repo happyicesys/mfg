@@ -4,10 +4,11 @@
             <x-flash></x-flash>
             <h2>Daily Report</h2>
             <hr>
+            {{-- @dd($tasks->toArray()) --}}
             @php
                 $tasksArr = $tasks->toArray();
-                $from = $tasksArr['from'];
-                $total = $tasksArr['total'];
+                $from = isset($tasksArr['from']) ? $tasksArr['from'] : 0;
+                $total = isset($tasksArr['total']) ? $tasksArr['total'] : count($tasks);
             @endphp
 
             <div class="bg-light pt-2 pb-2 pl-2 pr-2 mb-2">
@@ -85,8 +86,12 @@
                         <input wire:model="filters.date_to" type="date" class="form-control" placeholder="Date To">
                     </div>
                 </div>
-                <div class="form-row d-flex justify-content-end">
+                <div class="form-row d-flex btn-xs-block ml-auto">
                     <div class="btn-group">
+                        <button class="btn btn-success" wire:click="exportPdf">
+                            <i class="far fa-file-pdf"></i>
+                            Export PDF
+                        </button>
                         <button wire:click="resetFilters()" class="btn btn-outline-dark">Reset</button>
                     </div>
                 </div>
@@ -224,7 +229,7 @@
                 </table>
             </div>
             <div>
-                {{ $tasks->links() }}
+                {{ isset($tasksArr['from']) ? $tasks->links() : '' }}
             </div>
 
             {{-- <form wire:submit.prevent="save"> --}}
