@@ -88,5 +88,8 @@ return array (
     'normal' => $fontDir . '/fireflysung_normal_1a240bb048cf296d53ffc25714f1396b',
     'bold' => $fontDir . '/fireflysung_bold_1a240bb048cf296d53ffc25714f1396b',
   ),
+  'founder-type' => array(
+    'bold' => $fontDir . '/founder_type_bold_e17a477358db4a46a0414e35a68935dd',
+  ),
 );
 }; ?>

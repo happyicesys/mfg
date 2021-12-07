@@ -15,9 +15,9 @@
         }
 
         @font-face {
-            font-family: 'fireflysung';
+            font-family: 'founder-type';
             font-weight: bold;
-            src: url('{{storage_path("fonts/fireflysung.ttf")}}') format('truetype');
+            src: url('{{storage_path("fonts/founder-type.ttf")}}') format('truetype');
         }
         * {
             font-family: Verdana, Arial, sans-serif;
