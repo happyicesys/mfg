@@ -44,7 +44,7 @@ class VmmfgOps extends Component
 
     public function mount()
     {
-        $this->jobs = VmmfgJob::all();
+        $this->jobs = VmmfgJob::orderBy('order_date', 'desc')->get();
         $this->users = User::whereHas('roles', function($query) {
             $query->whereNotIn('name', ['superadmin']);
         })->orderBy('name', 'asc')->get();
