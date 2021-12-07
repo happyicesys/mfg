@@ -13,18 +13,24 @@
         body {
             margin: 0px;
         }
+
+        @font-face {
+            font-family: 'fireflysung';
+            font-weight: bold;
+            src: url('{{storage_path("fonts/fireflysung.ttf")}}') format('truetype');
+        }
         * {
-            font-family: 'Firefly Sung', Verdana, Arial, sans-serif;
+            font-family: Verdana, Arial, sans-serif;
         }
         a {
             color: #fff;
             text-decoration: none;
         }
         .container {
-            margin: 12px;
+            margin: 10px;
         }
         .container table tr td {
-            margin: 10px;
+            margin: 8px;
         }
         .container .text {
             font-size: 11px;
@@ -33,20 +39,20 @@
             padding-bottom: 5px;
         }
         .items {
-            margin-top: 30px;
+            margin-top: 20px;
         }
         .items table {
             border-collapse: collapse;
         }
         .items table tr th {
             font-size: 10px;
-            padding: 8px;
+            padding: 4px;
             border: 1px solid black;
             background-color: #ededed;
         }
         .items table tr td {
-            font-size: 12px;
-            padding: 5px;
+            font-size: 11px;
+            padding: 4px;
             border: 1px solid black;
         }
         .items tfoot tr td {
@@ -59,6 +65,7 @@
 
 </head>
 <body>
+    {{-- @dd(public_path('fonts/wts11.ttf')); --}}
     <div class="container">
         @yield('content')
     </body>
