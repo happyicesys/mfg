@@ -6,6 +6,10 @@ window.select2 = require('select2');
 // videojs
 require('video.js');
 
+// moment
+window.moment = require('moment-timezone');
+window.moment.tz.setDefault('Asia/Singapore');
+
 $(".sidebar-dropdown > a").click(function () {
     $(".sidebar-submenu").slideUp(200);
     if (

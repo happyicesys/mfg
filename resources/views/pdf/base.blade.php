@@ -54,6 +54,7 @@
             font-size: 11px;
             padding: 4px;
             border: 1px solid black;
+            height: auto;
         }
         .items tfoot tr td {
             font-size: 11px;
@@ -62,11 +63,17 @@
             font-size: 11px;
         }
     </style>
-
 </head>
 <body>
     {{-- @dd(public_path('fonts/wts11.ttf')); --}}
     <div class="container">
         @yield('content')
-    </body>
+
+        <script type="text/php">
+            if ( isset($pdf) ) {
+                $font = $fontMetrics->getFont("helvetica", "bold");
+                $pdf->page_text(565, 820, "{PAGE_NUM} of {PAGE_COUNT}", $font, 9, array(0,0,0));
+            }
+        </script>
+</body>
 </html>

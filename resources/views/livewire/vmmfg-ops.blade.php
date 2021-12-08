@@ -60,6 +60,7 @@
                                         <option value="{{$job->id}}">
                                             #{{$job->batch_no}} - {{$job->model}}
                                             @if($job->vmmfgUnits) ({{count($job->vmmfgUnits)}} units) @endif
+                                            @if($job->order_date) (Start: {{$job->order_date}}) @endif
                                         </option>
                                     @endforeach
                                 </select>
@@ -102,8 +103,8 @@
 
             @if($vmmfgUnit)
             {{-- @dd($vmmfgUnit->toArray()) --}}
-                <ul class="list-group">
-                    @forelse($vmmfgUnit->first()->vmmfgScope->vmmfgTitles as $title)
+                <ul class="list-group" wire:key="unit-list-{{$vmmfgUnit->first()->id}}">
+                    @forelse($vmmfgUnit->first()->vmmfgScope->vmmfgTitles as $index => $title)
                         @php
                             $sumItem = 0;
                             $sumDoneTask = 0;
@@ -121,7 +122,7 @@
                                 }
                             }
                         @endphp
-                    <li class="list-group-item mt-2" style="background-color: #9bc2cf;">
+                    <li class="list-group-item mt-2" style="background-color: #9bc2cf;" wire:key="title-{{$index}}">
                         <div class="row">
                         <span class="mr-auto">
                             {{$title->sequence}}.  {{$title->name}}
@@ -139,7 +140,7 @@
                         </span>
                         </div>
                     </li>
-                        @foreach($title->vmmfgItems as $item)
+                        @foreach($title->vmmfgItems as $index => $item)
 
                             @php
                                 $showDone = false;
@@ -201,7 +202,7 @@
 
                             @endphp
                         {{-- @if((!$this->form['user_id'] or ($this->form['user_id'] and $task)) and ((!$this->form['date_from'] and !$this->form['date_to']) or ($this->form['date_from'] or $this->form['date_to']) and $task)) --}}
-                        <li class="list-group-item ml-2 clearfix" style="background-color: #e6f3f7;">
+                        <li class="list-group-item ml-2 clearfix" style="background-color: #e6f3f7;" wire:key="item-{{$index}}">
                             {{-- <div class="form-group"> --}}
                                 <div class="row">
                                     <span class="mr-auto">

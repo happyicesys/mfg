@@ -9,6 +9,7 @@ use App\Models\VmmfgJob;
 use App\Models\VmmfgScope;
 use App\Models\VmmfgTask;
 use App\Models\VmmfgUnit;
+use App\Traits\HasDateControl;
 use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -19,7 +20,7 @@ use Storage;
 
 class VmmfgOps extends Component
 {
-    use WithFileUploads;
+    use HasDateControl, WithFileUploads;
 
     protected $paginationTheme = 'bootstrap';
     public $itemPerPage = 100;
@@ -57,6 +58,7 @@ class VmmfgOps extends Component
             $this->form['job_id'] = $this->job_id;
         }
         $this->reset('unit_id');
+        $this->form['unit_id'] = '';
     }
 
     public function updatedUnitId($value)

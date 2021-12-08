@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\VmmfgJob;
 use App\Models\VmmfgTask;
 use App\Models\VmmfgUnit;
+use App\Traits\HasDateControl;
 use DB;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -15,7 +16,7 @@ use Excel;
 
 class VmmfgDailyreport extends Component
 {
-    use WithPagination;
+    use HasDateControl, WithPagination;
 
     protected $paginationTheme = 'bootstrap';
     public $itemPerPage = 100;

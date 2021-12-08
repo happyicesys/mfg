@@ -53,7 +53,7 @@
     </table>
 
     <div class="items">
-        <table width="100%" >
+        <table  style="width:100%;">
             <thead>
             <tr>
                 <th align="center">
@@ -122,13 +122,13 @@
                     <td align="left">
                         {{ $item->vmmfgItem->vmmfgTitle->sequence }}
                     </td>
-                    <td align="left" style="font-family: 'founder-type'; font-weight: bold;">
+                    <td align="left" style="font-family: 'founder-type'; font-weight: bold; max-width: 180px; word-wrap: break-word;">
                         {{ $item->vmmfgItem->vmmfgTitle->name }}
                     </td>
                     <td align="left">
                         {{ $item->vmmfgItem->sequence }}
                     </td>
-                    <td align="left" style="font-family: 'founder-type'; font-weight: bold;">
+                    <td align="left" style="font-family: 'founder-type'; font-weight: bold;  max-width: 180px; word-wrap: break-word;">
                         {{ $item->vmmfgItem->name }}
                     </td>
                     <td align="center">

@@ -77,6 +77,7 @@
                         <label>
                             Date From
                         </label>
+                        {{-- <x-input-date model="filters.date_from" placeholder="Date From"></x-input-date> --}}
                         <input wire:model="filters.date_from" type="date" class="form-control" placeholder="Date From">
                     </div>
                     <div class="form-group col-md-4 col-xs-12">
