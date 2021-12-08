@@ -28,6 +28,7 @@ class VmmfgOps extends Component
     public $selected = [];
     public $job_id = '';
     public $unit_id = '';
+    public $is_incomplete = false;
     public $job;
     // public $unit;
     public $form = [
@@ -37,6 +38,7 @@ class VmmfgOps extends Component
         'date_from' => '',
         'date_to' => '',
         'user_id' => '',
+        'is_incomplete' => '',
     ];
     public $editArea = '';
     public $file;
@@ -69,6 +71,13 @@ class VmmfgOps extends Component
         }
     }
 
+    public function updatedIsIncomplete($value)
+    {
+        if($value) {
+            $this->form['is_incomplete'] = $this->is_incomplete;
+        }
+    }
+
     public function rules()
     {
         return [
@@ -84,6 +93,7 @@ class VmmfgOps extends Component
         $unitId = $this->form['unit_id'];
         $dateFrom = $this->form['date_from'];
         $dateTo = $this->form['date_to'];
+        $isIncomplete = $this->form['is_incomplete'] ? true : false;
         $vmmfgUnit = '';
 
         if($unitId) {
@@ -93,13 +103,19 @@ class VmmfgOps extends Component
                             'vmmfgScope',
                             'vmmfgScope.vmmfgTitles',
                             'vmmfgScope.vmmfgTitles.vmmfgItems',
+                                // => function($query) use ,
                             'vmmfgScope.vmmfgTitles.vmmfgItems.attachments',
                             'vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks'
-                                => function($query) use ($unitId){
+                                => function($query) use ($unitId, $isIncomplete){
                                     $query->when($unitId, fn($query, $input) => $query->search('vmmfg_unit_id', $input));
                                 },
                             'vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks.attachments',
                         ])
+                        ->whereHas('vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks', function($query) use ($isIncomplete){
+                            // $query->when($isIncomplete, fn($query, $input) =>
+                            //         $query->search('is_done', '!=', 1)
+                            // );
+                        })
                         // ->whereHas('vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks', function($query) use ($userId, $dateFrom, $dateTo){
                         //     $query->when($userId, fn($query, $input) =>
                         //             $query->search('done_by', $input)
@@ -256,6 +272,25 @@ class VmmfgOps extends Component
             'checked_by' => null,
             'status' => VmmfgTask::STATUS_DONE,
         ]);
+        session()->flash('success', 'Your entry has been updated');
+    }
+
+    public function onCancelledClicked(VmmfgItem $item)
+    {
+        VmmfgTask::updateOrCreate([
+            'vmmfg_item_id' => $item->id,
+            'vmmfg_unit_id' => $this->form['unit_id'],
+        ], [
+            'status' => VmmfgTask::STATUS_CANCELLED,
+            'cancelled_time' => Carbon::now(),
+            'cancelled_by' => auth()->user()->id,
+        ]);
+        session()->flash('success', 'Your entry has been updated');
+    }
+
+    public function onUndoCancelledClicked(VmmfgTask $task)
+    {
+        $task->delete();
         session()->flash('success', 'Your entry has been updated');
     }
 

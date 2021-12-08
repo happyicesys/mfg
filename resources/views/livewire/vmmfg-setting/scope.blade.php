@@ -191,7 +191,7 @@
                         <th></th>
                     </tr>
                     @forelse($scopes as $index => $scope)
-                    <tr class="row_edit" wire:loading.class.delay="opacity-2" wire:key="row-{{$scope->id}}">
+                    <tr class="row_edit" wire:loading.class.delay="opacity-2" wire:key="row-{{$index}}">
                         {{-- <th class="text-center">
                             <input type="checkbox" wire:model="selected" value="{{$admin->id}}">
                         </th> --}}
@@ -280,8 +280,8 @@
                             </button>
                         </div>
                             <ul class="list-group">
-                                @foreach($this->scope->vmmfgTitles as $title)
-                                <li class="list-group-item mt-2" style="background-color: #9bc2cf;" wire:key="title-{{$title->id}}">
+                                @foreach($this->scope->vmmfgTitles as $titleIndex => $title)
+                                <li class="list-group-item mt-2" style="background-color: #9bc2cf;" wire:key="title-{{$titleIndex}}">
                                     <div class="form-group">
                                         <span class="float-left">
                                             {{$title->sequence}}.  {{$title->name}}
@@ -316,8 +316,8 @@
                                         </div>
                                     @endif --}}
                                 </li>
-                                    @foreach($title->vmmfgItems as $item)
-                                    <li class="list-group-item ml-2" style="background-color: #e6f3f7;" wire:key="item-{{$item->id}}">
+                                    @foreach($title->vmmfgItems as $itemIndex => $item)
+                                    <li class="list-group-item ml-2" style="background-color: #e6f3f7;" wire:key="item-{{$itemIndex}}">
                                         <div class="form-group">
                                             <span class="float-left">
                                                 {{$item->sequence}}.  {{$item->name}}
@@ -452,8 +452,8 @@
                         </div>
                         <div class="form-group">
                             @if($this->item->attachments)
-                                @foreach($this->item->attachments as $attachment)
-                                    <div class="card" style="max-width:600px;width:100%;" wire:key="attachment-{{$attachment->id}}">
+                                @foreach($this->item->attachments as $attachmentIndex => $attachment)
+                                <div class="card" style="max-width:600px;width:100%;" wire:key="attachment-{{$attachmentIndex}}">
                                         @php
                                             $ext = pathinfo($attachment->full_url, PATHINFO_EXTENSION);
                                         @endphp

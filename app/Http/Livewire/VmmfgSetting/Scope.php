@@ -227,6 +227,8 @@ class Scope extends Component
                 'vmmfg_title_id' => $this->title->id,
             ]);
         }
+        // $this->emit('updated');
+        session()->flash('success', 'Your entry has been updated');
         // $this->reset('item');
         // $this->item = $this->item->fresh();
         // $this->emit('updated');

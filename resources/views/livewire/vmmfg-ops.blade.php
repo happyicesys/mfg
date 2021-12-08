@@ -89,12 +89,23 @@
                                         @endforeach
                                     </x-input-select2> --}}
                                 </div>
+{{--
+                                @if($vmmfgUnit)
+                                <div class="form-group">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" wire:model="is_incomplete">
+                                        <label class="form-check-label" for="is_incomplete">
+                                            Show Incomplete
+                                        </label>
+                                    </div>
+                                </div>
+                                @endif --}}
                             @endif
 
                         {{-- </div> --}}
                         <div class="form-group">
                             {{-- <div class="btn-group"> --}}
-                                <button wire:click="resetFilters()" class="btn btn-outline-dark btn-block">Reset</button>
+                                <button wire:click.prevent="resetFilters()" class="btn btn-outline-dark btn-block">Reset</button>
                             {{-- </div> --}}
                         </div>
                     </div>
@@ -150,20 +161,22 @@
                                 $showCheckedBy = false;
                                 $adminClickable = false;
                                 $showUndoDoneBy = false;
+                                $showCancelledBy = false;
                                 $doneTime = '';
+                                $isShowIncompleteItem = $this->form['is_incomplete'] ? true : false;
+                                $hideCompleted = false;
 
                                 // dd($item->vmmfgTasks);
                                 $task = $item->vmmfgTasks ? $item->vmmfgTasks->first() : null;
                                 if($task) {
                                     $doneBy = $task->doneBy ? $task->doneBy->name : null;
                                     $doneTime = \Carbon\Carbon::parse($task->done_time)->format('Y-m-d h:ia');
-                                    // $doneTime = $task->done_time;
                                     $checkedBy = $task->checkedBy ? $task->checkedBy->name : null;
                                     $checkedTime = \Carbon\Carbon::parse($task->checked_time)->format('Y-m-d h:ia');
-                                    // $checkedTime = $task->checked_time;
                                     $undoDoneBy = $task->undoDoneBy ? $task->undoDoneBy->name : null;
                                     $undoDoneTime = \Carbon\Carbon::parse($task->undo_done_time)->format('Y-m-d h:ia');
-                                    // $undoDoneTime = $task->undo_done_time;
+                                    $cancelledBy = $task->cancelledBy ? $task->cancelledBy->name : null;
+                                    $cancelledTime = \Carbon\Carbon::parse($task->cancelled_time)->format('Y-m-d h:ia');
 
                                     $status = $task->status;
                                     switch($status) {
@@ -184,6 +197,9 @@
                                             $showDoneTimeDoneBy = true;
                                             $showUndoDoneBy = true;
                                             break;
+                                        case 98:
+                                            $showCancelledBy = true;
+                                            break;
                                     }
                                 }else {
                                     $showDone = true;
@@ -202,6 +218,7 @@
 
                             @endphp
                         {{-- @if((!$this->form['user_id'] or ($this->form['user_id'] and $task)) and ((!$this->form['date_from'] and !$this->form['date_to']) or ($this->form['date_from'] or $this->form['date_to']) and $task)) --}}
+                        {{-- @if((($this->form['is_incomplete'] and !$task) or ($this->form['is_incomplete'] and $task and !$task->is_done)) or !$this->form['is_incomplete']) --}}
                         <li class="list-group-item ml-2 clearfix" style="background-color: #e6f3f7;" wire:key="item-{{$index}}">
                             {{-- <div class="form-group"> --}}
                                 <div class="row">
@@ -221,7 +238,7 @@
                                                     @if($showDoneTimeDoneBy)
                                                         @if(!$showUndoDoneBy)
                                                             @if($adminClickable)
-                                                                <a href="#" class="badge badge-success" style="font-size: 13px;" onclick="return confirm('Are you sure you want to Undo the Task?') || event.stopImmediatePropagation()" wire:click="onUndoClicked({{$task}})">
+                                                                <a href="" class="badge badge-success" style="font-size: 13px;" onclick="return confirm('Are you sure you want to Undo the Task?') || event.stopImmediatePropagation()" wire:click.prevent="onUndoClicked({{$task}})">
                                                                     <i class="fas fa-check-circle"></i>
                                                                     Done
                                                                 </a>
@@ -239,7 +256,7 @@
                                                     @endif
                                                     @if($showCheckedBy)
                                                         @if($adminClickable)
-                                                            <a href="#" class="badge badge-primary" style="font-size: 13px;" wire:click="onUndoCheckedClicked({{$task}})">
+                                                            <a href="" class="badge badge-primary" style="font-size: 13px;" wire:click.prevent="onUndoCheckedClicked({{$task}})">
                                                                 <i class="fas fa-check-circle"></i>
                                                                 Checked
                                                             </a>
@@ -259,25 +276,40 @@
                                                         By: <span class="font-weight-bold">{{$undoDoneBy}}</span> <br>
                                                         On: <span class="font-weight-bold">{{$undoDoneTime}}</span> <br>
                                                     @endif
+                                                    @if($showCancelledBy)
+                                                        @if($adminClickable)
+                                                            <a href="" class="badge badge-danger" style="font-size: 13px;" wire:click.prevent="onUndoCancelledClicked({{$task}})">
+                                                                <i class="far fa-times-circle"></i>
+                                                                Cancelled
+                                                            </a>
+                                                        @else
+                                                            <span class="badge badge-danger" style="font-size: 13px;">
+                                                                <i class="far fa-times-circle"></i>
+                                                                Cancelled
+                                                            </span>
+                                                        @endif
+                                                        By: <span class="font-weight-bold">{{$cancelledBy}}</span> <br>
+                                                        On: <span class="font-weight-bold">{{$cancelledTime}}</span> <br>
+                                                    @endif
                                                 </span>
                                             @endif
-                                            <button class="btn btn-secondary float-right" wire:key="item-area-{{$item->id}}" wire:click="showEditArea({{$item->id}})">
+                                            <a href="#item-dropdown-{{$item->id}}" class="btn btn-secondary float-right" wire:key="item-area-{{$item->id}}" wire:click.prevent="showEditArea({{$item->id}})">
                                                 @if($this->editArea === $item->id)
                                                     <i class="fas fa-caret-right"></i>
                                                 @else
                                                     <i class="fas fa-caret-down"></i>
                                                 @endif
-                                            </button>
+                                            </a>
                                         @endif
                                     </span>
                                 </div>
                                 @if(!$item->attachments()->exists())
-                                <div class="row pt-1">
+                                <div class="row pt-1" >
                                     <span class="ml-auto" style="font-size: 13px;">
                                         @if($showDoneTimeDoneBy)
                                             @if(!$showUndoDoneBy)
                                                 @if($adminClickable)
-                                                    <a href="#" class="badge badge-success" style="font-size: 13px;" onclick="return confirm('Are you sure you want to Undo the Task?') || event.stopImmediatePropagation()" wire:click="onUndoClicked({{$task}})">
+                                                    <a href="" class="badge badge-success" style="font-size: 13px;" onclick="return confirm('Are you sure you want to Undo the Task?') || event.stopImmediatePropagation()" wire:click.prevent="onUndoClicked({{$task}})">
                                                         <i class="fas fa-check-circle"></i>
                                                         Done
                                                     </a>
@@ -295,7 +327,7 @@
                                         @endif
                                         @if($showCheckedBy)
                                             @if($adminClickable)
-                                                <a href="#" class="badge badge-primary" style="font-size: 13px;" wire:click="onUndoCheckedClicked({{$task}})">
+                                                <a href="" class="badge badge-primary" style="font-size: 13px;" wire:click.prevent="onUndoCheckedClicked({{$task}})">
                                                     <i class="fas fa-check-circle"></i>
                                                     Checked
                                                 </a>
@@ -315,22 +347,40 @@
                                             By: <span class="font-weight-bold">{{$undoDoneBy}}</span> <br>
                                             On: <span class="font-weight-bold">{{$undoDoneTime}}</span> <br>
                                         @endif
+                                        @if($showCancelledBy)
+                                            @if($adminClickable)
+                                                <a href="" class="badge badge-danger" style="font-size: 13px;" wire:click.prevent="onUndoCancelledClicked({{$task}})">
+                                                    <i class="far fa-times-circle"></i>
+                                                    Cancelled
+                                                </a>
+                                            @else
+                                                <span class="badge badge-danger" style="font-size: 13px;">
+                                                    <i class="far fa-times-circle"></i>
+                                                    Cancelled
+                                                </span>
+                                            @endif
+                                            By: <span class="font-weight-bold">{{$cancelledBy}}</span> <br>
+                                            On: <span class="font-weight-bold">{{$cancelledTime}}</span> <br>
+                                        @endif
                                     </span>
                                 </div>
                                 <div class="row">
                                     <div class="btn-group ml-auto">
                                         @if($showDone)
-                                            <button class="btn btn-outline-dark btn-xs-block float-right" wire:key="item-done-{{$item->id}}" wire:click="onDoneClicked({{$item}})">
+                                            <button class="btn btn-outline-dark btn-xs-block" wire:key="item-done-{{$item->id}}" wire:click.prevent="onDoneClicked({{$item}})">
                                                 Done?
+                                            </button>
+                                            <button class="btn btn-danger btn-sm btn-xs-block" wire:key="item-cancelled-{{$item->id}}" wire:click.prevent="onCancelledClicked({{$item}})">
+                                                <i class="fas fa-times"></i>
                                             </button>
                                         @endif
                                         @if($showUndo)
-                                            <button class="btn btn-warning btn-xs-block" onclick="return confirm('Are you sure you want to Undo the Task?') || event.stopImmediatePropagation()" wire:key="item-undo-{{$item->id}}" wire:click="onUndoClicked({{$task}})">
+                                            <button class="btn btn-warning btn-xs-block" onclick="return confirm('Are you sure you want to Undo the Task?') || event.stopImmediatePropagation()" wire:key="item-undo-{{$item->id}}" wire:click.prevent="onUndoClicked({{$task}})">
                                                 <i class="fas fa-undo-alt"></i>
                                             </button>
                                         @endif
                                         @if($showChecked)
-                                            <button class="btn btn-info btn-xs-block" wire:key="item-check-{{$item->id}}" wire:click="onCheckedClicked({{$task}})">
+                                            <button class="btn btn-info btn-xs-block" wire:key="item-check-{{$item->id}}" wire:click.prevent="onCheckedClicked({{$task}})">
                                                 <i class="fas fa-check-double"></i>
                                             </button>
                                         @endif
@@ -341,7 +391,7 @@
 
                             {{-- </div> --}}
                             @if($this->editArea === $item->id)
-                                <div class="form-group">
+                                <div class="form-group" id="item-dropdown-{{$item->id}}">
                                     @if($item->attachments)
                                         @foreach($item->attachments as $attachment)
                                             <div class="row">
@@ -351,7 +401,7 @@
                                             @if($ext === 'pdf')
                                                 <embed src="{{$attachment->full_url}}" type="application/pdf" class="" style="min-height: 500px;" class="border border-dark">
                                             @else
-                                                <img class="img-fluid border border-dark" src="{{$attachment->full_url}}" alt="" wire:click="onZoomPictureClicked({{$attachment}})"  data-toggle="modal" data-target="#zoom-picture-modal">
+                                                <img class="img-fluid border border-dark" src="{{$attachment->full_url}}" alt="" wire:click.prevent="onZoomPictureClicked({{$attachment}})"  data-toggle="modal" data-target="#zoom-picture-modal">
                                             @endif
                                             </div>
                                         @endforeach
@@ -367,7 +417,6 @@
                                                         <i class="fas fa-cloud-upload-alt"></i>
                                                     </button>
                                                 </form>
-                                                {{-- <x-input-file wire:model="file" multiple></x-input-file> --}}
                                             </div>
                                         </div>
                                         <div class="form-group">
@@ -388,15 +437,15 @@
                                                                     </video>
                                                                 </div>
                                                             @else
-                                                                <img class="card-img-top" src="{{$attachment->full_url}}" alt="" wire:click="onZoomPictureClicked({{$attachment}})"  data-toggle="modal" data-target="#zoom-picture-modal">
+                                                                <img class="card-img-top" src="{{$attachment->full_url}}" alt="" wire:click.prevent="onZoomPictureClicked({{$attachment}})"  data-toggle="modal" data-target="#zoom-picture-modal">
                                                             @endif
                                                             <div class="card-body">
                                                                 <div class="btn-group">
-                                                                    <button type="button" class="btn btn-warning btn-xs-block" wire:click="downloadAttachment({{$attachment}})">
+                                                                    <button type="button" class="btn btn-warning btn-xs-block" wire:click.prevent="downloadAttachment({{$attachment}})">
                                                                         <i class="fas fa-cloud-download-alt"></i>
                                                                     </button>
                                                                     @if(!$task->is_done)
-                                                                    <button type="button" class="btn btn-danger btn-xs-block" wire:click="deleteAttachment({{$attachment}})">
+                                                                    <button type="button" class="btn btn-danger btn-xs-block" wire:click.prevent="deleteAttachment({{$attachment}})">
                                                                         <i class="fas fa-trash"></i>
                                                                     </button>
                                                                     @endif
@@ -413,7 +462,7 @@
                                             @if($showDoneTimeDoneBy)
                                                 @if(!$showUndoDoneBy)
                                                     @if($adminClickable)
-                                                        <a href="#" class="badge badge-success" style="font-size: 13px;" onclick="return confirm('Are you sure you want to Undo the Task?') || event.stopImmediatePropagation()" wire:click="onUndoClicked({{$task}})">
+                                                        <a href="#" class="badge badge-success" style="font-size: 13px;" onclick="return confirm('Are you sure you want to Undo the Task?') || event.stopImmediatePropagation()" wire:click.prevent="onUndoClicked({{$task}})">
                                                             <i class="fas fa-check-circle"></i>
                                                             Done
                                                         </a>
@@ -431,7 +480,7 @@
                                             @endif
                                             @if($showCheckedBy)
                                                 @if($adminClickable)
-                                                    <a href="#" class="badge badge-primary" style="font-size: 13px;" wire:click="onUndoCheckedClicked({{$task}})">
+                                                    <a href="" class="badge badge-primary" style="font-size: 13px;" wire:click.prevent="onUndoCheckedClicked({{$task}})">
                                                         <i class="fas fa-check-circle"></i>
                                                         Checked
                                                     </a>
@@ -456,19 +505,37 @@
                                     <div class="row">
                                         <span class="btn-group ml-auto">
                                             @if($showDone)
-                                                <button class="btn btn-outline-dark btn-xs-block" wire:key="item-done-normal-{{$item->id}}" wire:click="onDoneClicked({{$item}})" {{$task && $task->attachments()->exists() ? '' : 'disabled'}}>
+                                                <button class="btn btn-outline-dark btn-xs-block" wire:key="item-done-normal-{{$item->id}}" wire:click.prevent="onDoneClicked({{$item}})" {{$task && $task->attachments()->exists() ? '' : 'disabled'}}>
                                                     Done?
+                                                </button>
+                                                <button class="btn btn-danger btn-sm btn-xs-block" wire:key="item-cancelled-{{$item->id}}" wire:click.prevent="onCancelledClicked({{$item}})">
+                                                    <i class="fas fa-times"></i>
                                                 </button>
                                             @endif
                                             @if($showUndo)
-                                                <button class="btn btn-warning btn-xs-block" onclick="return confirm('Are you sure you want to Undo the Task?') || event.stopImmediatePropagation()" wire:key="item-undo-{{$item->id}}" wire:click="onUndoClicked({{$task}})">
+                                                <button class="btn btn-warning btn-xs-block" onclick="return confirm('Are you sure you want to Undo the Task?') || event.stopImmediatePropagation()" wire:key="item-undo-{{$item->id}}" wire:click.prevent="onUndoClicked({{$task}})">
                                                     <i class="fas fa-undo-alt"></i>
                                                 </button>
                                             @endif
                                             @if($showChecked)
-                                                <button class="btn btn-info btn-xs-block" wire:key="item-check-normal-{{$item->id}}" wire:click="onCheckedClicked({{$task}})">
+                                                <button class="btn btn-info btn-xs-block" wire:key="item-check-normal-{{$item->id}}" wire:click.prevent="onCheckedClicked({{$task}})">
                                                     <i class="fas fa-check-double"></i>
                                                 </button>
+                                            @endif
+                                            @if($showCancelledBy)
+                                                @if($adminClickable)
+                                                    <a href="#" class="badge badge-danger" style="font-size: 13px;" wire:click.prevent="onUndoCancelledClicked({{$task}})">
+                                                        <i class="far fa-times-circle"></i>
+                                                        Cancelled
+                                                    </a>
+                                                @else
+                                                    <span class="badge badge-danger" style="font-size: 13px;">
+                                                        <i class="far fa-times-circle"></i>
+                                                        Cancelled
+                                                    </span>
+                                                @endif
+                                                By: <span class="font-weight-bold">{{$cancelledBy}}</span> <br>
+                                                On: <span class="font-weight-bold">{{$cancelledTime}}</span> <br>
                                             @endif
                                         </span>
                                     </div>

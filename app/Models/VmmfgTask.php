@@ -15,6 +15,7 @@ class VmmfgTask extends Model
     const STATUS_DONE = 1;
     const STATUS_CHECKED = 2;
     const STATUS_UNDONE = 99;
+    const STATUS_CANCELLED = 98;
 
 
     protected $fillable = [
@@ -29,6 +30,8 @@ class VmmfgTask extends Model
         'status',
         'undo_done_by',
         'undo_done_time',
+        'cancelled_by',
+        'cancelled_time',
     ];
 
     // protected $casts = [
@@ -66,6 +69,11 @@ class VmmfgTask extends Model
     public function undoDoneBy()
     {
         return $this->belongsTo(User::class, 'undo_done_by');
+    }
+
+    public function cancelledBy()
+    {
+        return $this->belongsTo(User::class, 'cancelled_by');
     }
 
     // getter
