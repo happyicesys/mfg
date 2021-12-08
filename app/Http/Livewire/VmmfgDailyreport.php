@@ -145,6 +145,19 @@ class VmmfgDailyreport extends Component
         return $query;
     }
 
+    public function onPrevNextDateClicked($direction, $model)
+    {
+        $date = Carbon::now();
+        if($model) {
+            $date = Carbon::parse($this->filters[$model]);
+        }
+        if($direction > 0) {
+            $this->filters[$model] = $date->addDay()->toDateString();
+        }else {
+            $this->filters[$model] = $date->subDay()->toDateString();
+        }
+    }
+
     private function queryFilter($query, $filters)
     {
         $tasks = $query;

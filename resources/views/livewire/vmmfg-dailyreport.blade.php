@@ -77,14 +77,36 @@
                         <label>
                             Date From
                         </label>
+                        <div class="input-group">
+                            <input type="date" class="form-control" wire:model.defer="filters.date_from">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateClicked(-1, 'date_from')">
+                                    <i class="fas fa-caret-left"></i>
+                                </button>
+                                <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateClicked(1, 'date_from')">
+                                    <i class="fas fa-caret-right"></i>
+                                </button>
+                            </div>
+                        </div>
+
                         {{-- <x-input-date model="filters.date_from" placeholder="Date From"></x-input-date> --}}
-                        <input wire:model="filters.date_from" type="date" class="form-control" placeholder="Date From">
+                        {{-- <input wire:model="filters.date_from" type="date" class="form-control" placeholder="Date From"> --}}
                     </div>
                     <div class="form-group col-md-4 col-xs-12">
                         <label>
                             Date To
                         </label>
-                        <input wire:model="filters.date_to" type="date" class="form-control" placeholder="Date To">
+                        <div class="input-group">
+                            <input type="date" class="form-control" wire:model.defer="filters.date_to">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateClicked(-1, 'date_to')">
+                                    <i class="fas fa-caret-left"></i>
+                                </button>
+                                <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateClicked(1, 'date_to')">
+                                    <i class="fas fa-caret-right"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="form-row d-flex btn-xs-block ml-auto">

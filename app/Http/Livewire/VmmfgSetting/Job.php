@@ -5,6 +5,7 @@ namespace App\Http\Livewire\VmmfgSetting;
 use App\Models\VmmfgJob;
 use App\Models\VmmfgScope;
 use App\Models\VmmfgUnit;
+use Carbon\Carbon;
 use DB;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -146,5 +147,18 @@ class Job extends Component
     public function updatedFilters()
     {
         $this->resetPage();
+    }
+
+    public function onPrevNextDateClicked($direction, $model)
+    {
+        $date = Carbon::now();
+        if($model) {
+            $date = Carbon::parse($this->filters[$model]);
+        }
+        if($direction > 0) {
+            $this->filters[$model] = $date->addDay()->toDateString();
+        }else {
+            $this->filters[$model] = $date->subDay()->toDateString();
+        }
     }
 }
