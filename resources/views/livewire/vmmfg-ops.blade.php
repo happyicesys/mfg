@@ -1,4 +1,5 @@
 <div>
+    @inject('vmmfgTask', 'App\Models\VmmfgTask')
     <div>
         <div>
             <x-flash></x-flash>
@@ -125,7 +126,11 @@
                                 foreach($title->vmmfgItems as $item) {
                                     if($item->vmmfgTasks) {
                                         foreach($item->vmmfgTasks as $task) {
-                                            if($task->status === 1 or $task->status === 2) {
+                                            if(
+                                                $task->status === $vmmfgTask::STATUS_DONE
+                                                or $task->status === $vmmfgTask::STATUS_CHECKED
+                                                or $task->status === $vmmfgTask::STATUS_CANCELLED
+                                            ) {
                                                 $sumDoneTask += 1;
                                             }
                                         }
@@ -163,8 +168,7 @@
                                 $showUndoDoneBy = false;
                                 $showCancelledBy = false;
                                 $doneTime = '';
-                                $isShowIncompleteItem = $this->form['is_incomplete'] ? true : false;
-                                $hideCompleted = false;
+                                // $isShowIncomplete = $this->
 
                                 // dd($item->vmmfgTasks);
                                 $task = $item->vmmfgTasks ? $item->vmmfgTasks->first() : null;
@@ -180,24 +184,24 @@
 
                                     $status = $task->status;
                                     switch($status) {
-                                        case 0:
+                                        case $vmmfgTask::STATUS_NEW:
                                             $showDone = true;
                                             break;
-                                        case 1:
+                                        case $vmmfgTask::STATUS_DONE:
                                             $showUndo = true;
                                             $showChecked = true;
                                             $showDoneTimeDoneBy = true;
                                             break;
-                                        case 2:
+                                        case $vmmfgTask::STATUS_CHECKED:
                                             $showDoneTimeDoneBy = true;
                                             $showCheckedBy = true;
                                             break;
-                                        case 99:
+                                        case $vmmfgTask::STATUS_UNDONE:
                                             $showDone = true;
                                             $showDoneTimeDoneBy = true;
                                             $showUndoDoneBy = true;
                                             break;
-                                        case 98:
+                                        case $vmmfgTask::STATUS_CANCELLED:
                                             $showCancelledBy = true;
                                             break;
                                     }
@@ -230,6 +234,7 @@
                                                 <p>{{$item->remarks}}</p>
                                             </div>
                                         @endif
+                                        {{$task ? $task->status : ''}}
                                     </span>
                                     <span class="ml-auto">
                                         @if($item->attachments()->exists())
@@ -293,13 +298,21 @@
                                                     @endif
                                                 </span>
                                             @endif
-                                            <a href="#item-dropdown-{{$item->id}}" class="btn btn-secondary float-right" wire:key="item-area-{{$item->id}}" wire:click.prevent="showEditArea({{$item->id}})">
-                                                @if($this->editArea === $item->id)
-                                                    <i class="fas fa-caret-right"></i>
-                                                @else
-                                                    <i class="fas fa-caret-down"></i>
+                                            <div class="btn-group float-right">
+                                                @if($showChecked and $editArea !== $item->id)
+                                                    <button class="btn btn-info btn-xs-block" wire:key="item-check-{{$item->id}}" wire:click.prevent="onCheckedClicked({{$task}})">
+                                                        <i class="fas fa-check-double"></i>
+                                                    </button>
                                                 @endif
-                                            </a>
+                                                <a href="#item-dropdown-{{$item->id}}" class="btn btn-secondary" wire:key="item-area-{{$item->id}}" wire:click.prevent="showEditArea({{$item->id}})">
+                                                    @if($this->editArea === $item->id)
+                                                        <i class="fas fa-caret-right"></i>
+                                                    @else
+                                                        <i class="fas fa-caret-down"></i>
+                                                    @endif
+                                                </a>
+                                            </div>
+
                                         @endif
                                     </span>
                                 </div>
