@@ -224,16 +224,16 @@
                             {{ $task->vmmfgUnit->vmmfgJob->model }}
                         </td>
                         <td class="text-left" style="min-width: 100px;">
-                            {{ $task->vmmfgItem->vmmfgTitle->sequence }}
+                            {{ $task->vmmfgItem && $task->vmmfgItem->vmmfgTitle ? $task->vmmfgItem->vmmfgTitle->sequence : '' }}
                         </td>
                         <td class="text-left" style="min-width: 200px;">
-                            {{ $task->vmmfgItem->vmmfgTitle->name }}
+                            {{ $task->vmmfgItem && $task->vmmfgItem->vmmfgTitle ? $task->vmmfgItem->vmmfgTitle->name : ''}}
                         </td>
                         <td class="text-left" style="min-width: 120px;">
-                            {{ $task->vmmfgItem->sequence }}
+                            {{ $task->vmmfgItem ? $task->vmmfgItem->sequence : '' }}
                         </td>
                         <td class="text-left" style="min-width: 200px;">
-                            {{ $task->vmmfgItem->name }}
+                            {{ $task->vmmfgItem ? $task->vmmfgItem->name : '' }}
                         </td>
                         <td class="text-center">
                             {{ $task->doneBy ? $task->doneBy->name : null }}
