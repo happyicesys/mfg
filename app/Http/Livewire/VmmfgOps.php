@@ -40,10 +40,14 @@ class VmmfgOps extends Component
         'user_id' => '',
         'is_incomplete' => '',
     ];
-    public $editArea = '';
+    public $editArea = [0];
     public $file;
     public $zoomPictureUrl = '';
     public $users;
+
+    protected $listeners = [
+        'refresh' => '$refresh',
+    ];
 
     public function mount()
     {
@@ -61,6 +65,7 @@ class VmmfgOps extends Component
         }
         $this->reset('unit_id');
         $this->form['unit_id'] = '';
+        $this->reset('editArea');
     }
 
     public function updatedUnitId($value)
@@ -68,6 +73,7 @@ class VmmfgOps extends Component
         if($value) {
             // $this->unit = VmmfgUnit::find($value);
             $this->form['unit_id'] = $this->unit_id;
+            $this->reset('editArea');
         }
     }
 
@@ -173,11 +179,20 @@ class VmmfgOps extends Component
 
     public function showEditArea($itemId)
     {
-        if($this->editArea === $itemId) {
-            $this->editArea = '';
+
+        if(array_search($itemId, $this->editArea)) {
+            foreach(array_keys($this->editArea, $itemId, true) as $key) {
+                unset($this->editArea[$key]);
+            }
         }else {
-            $this->editArea = $itemId;
+            array_push($this->editArea, $itemId);
         }
+        $this->emit('refresh');
+        // if($this->editArea === $itemId) {
+        //     $this->editArea = '';
+        // }else {
+            // $this->editArea = $itemId;
+        // }
     }
 
     public function onDoneClicked(VmmfgItem $item)

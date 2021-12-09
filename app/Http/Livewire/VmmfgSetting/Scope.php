@@ -37,6 +37,10 @@ class Scope extends Component
     public VmmfgItem $item;
     public $file;
 
+    protected $listeners = [
+        'refresh' => '$refresh',
+    ];
+
     public function rules()
     {
         return [
@@ -228,6 +232,7 @@ class Scope extends Component
             ]);
         }
         // $this->emit('updated');
+        $this->emit('refresh');
         session()->flash('success', 'Your entry has been updated');
         // $this->reset('item');
         // $this->item = $this->item->fresh();
@@ -263,6 +268,7 @@ class Scope extends Component
             'url' => $url,
             'full_url' => $fullUrl,
         ]);
+        $this->emit('refresh');
     }
 
     public function deleteAttachment(Attachment $attachment)

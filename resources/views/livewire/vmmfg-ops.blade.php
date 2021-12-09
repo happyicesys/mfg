@@ -234,11 +234,11 @@
                                                 <p>{{$item->remarks}}</p>
                                             </div>
                                         @endif
-                                        {{-- {{$task ? $task->status : ''}} --}}
                                     </span>
                                     <span class="ml-auto">
                                         @if($item->attachments()->exists())
-                                            @if($this->editArea !== $item->id)
+                                            {{-- @if($this->editArea !== $item->id) --}}
+                                            @if(!array_search($item->id, $editArea, true))
                                                 <span class="" style="font-size: 13px;">
                                                     @if($showDoneTimeDoneBy)
                                                         @if(!$showUndoDoneBy)
@@ -299,13 +299,14 @@
                                                 </span>
                                             @endif
                                             <div class="btn-group float-right">
-                                                @if($showChecked and $editArea !== $item->id)
+                                                @if($showChecked)
                                                     <button class="btn btn-info btn-xs-block" wire:key="item-check-{{$item->id}}" wire:click.prevent="onCheckedClicked({{$task}})">
                                                         <i class="fas fa-check-double"></i>
                                                     </button>
                                                 @endif
                                                 <a href="#item-dropdown-{{$item->id}}" class="btn btn-secondary" wire:key="item-area-{{$item->id}}" wire:click.prevent="showEditArea({{$item->id}})">
-                                                    @if($this->editArea === $item->id)
+                                                    {{-- @if($this->editArea === $item->id) --}}
+                                                    @if(array_search($item->id, $editArea))
                                                         <i class="fas fa-caret-right"></i>
                                                     @else
                                                         <i class="fas fa-caret-down"></i>
@@ -403,7 +404,8 @@
                                 @endif
 
                             {{-- </div> --}}
-                            @if($this->editArea === $item->id)
+                            {{-- @if($this->editArea === $item->id) --}}
+                            @if(array_search($item->id, $editArea, true))
                                 <div class="form-group" id="item-dropdown-{{$item->id}}">
                                     @if($item->attachments)
                                         @foreach($item->attachments as $attachment)
@@ -513,6 +515,21 @@
                                                 By: <span class="font-weight-bold">{{$undoDoneBy}}</span> <br>
                                                 On: <span class="font-weight-bold">{{$undoDoneTime}}</span> <br>
                                             @endif
+                                           @if($showCancelledBy)
+                                                @if($adminClickable)
+                                                    <a href="#" class="badge badge-danger" style="font-size: 13px;" wire:click.prevent="onUndoCancelledClicked({{$task}})">
+                                                        <i class="far fa-times-circle"></i>
+                                                        Cancelled
+                                                    </a>
+                                                @else
+                                                    <span class="badge badge-danger" style="font-size: 13px;">
+                                                        <i class="far fa-times-circle"></i>
+                                                        Cancelled
+                                                    </span>
+                                                @endif
+                                                By: <span class="font-weight-bold">{{$cancelledBy}}</span> <br>
+                                                On: <span class="font-weight-bold">{{$cancelledTime}}</span> <br>
+                                            @endif
                                         </span>
                                     </div>
                                     <div class="row">
@@ -535,21 +552,7 @@
                                                     <i class="fas fa-check-double"></i>
                                                 </button>
                                             @endif
-                                            @if($showCancelledBy)
-                                                @if($adminClickable)
-                                                    <a href="#" class="badge badge-danger" style="font-size: 13px;" wire:click.prevent="onUndoCancelledClicked({{$task}})">
-                                                        <i class="far fa-times-circle"></i>
-                                                        Cancelled
-                                                    </a>
-                                                @else
-                                                    <span class="badge badge-danger" style="font-size: 13px;">
-                                                        <i class="far fa-times-circle"></i>
-                                                        Cancelled
-                                                    </span>
-                                                @endif
-                                                By: <span class="font-weight-bold">{{$cancelledBy}}</span> <br>
-                                                On: <span class="font-weight-bold">{{$cancelledTime}}</span> <br>
-                                            @endif
+
                                         </span>
                                     </div>
 
