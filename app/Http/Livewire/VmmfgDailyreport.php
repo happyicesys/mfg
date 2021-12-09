@@ -58,6 +58,8 @@ class VmmfgDailyreport extends Component
 
         if($sortKey = $this->sortKey) {
             $tasks = $tasks->orderBy($sortKey, $this->sortAscending ? 'asc' : 'desc');
+        }else {
+            $tasks = $tasks->orderBy('batch_no')->orderBy('unit_no')->orderBy('done_time');
         }
 
         $tasks = $tasks->paginate($this->itemPerPage);

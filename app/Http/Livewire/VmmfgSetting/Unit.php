@@ -13,7 +13,7 @@ class Unit extends Component
 
     protected $paginationTheme = 'bootstrap';
     public $itemPerPage = 100;
-    public $sortKey = 'unit_no';
+    public $sortKey = '';
     public $sortAscending = true;
     public $showEditModal = false;
     public $showFilters = false;
@@ -52,6 +52,8 @@ class Unit extends Component
 
         if($sortKey = $this->sortKey) {
             $units = $units->orderBy($sortKey, $this->sortAscending ? 'asc' : 'desc');
+        }else {
+            $units = $units->orderBy('batch_no');
         }
 
         $units = $units->paginate($this->itemPerPage);
