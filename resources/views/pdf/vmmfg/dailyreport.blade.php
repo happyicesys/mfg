@@ -122,13 +122,13 @@
                     <td align="left">
                         {{ $item->vmmfgItem && $item->vmmfgItem->vmmfgTitle ? $item->vmmfgItem->vmmfgTitle->sequence : '' }}
                     </td>
-                    <td align="left" style="font-family: 'founder-type'; font-weight: bold; max-width: 180px; word-wrap: break-word;">
+                    <td align="left" style="font-family: 'founder-type'; font-weight: bold; max-width: 150px; word-wrap: break-word;">
                         {{ $item->vmmfgItem && $item->vmmfgItem->vmmfgTitle ? $item->vmmfgItem->vmmfgTitle->name : ''}}
                     </td>
                     <td align="left">
                         {{ $item->vmmfgItem ? $item->vmmfgItem->sequence : '' }}
                     </td>
-                    <td align="left" style="font-family: 'founder-type'; font-weight: bold;  max-width: 180px; word-wrap: break-word;">
+                    <td align="left" style="font-family: 'founder-type'; font-weight: bold;  max-width: 150px; word-wrap: break-word;">
                         {{ $item->vmmfgItem ? $item->vmmfgItem->name : '' }}
                     </td>
                     <td align="center">
