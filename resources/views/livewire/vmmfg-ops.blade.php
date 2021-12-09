@@ -234,7 +234,7 @@
                                                 <p>{{$item->remarks}}</p>
                                             </div>
                                         @endif
-                                        {{$task ? $task->status : ''}}
+                                        {{-- {{$task ? $task->status : ''}} --}}
                                     </span>
                                     <span class="ml-auto">
                                         @if($item->attachments()->exists())
