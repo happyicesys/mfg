@@ -120,16 +120,16 @@
                         {{ $item->vmmfgUnit->vmmfgJob->model }}
                     </td>
                     <td align="left">
-                        {{ $item->vmmfgItem->vmmfgTitle->sequence }}
+                        {{ $item->vmmfgItem && $item->vmmfgItem->vmmfgTitle ? $item->vmmfgItem->vmmfgTitle->sequence : '' }}
                     </td>
                     <td align="left" style="font-family: 'founder-type'; font-weight: bold; max-width: 180px; word-wrap: break-word;">
-                        {{ $item->vmmfgItem->vmmfgTitle->name }}
+                        {{ $item->vmmfgItem && $item->vmmfgItem->vmmfgTitle ? $item->vmmfgItem->vmmfgTitle->name : ''}}
                     </td>
                     <td align="left">
-                        {{ $item->vmmfgItem->sequence }}
+                        {{ $item->vmmfgItem ? $item->vmmfgItem->sequence : '' }}
                     </td>
                     <td align="left" style="font-family: 'founder-type'; font-weight: bold;  max-width: 180px; word-wrap: break-word;">
-                        {{ $item->vmmfgItem->name }}
+                        {{ $item->vmmfgItem ? $item->vmmfgItem->name : '' }}
                     </td>
                     <td align="center">
                         {{ $item->doneBy ? $item->doneBy->name : null }}
