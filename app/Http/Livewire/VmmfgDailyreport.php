@@ -45,7 +45,7 @@ class VmmfgDailyreport extends Component
                         })->orderBy('name', 'asc')->get();
         $this->filters['date_from'] = Carbon::today()->toDateString();
         $this->filters['date_to'] = Carbon::today()->toDateString();
-        $this->filters['user_id'] = auth()->user()->hasRole('staff') ? auth()->user()->id : '';
+        $this->filters['user_id'] =  auth()->user()->id;
         $this->filters['is_done'] = 1;
     }
 
