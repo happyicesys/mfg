@@ -58,11 +58,13 @@
                                 <select name="batch_no" wire:model="job_id" class="select form-control">
                                     <option value="">Select...</option>
                                     @foreach($jobs as $job)
-                                        <option value="{{$job->id}}">
-                                            #{{$job->batch_no}} - {{$job->model}}
-                                            @if($job->vmmfgUnits) ({{count($job->vmmfgUnits)}} units) @endif
-                                            @if($job->order_date) (Start: {{$job->order_date}}) @endif
-                                        </option>
+                                        @if(!$job->completion_date)
+                                            <option value="{{$job->id}}">
+                                                #{{$job->batch_no}} - {{$job->model}}
+                                                @if($job->vmmfgUnits) ({{count($job->vmmfgUnits)}} units) @endif
+                                                @if($job->order_date) (Start: {{$job->order_date}}) @endif
+                                            </option>
+                                        @endif
                                     @endforeach
                                 </select>
                             </div>
