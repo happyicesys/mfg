@@ -2,18 +2,51 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">{{ __('Dashboard') }}</div>
+                <div class="card-header">
+                    For Year {{$year}}
+                </div>
 
                 <div class="card-body">
-                    @if (session('status'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('status') }}
-                        </div>
-                    @endif
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="text-center">
+                                        Month
+                                    </th>
+                                    <th scope="col" class="text-center">
+                                        Start (# Units)
+                                    </th>
+                                    <th scope="col" class="text-center">
+                                        Completed (# Units)
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($dataArr as $data)
+                                    <tr>
+                                        <td scope="row" align="center">
+                                            {{$data['name']}}
+                                        </td>
+                                        <td class="text-center">
+                                            {{$data['order']}}
+                                        </td>
+                                        <td class="text-center">
+                                            {{$data['completion']}}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
 
-                    {{ __('You are logged in!') }}
+                        </table>
+                    </div>
+
+
                 </div>
             </div>
         </div>
     </div>
+    {{-- <div style="height: 32rem;">
+        <livewire:livewire-line-chart :line-chart-model="$multiLineChartModel"/>
+    </div> --}}
 </div>

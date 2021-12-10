@@ -415,6 +415,13 @@
                                             @endphp
                                             @if($ext === 'pdf')
                                                 <embed src="{{$attachment->full_url}}" type="application/pdf" class="" style="min-height: 500px;" class="border border-dark">
+                                            @elseif($ext === 'mov' or $ext === 'mp4')
+                                                <div class="embed-responsive embed-responsive-16by9">
+                                                    <video class=" embed-responsive-item video-js" controls>
+                                                        <source src="{{$attachment->full_url}}">
+                                                        Your browser does not support the video tag.
+                                                    </video>
+                                                </div>
                                             @else
                                                 <img class="img-fluid border border-dark" src="{{$attachment->full_url}}" alt="" wire:click.prevent="onZoomPictureClicked({{$attachment}})"  data-toggle="modal" data-target="#zoom-picture-modal">
                                             @endif

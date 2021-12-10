@@ -92,6 +92,7 @@
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>
     @livewireScripts
+    @livewireChartsScripts
     @stack('scripts')
 </body>
 </html>

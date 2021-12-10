@@ -59,7 +59,7 @@ class VmmfgDailyreport extends Component
         if($sortKey = $this->sortKey) {
             $tasks = $tasks->orderBy($sortKey, $this->sortAscending ? 'asc' : 'desc');
         }else {
-            $tasks = $tasks->orderBy('batch_no')->orderBy('unit_no')->orderBy('done_time');
+            $tasks = $tasks->orderBy('batch_no')->orderBy('unit_no')->orderBy('vmmfg_items.sequence');
         }
 
         $tasks = $tasks->paginate($this->itemPerPage);
@@ -103,7 +103,7 @@ class VmmfgDailyreport extends Component
 
         return response()->streamDownload(
             fn () => print($pdf),
-            Carbon::now()->format('ymdHis')."_dailyreport.pdf"
+            "dailyreport_".Carbon::now()->format('ymdHis').".pdf"
        );
     }
 
