@@ -45,12 +45,23 @@ class VmmfgDailyreport extends Component
                         })->orderBy('name', 'asc')->get();
         $this->filters['date_from'] = Carbon::today()->toDateString();
         $this->filters['date_to'] = Carbon::today()->toDateString();
-        $this->filters['user_id'] =  auth()->user()->id;
         $this->filters['is_done'] = 1;
+
+        $isAccessAll = false;
+        $accessAllUsers = [
+            'brian', 'daniel', 'kent', 'zhengzhong', 'stephen'
+        ];
+        foreach($accessAllUsers as $accessAllUser) {
+            if($accessAllUser === auth()->user()->name) {
+                $isAccessAll = true;
+            }
+        }
+        $this->filters['user_id'] =  $isAccessAll ? '' : auth()->user()->id;
     }
 
     public function render()
     {
+        // dd(auth()->user()->whereIn('name', ['brian', 'daniel', 'kent', 'zhengzhong', 'stephen'])->get()->toArray());
 
         $tasks = $this->mainQuery();
 
@@ -185,18 +196,21 @@ class VmmfgDailyreport extends Component
         }
         if($userId = $filters['user_id']) {
             $tasks = $tasks->where(function($query) use ($userId) {
-                $query->search('done_by', $userId)->orSearch('checked_by', $userId)->orSearch('undo_done_by', $userId);
+                // $query->search('done_by', $userId)->orSearch('checked_by', $userId)->orSearch('undo_done_by', $userId);
+                $query->search('done_by', $userId);
             });
         }
         // dd($filters['date_from'], $filters['date_to']);
         if($dateFrom = $filters['date_from']) {
             $tasks = $tasks->where(function($query) use ($dateFrom) {
-                $query->searchFromDate('done_time', $dateFrom)->orSearchFromDate('checked_time', $dateFrom)->orSearchFromDate('undo_done_time', $dateFrom);
+                // $query->searchFromDate('done_time', $dateFrom)->orSearchFromDate('checked_time', $dateFrom)->orSearchFromDate('undo_done_time', $dateFrom);
+                $query->searchFromDate('done_time', $dateFrom);
             });
         }
         if($dateTo = $filters['date_to']) {
             $tasks = $tasks->where(function($query) use ($dateTo) {
-                $query->searchToDate('done_time', $dateTo)->orSearchToDate('checked_time', $dateTo)->orSearchToDate('undo_done_time', $dateTo);
+                // $query->searchToDate('done_time', $dateTo)->orSearchToDate('checked_time', $dateTo)->orSearchToDate('undo_done_time', $dateTo);
+                $query->searchToDate('done_time', $dateTo);
             });
         }
 
