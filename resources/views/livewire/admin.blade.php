@@ -274,7 +274,7 @@
                             Role
                         </label>
                         <select name="role_id" wire:model.defer="role_id" class="select form-control">
-                            <option value="">Select...</option>
+                            <option value="">Select..</option>
                             @foreach($roles as $role)
                                 <option value="{{$role->id}}">
                                     {{$role->name}}

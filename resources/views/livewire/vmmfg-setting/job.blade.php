@@ -394,7 +394,7 @@
                                             Which Scope?
                                         </label>
                                         <select name="vmmfg_scope_id" wire:model="unitForm.vmmfg_scope_id" class="select form-control">
-                                            <option value="">Select...</option>
+                                            <option value="">Select..</option>
                                             @foreach($this->scopes as $scope)
                                                 <option value="{{$scope->id}}">
                                                     {{$scope->name}} @if($scope->remarks)({{$scope->remarks}})@endif

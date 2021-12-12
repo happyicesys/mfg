@@ -56,7 +56,7 @@
                                     @endforeach
                                 </x-input-select2> --}}
                                 <select name="batch_no" wire:model="job_id" class="select form-control">
-                                    <option value="">Select...</option>
+                                    <option value="">Select..</option>
                                     @foreach($jobs as $job)
                                         @if(!$job->completion_date)
                                             <option value="{{$job->id}}">
@@ -76,7 +76,7 @@
                                         Unit No
                                     </label>
                                     <select name="unit_no" wire:model="unit_id" class="select form-control">
-                                        <option value="">Select...</option>
+                                        <option value="">Select..</option>
                                         @foreach($this->job->vmmfgUnits as $unit)
                                             <option value="{{$unit->id}}">
                                                 #{{$unit->unit_no}}

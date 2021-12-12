@@ -18,7 +18,7 @@
                             Batch No
                         </label>
                         <select name="job_id" wire:model="filters.job_id" class="select form-control">
-                            <option value="">Select...</option>
+                            <option value="">All</option>
                             @foreach($jobs as $job)
                                 <option value="{{$job->id}}">
                                     #{{$job->batch_no}} - {{$job->model}}
@@ -32,7 +32,7 @@
                             Unit No
                         </label>
                         <select name="unit_no" wire:model="filters.unit_id" class="select form-control">
-                            <option value="">Select...</option>
+                            <option value="">All</option>
                             @foreach($units as $unit)
                                 <option value="{{$unit->id}}">
                                     #{{$unit->unit_no}}
@@ -45,7 +45,7 @@
                             Is Done?
                         </label>
                         <select name="is_done" wire:model="filters.is_done" class="select form-control">
-                            <option value="">Select...</option>
+                            <option value="">All</option>
                             <option value="1">Yes</option>
                             <option value="0">No</option>
                         </select>
@@ -56,7 +56,7 @@
                             Is Checked?
                         </label>
                         <select name="is_checked" wire:model="filters.is_checked" class="select form-control">
-                            <option value="">Select...</option>
+                            <option value="">All</option>
                             <option value="1">Yes</option>
                             <option value="0">No</option>
                         </select>
@@ -67,7 +67,7 @@
                             User
                         </label>
                         <select name="user_id" wire:model="filters.user_id" class="select form-control">
-                            <option value="">Select...</option>
+                            <option value="">All</option>
                             @foreach($users as $user)
                                 <option value="{{$user->id}}">
                                     {{$user->name}} ({{$user->roles[0]->name}})
