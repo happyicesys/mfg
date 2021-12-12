@@ -50,6 +50,7 @@
                             <option value="0">No</option>
                         </select>
                     </div>
+                    @hasanyrole('superadmin|admin')
                     <div class="form-group col-md-4 col-xs-12">
                         <label>
                             Is Checked?
@@ -60,6 +61,7 @@
                             <option value="0">No</option>
                         </select>
                     </div>
+                    @endhasanyrole
                     <div class="form-group col-md-4 col-xs-12">
                         <label>
                             User

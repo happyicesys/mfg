@@ -84,6 +84,9 @@
         <li class="{{ $name == 'vmmfg-ops' ? 'active' : '' }}">
           <a href="{{ route('vmmfg-ops') }}"><i class="fas fa-wrench"></i>QA/QC</a>
         </li>
+        <li class="{{ $name == 'vmmfg-ops-progress' ? 'active' : '' }}">
+          <a href="{{ route('vmmfg-ops-progress') }}"><i class="fas fa-tasks"></i>Progress</a>
+        </li>
         <li class="{{ $name == 'vmmfg-ops-dailyreport' ? 'active' : '' }}">
           <a href="{{ route('vmmfg-ops-dailyreport') }}"><i class="far fa-list-alt"></i>Daily Report</a>
         </li>

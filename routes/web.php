@@ -10,6 +10,7 @@ use App\Http\Livewire\SelfSetting;
 use App\Http\Livewire\Setting;
 use App\Http\Livewire\VmmfgDailyreport;
 use App\Http\Livewire\VmmfgOps;
+use App\Http\Livewire\VmmfgProgress;
 use App\Http\Livewire\VmmfgSetting\Job as VmmfgSettingJob;
 use App\Http\Livewire\VmmfgSetting\Unit as VmmfgSettingUnit;
 use App\Http\Livewire\VmmfgSetting\Scope as VmmfgSettingScope;
@@ -41,6 +42,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::group(['middleware' => ['permission:vmmfg-ops-access']], function() {
         Route::get('/vmmfg-ops-dailyreport', VmmfgDailyreport::class)->name('vmmfg-ops-dailyreport');
+        Route::get('/vmmfg-ops-progress', VmmfgProgress::class)->name('vmmfg-ops-progress');
         Route::get('/vmmfg-ops', VmmfgOps::class)->name('vmmfg-ops');
     });
 

@@ -250,6 +250,7 @@ class Scope extends Component
                 }
             }
         }
+        $this->item->vmmfgTasks()->delete();
         $this->item->delete();
         $this->emit('updated');
         session()->flash('success', 'Entry has been removed');
