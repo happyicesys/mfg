@@ -137,7 +137,7 @@
                             </td>
                             {{-- @dd($unit->toArray()) --}}
                             <td class="text-center text-dark">
-                                {{ $taskCount }}/{{ $itemCount }}
+                                {{ $taskCount }} / {{ $itemCount }}
                             </td>
                             <td class="text-center text-dark {{$color}}">
                                 {{ $progressPercent }}
