@@ -14,12 +14,18 @@ class VmmfgTitle extends Model
         'sequence',
         'name',
         'vmmfg_scope_id',
+        'vmmfg_title_category_id',
     ];
 
     //relationships
     public function vmmfgItems()
     {
         return $this->hasMany(VmmfgItem::class)->orderBy('sequence', 'asc')->orderBy('created_at', 'desc');
+    }
+
+    public function vmmfgTitleCategory()
+    {
+        return $this->belongsTo(VmmfgTitleCategory::class)->orderBy('name', 'asc');
     }
 
     // // getter

@@ -90,31 +90,20 @@
                         <x-th-data model="order_date" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Start Date
                         </x-th-data>
-                        <th class="text-center text-dark">
-                            Progress
-                        </th>
+                        @foreach($vmmfgTitleCategories as $vmmfgTitleCategory)
+                            <th class="text-center text-dark">
+                                {{$vmmfgTitleCategory->name}}
+                            </th>
+                        @endforeach
                         <th class="text-center text-dark">
                             Completion (%)
                         </th>
                     </tr>
                     @forelse($units as $index => $unit)
                         @php
-                            $itemCount = 0;
-                            $taskCount = 0;
+                            $totalItemCount = 0;
+                            $totalTaskCount = 0;
                             $color = '';
-                            foreach($unit->vmmfgScope->vmmfgTitles as $title) {
-                                $itemCount += $title->vmmfg_items_count;
-                            }
-
-                            $taskCount = $unit->vmmfg_tasks_count;
-
-                            $progressPercent = round($taskCount/$itemCount * 100);
-
-                            if($progressPercent == 100) {
-                                $color = 'bg-success';
-                            }else if($progressPercent >= 80 and $progressPercent < 100) {
-                                $color = 'bg-warning';
-                            }
                         @endphp
                         <tr class="row_edit" wire:loading.class.delay="opacity-2" wire:key="row-{{$unit->id}}">
                             {{-- <th class="text-center">
@@ -135,10 +124,45 @@
                             <td class="text-center">
                                 {{ $unit->vmmfgJob->order_date }}
                             </td>
+                            @foreach($vmmfgTitleCategories as $vmmfgTitleCategory)
+                                @php
+                                    $itemCount = 0;
+                                    $taskCount = $unit
+                                        ->vmmfgTasks()
+                                        ->whereHas('vmmfgItem', function($query) use ($vmmfgTitleCategory) {
+                                            $query->whereHas('vmmfgTitle', function($query) use ($vmmfgTitleCategory) {
+                                                $query->where('vmmfg_title_category_id', $vmmfgTitleCategory->id);
+                                            });
+                                        })->whereIn('status', [1, 2, 98])
+                                        ->count();
+
+                                    foreach($unit->vmmfgScope->vmmfgTitles as $title) {
+                                        if($title->vmmfg_title_category_id === $vmmfgTitleCategory->id) {
+                                            $itemCount += $title->vmmfgItems()->count();
+                                        }
+                                    }
+                                    $totalItemCount += $itemCount;
+                                    $totalTaskCount += $taskCount;
+
+                                @endphp
+                                <td class="text-center text-dark">
+                                    {{ $taskCount }} /
+                                    {{ $itemCount }}
+                                </td>
+                            @endforeach
+                            @php
+                                $progressPercent = round($totalTaskCount/$totalItemCount * 100);
+
+                                if($progressPercent == 100) {
+                                    $color = 'bg-success';
+                                }else if($progressPercent >= 80 and $progressPercent < 100) {
+                                    $color = 'bg-warning';
+                                }
+                            @endphp
                             {{-- @dd($unit->toArray()) --}}
-                            <td class="text-center text-dark">
+                            {{-- <td class="text-center text-dark">
                                 {{ $taskCount }} / {{ $itemCount }}
-                            </td>
+                            </td> --}}
                             <td class="text-center text-dark {{$color}}">
                                 {{ $progressPercent }}
                             </td>

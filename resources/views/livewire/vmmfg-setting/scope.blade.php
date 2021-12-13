@@ -285,6 +285,11 @@
                                     <div class="form-group">
                                         <span class="float-left">
                                             {{$title->sequence}}.  {{$title->name}}
+                                            @if($title->vmmfgTitleCategory)
+                                                <span class="badge badge-warning">
+                                                    {{$title->vmmfgTitleCategory->name}}
+                                                </span>
+                                            @endif
                                         </span>
                                         <span class="float-right">
                                             {{-- <button type="button" class="btn btn-success btn-md" wire:click="showCreateTask({{$title->id}})"> --}}
@@ -392,6 +397,19 @@
                     <x-input type="text" model="title.name">
                         Name
                     </x-input>
+                    <div class="form-group">
+                        <label>
+                            Category
+                        </label>
+                        <select name="vmmfg_title_category_id" wire:model.defer="title.vmmfg_title_category_id" class="select form-control">
+                            <option value="">None</option>
+                            @foreach($vmmfgTitleCategories as $vmmfgTitleCategory)
+                                <option value="{{$vmmfgTitleCategory->id}}">
+                                    {{$vmmfgTitleCategory->name}}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
                 </x-slot>
                 <x-slot name="footer">
                     {{-- normal view --}}

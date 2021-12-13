@@ -6,6 +6,7 @@ use App\Models\Attachment;
 use App\Models\VmmfgItem;
 use App\Models\VmmfgScope;
 use App\Models\VmmfgTitle;
+use App\Models\VmmfgTitleCategory;
 use DB;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -36,6 +37,7 @@ class Scope extends Component
     public VmmfgTitle $title;
     public VmmfgItem $item;
     public $file;
+    public $vmmfgTitleCategories;
 
     protected $listeners = [
         'refresh' => '$refresh',
@@ -48,12 +50,18 @@ class Scope extends Component
             'scope.remarks' => 'sometimes',
             'title.sequence' => 'required',
             'title.name' => 'required',
+            'title.vmmfg_title_category_id' => 'sometimes',
             'item.sequence' => 'required',
             'item.name' => 'required',
             'item.remarks' => 'sometimes',
             'item.is_required_upload' => 'sometimes',
             'item.is_required' => 'sometimes',
         ];
+    }
+
+    public function mount()
+    {
+        $this->vmmfgTitleCategories = VmmfgTitleCategory::oldest()->get();
     }
 
 
@@ -161,11 +169,15 @@ class Scope extends Component
 
     public function saveTitle()
     {
-        // dd($this->title);
+        if(! $this->title->vmmfg_title_category_id) {
+            $this->title->vmmfg_title_category_id = null;
+        }
+
         if($this->title and $this->title->id) {
             $this->title->update([
                 'sequence' => $this->title->sequence,
                 'name' => $this->title->name,
+                'vmmfg_title_category_id' => $this->title->vmmfg_title_category_id,
             ]);
         }else {
             // dd($this->title->toArray());
@@ -173,12 +185,14 @@ class Scope extends Component
                 'sequence' => $this->title->sequence,
                 'name' => $this->title->name,
                 'vmmfg_scope_id' => $this->scope->id,
+                'vmmfg_title_category_id' => $this->title->vmmfg_title_category_id,
             ]);
         }
 
         // $this->reset('title');
         // $this->showCreateTitleArea = false;
-        $this->emit('updated');
+        // $this->emit('updated');
+        $this->emit('refresh');
         session()->flash('success', 'Entry has been created');
     }
 

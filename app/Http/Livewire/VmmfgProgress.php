@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\VmmfgTitleCategory;
 use App\Models\VmmfgUnit;
 use DB;
 use Livewire\Component;
@@ -25,6 +26,7 @@ class VmmfgProgress extends Component
         'model' => '',
         'is_completed' => '0',
     ];
+    public $vmmfgTitleCategories;
 
     public VmmfgUnit $unitForm;
 
@@ -33,6 +35,11 @@ class VmmfgProgress extends Component
         return [
             'unitForm.unit_no' => 'required',
         ];
+    }
+
+    public function mount()
+    {
+        $this->vmmfgTitleCategories = VmmfgTitleCategory::oldest()->get();
     }
 
     public function render()

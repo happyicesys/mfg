@@ -22,7 +22,8 @@ class DatabaseSeeder extends Seeder
         // VmmfgScopeSeeder::class,
         // VmmfgJobSeeder::class,
         // RolePermissionSeeder::class,
-        StaffPermission::class,
+        // StaffPermission::class,
+        VmmfgTitleCategorySeeder::class,
        ]);
     //    \App\Models\User::factory(150)->create();
     }
