@@ -151,6 +151,9 @@
                                 </td>
                             @endforeach
                             @php
+                                if($totalItemCount === 0) {
+                                    $totalItemCount = 1;
+                                }
                                 $progressPercent = round($totalTaskCount/$totalItemCount * 100);
 
                                 if($progressPercent == 100) {
