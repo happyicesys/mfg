@@ -64,6 +64,16 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="form-group col-md-4 col-xs-12">
+                                    <label>
+                                        Is Completed?
+                                    </label>
+                                    <select name="is_completed" wire:model="filters.is_completed" class="select form-control">
+                                        <option value="">All</option>
+                                        <option value="1">Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                </div>
                             </div>
                             <div class="form-row d-flex justify-content-end">
                                 <div class="btn-group">

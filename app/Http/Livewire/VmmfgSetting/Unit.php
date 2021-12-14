@@ -25,6 +25,7 @@ class Unit extends Component
         'vend_id' => '',
         'date_from' => '',
         'date_to' => '',
+        'is_completed' => '0',
     ];
 
     public VmmfgUnit $unitForm;
@@ -64,6 +65,17 @@ class Unit extends Component
         if($dateTo = $this->filters['date_to']) {
             $units = $units->where(function($query) use ($dateTo) {
                 $query->searchToDate('order_date', $dateTo);
+            });
+        }
+
+        if($this->filters['is_completed'] !== '') {
+            $isCompleted = $this->filters['is_completed'];
+            $units = $units->where(function($query) use ($isCompleted) {
+                if($isCompleted == 1) {
+                    $query->whereNotNull('vmmfg_units.completion_date');
+                }else {
+                    $query->whereNull('vmmfg_units.completion_date');
+                }
             });
         }
 
