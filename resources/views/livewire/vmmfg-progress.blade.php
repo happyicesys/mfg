@@ -127,6 +127,9 @@
                             @foreach($vmmfgTitleCategories as $vmmfgTitleCategory)
                                 @php
                                     $itemCount = 0;
+                                    $taskCount = 0;
+                                    $eachColor = '';
+
                                     $taskCount = $unit
                                         ->vmmfgTasks()
                                         ->whereHas('vmmfgItem', function($query) use ($vmmfgTitleCategory) {
@@ -141,11 +144,23 @@
                                             $itemCount += $title->vmmfgItems()->count();
                                         }
                                     }
+//
+                                    if($itemCount === 0) {
+                                        $itemCount = 1;
+                                    }
+                                    $eachProgressPercent = round($taskCount/$itemCount * 100);
+
+                                    if($eachProgressPercent == 100) {
+                                        $eachColor = 'bg-success';
+                                    }else if($eachProgressPercent >= 80 and $eachProgressPercent < 100) {
+                                        $eachColor = 'bg-warning';
+                                    }
+//
                                     $totalItemCount += $itemCount;
                                     $totalTaskCount += $taskCount;
 
                                 @endphp
-                                <td class="text-center text-dark">
+                                <td class="text-center text-dark {{$eachColor}}">
                                     {{ $taskCount }} /
                                     {{ $itemCount }}
                                 </td>
