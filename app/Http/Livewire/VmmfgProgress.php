@@ -71,11 +71,11 @@ class VmmfgProgress extends Component
 
         if($this->filters['is_completed'] !== '') {
             $isCompleted = $this->filters['is_completed'];
-            $units = $units->whereHas('vmmfgJob', function($query) use ($isCompleted) {
+            $units = $units->where(function($query) use ($isCompleted) {
                 if($isCompleted == 1) {
-                    $query->whereNotNull('completion_date');
+                    $query->whereNotNull('vmmfg_units.completion_date');
                 }else {
-                    $query->whereNull('completion_date');
+                    $query->whereNull('vmmfg_units.completion_date');
                 }
             });
         }

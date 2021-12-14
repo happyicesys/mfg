@@ -58,13 +58,11 @@
                                 <select name="batch_no" wire:model="job_id" class="select form-control">
                                     <option value="">Select..</option>
                                     @foreach($jobs as $job)
-                                        @if(!$job->completion_date)
-                                            <option value="{{$job->id}}">
-                                                #{{$job->batch_no}} - {{$job->model}}
-                                                @if($job->vmmfgUnits) ({{count($job->vmmfgUnits)}} units) @endif
-                                                @if($job->order_date) (Start: {{$job->order_date}}) @endif
-                                            </option>
-                                        @endif
+                                        <option value="{{$job->id}}">
+                                            #{{$job->batch_no}} - {{$job->model}}
+                                            @if($job->vmmfgUnits) ({{count($job->vmmfgUnits)}} units) @endif
+                                            @if($job->order_date) (Start: {{$job->order_date}}) @endif
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
@@ -78,9 +76,14 @@
                                     <select name="unit_no" wire:model="unit_id" class="select form-control">
                                         <option value="">Select..</option>
                                         @foreach($this->job->vmmfgUnits as $unit)
-                                            <option value="{{$unit->id}}">
-                                                #{{$unit->unit_no}}
-                                            </option>
+                                            @if(!$unit->completion_date)
+                                                <option value="{{$unit->id}}">
+                                                    #{{$unit->unit_no}}
+                                                    @if($unit->vend_id)
+                                                        [{{$unit->vend_id}}]
+                                                    @endif
+                                                </option>
+                                            @endif
                                         @endforeach
                                     </select>
                                     {{-- <x-input-select2 wire:model.defer="unit_no">

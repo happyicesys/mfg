@@ -261,9 +261,6 @@
                         <x-th-data model="order_date" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Start Date
                         </x-th-data>
-                        <x-th-data model="completion_date" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
-                            Completion Date
-                        </x-th-data>
                         <th class="text-center text-dark">
                             Remarks
                         </th>
@@ -288,9 +285,6 @@
                         </td>
                         <td class="text-center">
                             {{ $job->order_date }}
-                        </td>
-                        <td class="text-center">
-                            {{ $job->completion_date }}
                         </td>
                         <td class="text-left">
                             {{ $job->remarks }}
@@ -337,12 +331,6 @@
                                 Start Date
                             </label>
                             <input type="date" class="form-control" wire:model.defer="form.order_date">
-                        </div>
-                        <div class="form-group">
-                            <label for="completion_date">
-                                Completion Date
-                            </label>
-                            <input type="date" class="form-control" wire:model.defer="form.completion_date">
                         </div>
                         <div class="form-group">
                             <label for="remarks">
@@ -466,12 +454,6 @@
                             Start Date
                         </label>
                         <input type="date" class="form-control" wire:model.defer="form.order_date">
-                    </div>
-                    <div class="form-group">
-                        <label for="completion_date">
-                            Completion Date
-                        </label>
-                        <input type="date" class="form-control" wire:model.defer="form.completion_date">
                     </div>
                     <div class="form-group">
                         <label for="remarks">
