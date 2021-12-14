@@ -16,8 +16,8 @@ class Job extends Component
 
     protected $paginationTheme = 'bootstrap';
     public $itemPerPage = 100;
-    public $sortKey = 'order_date';
-    public $sortAscending = false;
+    public $sortKey = '';
+    public $sortAscending = true;
     public $showEditModal = false;
     public $showFilters = false;
     public $showBatchGenerateUnits = false;
@@ -71,6 +71,8 @@ class Job extends Component
 
         if($sortKey = $this->sortKey) {
             $jobs = $jobs->orderBy($sortKey, $this->sortAscending ? 'asc' : 'desc');
+        }else {
+            $jobs = $jobs->orderBy('order_date', 'desc');
         }
 
         $jobs = $jobs->paginate($this->itemPerPage);

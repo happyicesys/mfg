@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\HasSearch;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -15,6 +16,8 @@ class VmmfgUnit extends Model
         'vmmfg_job_id',
         'serial_no',
         'vmmfg_scope_id',
+        'vend_id',
+        'completion_date',
     ];
 
     //relationships
@@ -31,5 +34,13 @@ class VmmfgUnit extends Model
     public function vmmfgTasks()
     {
         return $this->hasMany(VmmfgTask::class);
+    }
+
+    // getter
+    public function getCompletionDateAttribute($value)
+    {
+        if($value) {
+            return Carbon::parse($value)->format('Y-m-d');
+        }
     }
 }

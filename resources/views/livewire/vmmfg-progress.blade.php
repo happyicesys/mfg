@@ -84,7 +84,10 @@
                         <x-th-data model="unit_no" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Unit No
                         </x-th-data>
-                        <x-th-data model="unit_no" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
+                        <x-th-data model="vend_id" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
+                            Vend ID#
+                        </x-th-data>
+                        <x-th-data model="model" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Model
                         </x-th-data>
                         <x-th-data model="order_date" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
@@ -117,6 +120,9 @@
                             </td>
                             <td class="text-center">
                                 {{ $unit->unit_no }}
+                            </td>
+                            <td class="text-center">
+                                {{ $unit->vend_id }}
                             </td>
                             <td class="text-center">
                                 {{ $unit->vmmfgJob->model }}

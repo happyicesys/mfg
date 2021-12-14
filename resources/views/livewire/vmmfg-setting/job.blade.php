@@ -186,13 +186,33 @@
                                     <label>
                                         Start Date From
                                     </label>
-                                    <input wire:model="filters.order_date_from" type="text" class="form-control" placeholder="Start Date From">
+                                    <div class="input-group">
+                                        <input type="date" class="form-control" wire:model.defer="filters.order_date_from">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateClicked(-1, 'order_date_from')">
+                                                <i class="fas fa-caret-left"></i>
+                                            </button>
+                                            <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateClicked(1, 'order_date_from')">
+                                                <i class="fas fa-caret-right"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="form-group">
                                     <label>
                                         Start Date To
                                     </label>
-                                    <input wire:model="filters.order_date_to" type="text" class="form-control" placeholder="Start Date To">
+                                    <div class="input-group">
+                                        <input type="date" class="form-control" wire:model.defer="filters.order_date_to">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateClicked(-1, 'order_date_to')">
+                                                <i class="fas fa-caret-left"></i>
+                                            </button>
+                                            <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateClicked(1, 'order_date_to')">
+                                                <i class="fas fa-caret-right"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             {{-- </div> --}}
                             <div class="form-group">
@@ -312,12 +332,18 @@
                         <x-input type="text" model="form.model">
                             Model
                         </x-input>
-                        <x-input type="date" model="form.order_date">
-                            Start Date
-                        </x-input>
-                        <x-input type="date" model="form.completion_date">
-                            Completion Date
-                        </x-input>
+                        <div class="form-group">
+                            <label for="order_date">
+                                Start Date
+                            </label>
+                            <input type="date" class="form-control" wire:model.defer="form.order_date">
+                        </div>
+                        <div class="form-group">
+                            <label for="completion_date">
+                                Completion Date
+                            </label>
+                            <input type="date" class="form-control" wire:model.defer="form.completion_date">
+                        </div>
                         <div class="form-group">
                             <label for="remarks">
                                 Remarks
@@ -435,12 +461,18 @@
                     <x-input type="text" model="form.model">
                         Model
                     </x-input>
-                    <x-input type="date" model="form.order_date">
-                        Start Date
-                    </x-input>
-                    <x-input type="date" model="form.completion_date">
-                        Completion Date
-                    </x-input>
+                    <div class="form-group">
+                        <label for="order_date">
+                            Start Date
+                        </label>
+                        <input type="date" class="form-control" wire:model.defer="form.order_date">
+                    </div>
+                    <div class="form-group">
+                        <label for="completion_date">
+                            Completion Date
+                        </label>
+                        <input type="date" class="form-control" wire:model.defer="form.completion_date">
+                    </div>
                     <div class="form-group">
                         <label for="remarks">
                             Remarks

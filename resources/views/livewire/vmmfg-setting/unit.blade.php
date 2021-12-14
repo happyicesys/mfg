@@ -9,53 +9,60 @@
                 $from = $unitsArr['from'];
                 $total = $unitsArr['total'];
             @endphp
-            <div class="d-none d-sm-block">
-                <div class="form-group form-inline">
-                    <label for="name">
-                        Quick Search
-                    </label>
-                    <input type="text" wire:model="filters.search" class="form-control mx-2" placeholder="Quick Search" @if($showFilters) disabled @endif>
-                    <button wire:click="$toggle('showFilters')" class="btn btn-outline-secondary">
-                        Advance Search
-                        @if($showFilters)
-                            <i class="fas fa-caret-right"></i>
-                        @else
-                            <i class="fas fa-caret-down"></i>
-                        @endif
-                    </button>
-        {{--
-                    <div class="dropdown show">
-                        <button class="btn btn-outline-info dropdown-toggle" type="button" id="bulkActionsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                            Bulk Actions
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="bulkActionsDropdown">
-                            <a class="dropdown-item" href="#">
-                                <i class="far fa-file-excel"></i>
-                                Export
-                            </a>
-                            <a class="dropdown-item" href="#">
-                                <i class="far fa-trash-alt"></i>
-                                Delete
-                            </a>
-                        </div>
-                    </div> --}}
-
-                </div>
+            <div class="">
                 <div>
-                    @if($showFilters)
+                    {{-- @if($showFilters) --}}
                         <div class="bg-light pt-2 pb-2 pl-2 pr-2 mb-2">
                             <div class="form-row">
-                                <div class="form-group col-4">
+                                <div class="form-group col-md-4 col-xs-12">
                                     <label>
                                         Unit No
                                     </label>
                                     <input wire:model="filters.unit_no" type="text" class="form-control" placeholder="Unit No">
                                 </div>
-                                <div class="form-group col-4">
+                                <div class="form-group col-md-4 col-xs-12">
                                     <label>
                                         Batch No
                                     </label>
                                     <input wire:model="filters.batch_no" type="text" class="form-control" placeholder="Batch No">
+                                </div>
+                                <div class="form-group col-md-4 col-xs-12">
+                                    <label>
+                                        Vend ID#
+                                    </label>
+                                    <input wire:model="filters.vend_id" type="text" class="form-control" placeholder="Vend ID#">
+                                </div>
+                                <div class="form-group col-md-4 col-xs-12">
+                                    <label>
+                                        Date From
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="date" class="form-control" wire:model.defer="filters.date_from">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateClicked(-1, 'date_from')">
+                                                <i class="fas fa-caret-left"></i>
+                                            </button>
+                                            <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateClicked(1, 'date_from')">
+                                                <i class="fas fa-caret-right"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-4 col-xs-12">
+                                    <label>
+                                        Date To
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="date" class="form-control" wire:model.defer="filters.date_to">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateClicked(-1, 'date_to')">
+                                                <i class="fas fa-caret-left"></i>
+                                            </button>
+                                            <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateClicked(1, 'date_to')">
+                                                <i class="fas fa-caret-right"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="form-row d-flex justify-content-end">
@@ -64,7 +71,7 @@
                                 </div>
                             </div>
                         </div>
-                    @endif
+                    {{-- @endif --}}
                 </div>
                 <div class="form-row">
                     {{-- <div class="mr-auto pl-1">
@@ -93,79 +100,6 @@
                 </div>
             </div>
 
-            <div class="d-block d-sm-none">
-                <div class="form-group">
-                    <label for="name">
-                        Quick Search
-                    </label>
-                    <input type="text" wire:model="filters.search" class="form-control" placeholder="Quick Search" @if($showFilters) disabled @endif>
-        {{--
-                    <div class="dropdown show">
-                        <button class="btn btn-outline-info dropdown-toggle" type="button" id="bulkActionsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                            Bulk Actions
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="bulkActionsDropdown">
-                            <a class="dropdown-item" href="#">
-                                <i class="far fa-file-excel"></i>
-                                Export
-                            </a>
-                            <a class="dropdown-item" href="#">
-                                <i class="far fa-trash-alt"></i>
-                                Delete
-                            </a>
-                        </div>
-                    </div> --}}
-                </div>
-                <div class="form-group">
-                    <button wire:click="$toggle('showFilters')" class="btn btn-outline-secondary btn-block">
-                        Advance Search
-                        @if($showFilters)
-                            <i class="fas fa-caret-right"></i>
-                        @else
-                            <i class="fas fa-caret-down"></i>
-                        @endif
-                    </button>
-                </div>
-                <div>
-                    @if($showFilters)
-                        <div class="bg-light">
-                            {{-- <div class="form-row"> --}}
-                                <div class="form-group">
-                                    <label>
-                                        Unit No
-                                    </label>
-                                    <input wire:model="filters.unit_no" type="text" class="form-control" placeholder="Unit No">
-                                </div>
-                                <div class="form-group">
-                                    <label>
-                                        Batch No
-                                    </label>
-                                    <input wire:model="filters.batch_no" type="text" class="form-control" placeholder="Batch No">
-                                </div>
-                            {{-- </div> --}}
-                            <div class="form-group">
-                                {{-- <div class="btn-group"> --}}
-                                    <button wire:click="resetFilters()" class="btn btn-outline-dark btn-block">Reset</button>
-                                {{-- </div> --}}
-                            </div>
-                        </div>
-                    @endif
-                </div>
-
-                    <div class="form-group form-inline">
-                        <label class="mt-1" for="display_num">Display </label>
-                        <select wire:model="itemPerPage" class="ml-1 mr-1" name="pageNum">
-                            <option value="100">100</option>
-                            <option value="200">200</option>
-                            <option value="500">500</option>
-                        </select>
-                        <label class="mt-1" for="display_num2" style="padding-right: 20px"> per Page</label>
-                        <label class="ml-auto">
-                            Showing {{ count($units) }} of {{$total}}
-                        </label>
-                    </div>
-            </div>
-
             <div class="table-responsive pt-3" style="font-size: 14px;">
                 <table class="table table-bordered table-hover">
                     <tr class="table-secondary">
@@ -184,10 +118,19 @@
                         <x-th-data model="unit_no" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Model
                         </x-th-data>
+                        <x-th-data model="vend_id" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
+                            Vend ID#
+                        </x-th-data>
+                        <x-th-data model="order_date" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
+                            Start Date
+                        </x-th-data>
+                        <x-th-data model="completion_date" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
+                            Completion Date
+                        </x-th-data>
                         <th></th>
                     </tr>
                     @forelse($units as $index => $unit)
-                    <tr class="row_edit" wire:loading.class.delay="opacity-2" wire:key="row-{{$index}}">
+                    <tr class="row_edit" wire:loading.class.delay="opacity-2" wire:key="row-{{$unit->id}}">
                         {{-- <th class="text-center">
                             <input type="checkbox" wire:model="selected" value="{{$admin->id}}">
                         </th> --}}
@@ -202,6 +145,15 @@
                         </td>
                         <td class="text-center">
                             {{ $unit->vmmfgJob->model }}
+                        </td>
+                        <td class="text-center">
+                            {{ $unit->vend_id }}
+                        </td>
+                        <td class="text-center">
+                            {{ $unit->vmmfgJob->order_date }}
+                        </td>
+                        <td class="text-center">
+                            {{ $unit->completion_date }}
                         </td>
                         <td class="text-center">
                             <button type="button" wire:click="edit({{$unit->id}})" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#edit-unit">
@@ -226,9 +178,18 @@
                         Edit Unit
                     </x-slot>
                     <x-slot name="content">
-                        <x-input type="text" model="form.unit_no">
+                        <x-input type="text" model="unitForm.unit_no">
                             Unit No
                         </x-input>
+                        <x-input type="text" model="unitForm.vend_id">
+                            Vend ID#
+                        </x-input>
+                        <div class="form-group">
+                            <label for="completion_date">
+                                Completion Date
+                            </label>
+                            <input type="date" class="form-control" wire:model.defer="unitForm.completion_date">
+                        </div>
                     </x-slot>
                     <x-slot name="footer">
                         <button type="submit" class="btn btn-success d-none d-sm-block" wire:click.prevent="save">
