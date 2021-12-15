@@ -7,7 +7,7 @@
         <div class="col-md-8">
             <img src="/img/logo.png" class="img mx-auto d-block" style="max-width: 40%;" alt="Logo">
             <div class="card mt-4">
-                <div class="card-header">{{ __('Login') }}</div>
+                <div class="card-header">{{ env('APP_NAME') }}</div>
 
                 <div class="card-body">
                     <form method="POST" action="{{ route('login') }}">
