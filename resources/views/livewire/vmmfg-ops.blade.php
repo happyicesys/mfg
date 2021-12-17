@@ -147,6 +147,11 @@
                         <div class="row">
                         <span class="mr-auto">
                             {{$title->sequence}}.  {{$title->name}}
+                            @if($title->vmmfgTitleCategory)
+                                <span class="badge badge-warning">
+                                    {{$title->vmmfgTitleCategory->name}}
+                                </span>
+                            @endif
                         </span>
                         <span class="ml-auto" style="font-size: 18px;">
                             @if($sumItem === $sumDoneTask)
