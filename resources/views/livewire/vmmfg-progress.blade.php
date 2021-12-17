@@ -151,10 +151,10 @@
                                         }
                                     }
 //
-                                    if($itemCount === 0) {
-                                        $itemCount = 1;
-                                    }
-                                    $eachProgressPercent = round($taskCount/$itemCount * 100);
+                                    // if($itemCount === 0) {
+                                    //     $itemCount = 1;
+                                    // }
+                                    $eachProgressPercent = round($taskCount/($itemCount ? $itemCount : 1) * 100);
 
                                     if($eachProgressPercent == 100) {
                                         $eachColor = 'bg-success';
@@ -172,10 +172,7 @@
                                 </td>
                             @endforeach
                             @php
-                                if($totalItemCount === 0) {
-                                    $totalItemCount = 1;
-                                }
-                                $progressPercent = round($totalTaskCount/$totalItemCount * 100);
+                                $progressPercent = round($totalTaskCount/($totalItemCount ? $totalItemCount : 1) * 100);
 
                                 if($progressPercent == 100) {
                                     $color = 'bg-success';

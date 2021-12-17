@@ -13,6 +13,7 @@ use App\Traits\HasDateControl;
 use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use PDF;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Storage;
@@ -94,57 +95,7 @@ class VmmfgOps extends Component
 
     public function render()
     {
-        $userId = $this->form['user_id'];
-        $unitId = $this->form['unit_id'];
-        $dateFrom = $this->form['date_from'];
-        $dateTo = $this->form['date_to'];
-        $isIncomplete = $this->form['is_incomplete'] ? true : false;
-        $vmmfgUnit = '';
-
-        if($unitId) {
-            $vmmfgUnit = VmmfgUnit::query();
-            $vmmfgUnit = $vmmfgUnit
-                        ->with([
-                            'vmmfgScope',
-                            'vmmfgScope.vmmfgTitles',
-                            'vmmfgScope.vmmfgTitles.vmmfgItems'
-                                => function($query) use ($isIncomplete){
-                                    if($isIncomplete === true) {
-                                        $query->whereHas('vmmfgTasks', function($query) use ($isIncomplete) {
-                                            $query->where('is_done', '!=', 1);
-                                        });
-                                    }
-                                },
-                            'vmmfgScope.vmmfgTitles.vmmfgItems.attachments',
-                            'vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks'
-                                => function($query) use ($unitId, $isIncomplete){
-                                    $query->when($unitId, fn($query, $input) => $query->search('vmmfg_unit_id', $input));
-                                    if($isIncomplete === true) {
-                                        $query->where('is_done', '!=', 1);
-                                    }
-                                },
-                            'vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks.attachments',
-                        ])
-                        // ->whereHas('vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks', function($query) use ($userId, $dateFrom, $dateTo){
-                        //     $query->when($userId, fn($query, $input) =>
-                        //             $query->search('done_by', $input)
-                        //                 ->orSearch('checked_by', $input)
-                        //                 ->orSearch('undo_done_by', $input))
-                        //         ->when($dateFrom, fn($query, $input) =>
-                        //             $query->searchFromDate('done_time', $input)
-                        //                 ->orSearchFromDate('checked_time', $input)
-                        //                 ->orSearchFromDate('undo_done_time', $input))
-                        //         ->when($dateTo, fn($query, $input) =>
-                        //             $query->searchToDate('done_time', $input)
-                        //                 ->orSearchToDate('checked_time', $input)
-                        //                 ->orSearchToDate('undo_done_time', $input)
-                        //     );
-                        // })
-                        ->when($unitId, fn($query, $input) => $query->search('id', $input))
-                        ->get();
-                        // dd($vmmfgUnit->toArray());
-        }
-
+        $vmmfgUnit = $this->mainCollections($this->form);
 
         return view('livewire.vmmfg-ops', ['vmmfgUnit' => $vmmfgUnit]);
     }
@@ -315,5 +266,85 @@ class VmmfgOps extends Component
     public function onZoomPictureClicked(Attachment $attachment)
     {
         $this->zoomPictureUrl = $attachment->full_url;
+    }
+
+    public function exportPdf()
+    {
+        $vmmfgUnit = $this->mainCollections($this->form);
+
+        $pdf = PDF::loadView('pdf.vmmfg.ops', [
+            'vmmfgUnit' => $vmmfgUnit,
+            'filtersData' => $this->getFilterInfo(),
+        ])->output();
+
+        return response()->streamDownload(
+            fn () => print($pdf),
+            "qaqc_".Carbon::now()->format('ymdHis').".pdf"
+       );
+    }
+
+    public function getFilterInfo()
+    {
+        $filtersData = [
+            'jobBatchNo' => $this->form['job_id'] ? VmmfgJob::find($this->form['job_id'])->batch_no : '',
+            'unitNo' => $this->form['unit_id'] ? VmmfgUnit::find($this->form['unit_id'])->unit_no : '',
+        ];
+
+        return $filtersData;
+    }
+
+    private function mainCollections($filters)
+    {
+        $userId = $filters['user_id'];
+        $unitId = $filters['unit_id'];
+        $dateFrom = $filters['date_from'];
+        $dateTo = $filters['date_to'];
+        $isIncomplete = $filters['is_incomplete'] ? true : false;
+        $vmmfgUnit = '';
+
+        if($unitId) {
+            $vmmfgUnit = VmmfgUnit::query();
+            $vmmfgUnit = $vmmfgUnit
+                        ->with([
+                            'vmmfgScope',
+                            'vmmfgScope.vmmfgTitles',
+                            'vmmfgScope.vmmfgTitles.vmmfgItems'
+                                => function($query) use ($isIncomplete){
+                                    if($isIncomplete === true) {
+                                        $query->whereHas('vmmfgTasks', function($query) use ($isIncomplete) {
+                                            $query->where('is_done', '!=', 1);
+                                        });
+                                    }
+                                },
+                            'vmmfgScope.vmmfgTitles.vmmfgItems.attachments',
+                            'vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks'
+                                => function($query) use ($unitId, $isIncomplete){
+                                    $query->when($unitId, fn($query, $input) => $query->search('vmmfg_unit_id', $input));
+                                    if($isIncomplete === true) {
+                                        $query->where('is_done', '!=', 1);
+                                    }
+                                },
+                            'vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks.attachments',
+                        ])
+                        // ->whereHas('vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks', function($query) use ($userId, $dateFrom, $dateTo){
+                        //     $query->when($userId, fn($query, $input) =>
+                        //             $query->search('done_by', $input)
+                        //                 ->orSearch('checked_by', $input)
+                        //                 ->orSearch('undo_done_by', $input))
+                        //         ->when($dateFrom, fn($query, $input) =>
+                        //             $query->searchFromDate('done_time', $input)
+                        //                 ->orSearchFromDate('checked_time', $input)
+                        //                 ->orSearchFromDate('undo_done_time', $input))
+                        //         ->when($dateTo, fn($query, $input) =>
+                        //             $query->searchToDate('done_time', $input)
+                        //                 ->orSearchToDate('checked_time', $input)
+                        //                 ->orSearchToDate('undo_done_time', $input)
+                        //     );
+                        // })
+                        ->when($unitId, fn($query, $input) => $query->search('id', $input))
+                        ->get();
+        }
+
+        return $vmmfgUnit;
     }
 }

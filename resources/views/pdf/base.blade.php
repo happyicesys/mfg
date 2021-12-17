@@ -72,7 +72,7 @@
         <script type="text/php">
             if ( isset($pdf) ) {
                 $font = $fontMetrics->getFont("helvetica", "bold");
-                $pdf->page_text(565, 820, "{PAGE_NUM} of {PAGE_COUNT}", $font, 9, array(0,0,0));
+                $pdf->page_text(560, 820, "{PAGE_NUM} of {PAGE_COUNT}", $font, 9, array(0,0,0));
             }
         </script>
 </body>

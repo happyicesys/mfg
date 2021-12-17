@@ -76,14 +76,15 @@
                                     <select name="unit_no" wire:model="unit_id" class="select form-control">
                                         <option value="">Select..</option>
                                         @foreach($this->job->vmmfgUnits as $unit)
-                                            @if(!$unit->completion_date)
-                                                <option value="{{$unit->id}}">
-                                                    #{{$unit->unit_no}}
-                                                    @if($unit->vend_id)
-                                                        [{{$unit->vend_id}}]
-                                                    @endif
-                                                </option>
-                                            @endif
+                                            <option value="{{$unit->id}}">
+                                                #{{$unit->unit_no}}
+                                                @if($unit->vend_id)
+                                                    [{{$unit->vend_id}}]
+                                                @endif
+                                                @if($unit->completion_date)
+                                                        (Complete: {{$unit->completion_date}})
+                                                @endif
+                                            </option>
                                         @endforeach
                                     </select>
                                     {{-- <x-input-select2 wire:model.defer="unit_no">
@@ -111,6 +112,13 @@
                         {{-- </div> --}}
                         <div class="form-group">
                             {{-- <div class="btn-group"> --}}
+{{--
+                                @if($this->form['unit_id'])
+                                    <button class="btn btn-success btn-block" wire:click="exportPdf">
+                                        <i class="far fa-file-pdf"></i>
+                                        Export PDF
+                                    </button>
+                                @endif --}}
                                 <button wire:click.prevent="resetFilters()" class="btn btn-outline-dark btn-block">Reset</button>
                             {{-- </div> --}}
                         </div>
