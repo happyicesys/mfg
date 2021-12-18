@@ -112,13 +112,13 @@
                         {{-- </div> --}}
                         <div class="form-group">
                             {{-- <div class="btn-group"> --}}
-{{--
+
                                 @if($this->form['unit_id'])
                                     <button class="btn btn-success btn-block" wire:click="exportPdf">
                                         <i class="far fa-file-pdf"></i>
                                         Export PDF
                                     </button>
-                                @endif --}}
+                                @endif
                                 <button wire:click.prevent="resetFilters()" class="btn btn-outline-dark btn-block">Reset</button>
                             {{-- </div> --}}
                         </div>

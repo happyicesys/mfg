@@ -2,9 +2,9 @@
 @extends('pdf.base')
 
 @section('content')
-    <table width="100%">
+    <table width="100%" style="font-size: 13px;">
         <tr>
-            <td style="padding-bottom: 0.5em; text-align: right">
+            <td style="padding-bottom: 0.2em; text-align: right">
                 <span style="font-size: 20px">
                     <strong>QA/QC Report</strong>
                 </span>
@@ -13,12 +13,12 @@
         <tr>
             <td class="text" valign="top" style="text-align: right">
                 <table align="right">
-                    <tr>
+                    <tr style="font-size: 13px;">
                         <td>Batch No</td>
                         <td>:</td>
                         <td style="text-align: right">{{ $filtersData['jobBatchNo'] }}</td>
                     </tr>
-                    <tr>
+                    <tr style="font-size: 13px;">
                         <td>Unit No</td>
                         <td>:</td>
                         <td style="text-align: right">{{ $filtersData['unitNo'] }}</td>
@@ -53,11 +53,11 @@
             @endphp
             <table style="width:100%; padding-top: 15px;">
                 <tr>
-                    <th style="font-family: 'founder-type'; font-weight: bold; word-wrap: break-word;">
-                        <span class="mr-auto" style="font-size: 13px;">
+                    <th>
+                        <span class="mr-auto" style="font-family: 'founder-type'; font-weight: bold; word-wrap: break-word; font-size: 13px;">
                             {{$title->sequence}}.  {{$title->name}}
                             @if($title->vmmfgTitleCategory)
-                                <span class="badge badge-warning">
+                                <span class="badge badge-warning" style="font-family: 'founder-type'; font-weight: bold; word-wrap: break-word;">
                                     {{$title->vmmfgTitleCategory->name}}
                                 </span>
                             @endif
@@ -142,98 +142,27 @@
                 @endphp
 
                 <tr>
-                    <td style="font-family: 'founder-type'; font-weight: bold; word-wrap: break-word;">
-                {{-- <div class="form-group"> --}}
+                    <td>
                     <div class="row">
-                        <span class="mr-auto">
-                            {{$item->sequence}}.  {{$item->name}}
-                            <br>
-                            @if($item->remarks)
-                                <div class="p-2 mb-1 bg-light">
-                                    <p>{{$item->remarks}}</p>
-                                </div>
-                            @endif
+                        <span class="mr-auto" >
+                            <u style="font-family: 'founder-type'; font-weight: bold; word-wrap: break-word;">{{$item->sequence}}.  {{$item->name}}</u>
                         </span>
-                        <span class="ml-auto">
-                            @if($item->attachments()->exists())
-                                    <span class="" style="font-size: 12px;">
-                                        @if($showDoneTimeDoneBy)
-                                            @if(!$showUndoDoneBy)
-                                                @if($adminClickable)
-                                                    <a href="" class="badge badge-success" style="font-size: 12px;" onclick="return confirm('Are you sure you want to Undo the Task?') || event.stopImmediatePropagation()" wire:click.prevent="onUndoClicked({{$task}})">
-                                                        <i class="fas fa-check-circle"></i>
-                                                        Done
-                                                    </a>
-                                                @else
-                                                    <span class="badge badge-success" style="font-size: 12px;">
-                                                        <i class="fas fa-check-circle"></i>
-                                                        Done
-                                                    </span>
-                                                @endif
-                                            @else
-                                                P.Done
-                                            @endif
-                                            By: <span class="font-weight-bold">{{$doneBy}}</span> <br>
-                                            On: <span class="font-weight-bold">{{$doneTime}}</span> <br>
-                                        @endif
-                                        @if($showCheckedBy)
-                                            @if($adminClickable)
-                                                <a href="" class="badge badge-primary" style="font-size: 12px;" wire:click.prevent="onUndoCheckedClicked({{$task}})">
-                                                    <i class="fas fa-check-circle"></i>
-                                                    Checked
-                                                </a>
-                                            @else
-                                                <span class="badge badge-primary" style="font-size: 12px;">
-                                                    <i class="fas fa-check-circle"></i>
-                                                    Checked
-                                                </span>
-                                            @endif
-                                            By: <span class="font-weight-bold">{{$checkedBy}}</span> <br>
-                                            On: <span class="font-weight-bold">{{$checkedTime}}</span> <br>
-                                        @endif
-                                        @if($showUndoDoneBy)
-                                            <span class="badge badge-warning" style="font-size: 12px;">
-                                                Undo
-                                            </span>
-                                            By: <span class="font-weight-bold">{{$undoDoneBy}}</span> <br>
-                                            On: <span class="font-weight-bold">{{$undoDoneTime}}</span> <br>
-                                        @endif
-                                        @if($showCancelledBy)
-                                            @if($adminClickable)
-                                                <a href="" class="badge badge-danger" style="font-size: 12px;" wire:click.prevent="onUndoCancelledClicked({{$task}})">
-                                                    <i class="far fa-times-circle"></i>
-                                                    Cancelled
-                                                </a>
-                                            @else
-                                                <span class="badge badge-danger" style="font-size: 12px;">
-                                                    <i class="far fa-times-circle"></i>
-                                                    Cancelled
-                                                </span>
-                                            @endif
-                                            By: <span class="font-weight-bold">{{$cancelledBy}}</span> <br>
-                                            On: <span class="font-weight-bold">{{$cancelledTime}}</span> <br>
-                                        @endif
-                                    </span>
-
-                            @endif
-                        </span>
+                        @if($item->remarks)
+                        <div class="p-2 mb-1 bg-light">
+                            <p style="font-family: 'founder-type'; font-weight: bold;">
+                                {!! nl2br(e($item->remarks)) !!}
+                            </p>
+                        </div>
+                    @endif
                     </div>
-                    @if(!$item->attachments()->exists())
                     <div class="row pt-1" >
-                        <span class="ml-auto" style="font-size: 12px;">
+                        <span style="font-size: 12px;">
                             @if($showDoneTimeDoneBy)
                                 @if(!$showUndoDoneBy)
-                                    @if($adminClickable)
-                                        <a href="" class="badge badge-success" style="font-size: 12px;" onclick="return confirm('Are you sure you want to Undo the Task?') || event.stopImmediatePropagation()" wire:click.prevent="onUndoClicked({{$task}})">
-                                            <i class="fas fa-check-circle"></i>
-                                            Done
-                                        </a>
-                                    @else
-                                        <span class="badge badge-success" style="font-size: 12px;">
-                                            <i class="fas fa-check-circle"></i>
-                                            Done
-                                        </span>
-                                    @endif
+                                    <span class="badge badge-success" style="font-size: 12px;">
+                                        <i class="fas fa-check-circle"></i>
+                                        Done
+                                    </span>
                                 @else
                                     P.Done
                                 @endif
@@ -241,17 +170,10 @@
                                 On: <span class="font-weight-bold">{{$doneTime}}</span> <br>
                             @endif
                             @if($showCheckedBy)
-                                @if($adminClickable)
-                                    <a href="" class="badge badge-primary" style="font-size: 12px;" wire:click.prevent="onUndoCheckedClicked({{$task}})">
-                                        <i class="fas fa-check-circle"></i>
-                                        Checked
-                                    </a>
-                                @else
                                     <span class="badge badge-primary" style="font-size: 12px;">
                                         <i class="fas fa-check-circle"></i>
                                         Checked
                                     </span>
-                                @endif
                                 By: <span class="font-weight-bold">{{$checkedBy}}</span> <br>
                                 On: <span class="font-weight-bold">{{$checkedTime}}</span> <br>
                             @endif
@@ -263,24 +185,15 @@
                                 On: <span class="font-weight-bold">{{$undoDoneTime}}</span> <br>
                             @endif
                             @if($showCancelledBy)
-                                @if($adminClickable)
-                                    <a href="" class="badge badge-danger" style="font-size: 12px;" wire:click.prevent="onUndoCancelledClicked({{$task}})">
-                                        <i class="far fa-times-circle"></i>
-                                        Cancelled
-                                    </a>
-                                @else
                                     <span class="badge badge-danger" style="font-size: 12px;">
                                         <i class="far fa-times-circle"></i>
                                         Cancelled
                                     </span>
-                                @endif
                                 By: <span class="font-weight-bold">{{$cancelledBy}}</span> <br>
                                 On: <span class="font-weight-bold">{{$cancelledTime}}</span> <br>
                             @endif
                         </span>
                     </div>
-
-                    @endif
 
                 {{-- </div> --}}
                     <div class="form-group" id="item-dropdown-{{$item->id}}">
@@ -303,9 +216,9 @@
                                                         </video>
                                                     </div>
                                                 @else
-                                                    <img class="card-img-top" src="{{$attachment->full_url}}" alt="" wire:click.prevent="onZoomPictureClicked({{$attachment}})"  data-toggle="modal" data-target="#zoom-picture-modal">
-                                                @endif --}}
 
+                                                @endif --}}
+                                                <img class="card-img-top" src="{{$attachment->full_url}}" alt="" width="350" height="350">
                                             </div>
                                         </div>
                                     @endforeach
