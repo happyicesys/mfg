@@ -218,7 +218,7 @@
                                                 @else
 
                                                 @endif --}}
-                                                <img class="card-img-top" src="{{$attachment->full_url}}" alt="" width="350" height="350">
+                                                {{-- <img class="card-img-top" src="{{$attachment->full_url}}" alt="" width="350" height="350"> --}}
                                             </div>
                                         </div>
                                     @endforeach
