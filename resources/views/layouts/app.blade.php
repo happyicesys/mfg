@@ -20,9 +20,12 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    @php
+        $profile = \App\Models\Profile::where('is_primary', 1)->first();
+    @endphp
     <style>
         body {
-            background-image: url("/img/background.jpg");
+            background-image: url("{{ $profile->profileSetting->theme_background_url}}");
             background-repeat: no-repeat;
             background-size:cover;
             max-width: 100%;
@@ -49,6 +52,57 @@
         }
         td:first-child {
             background-color:lightgrey;
+        }
+
+        .chiller-theme .sidebar-wrapper {
+            /* background: #31353D; */
+            /* background: #5a889d; */
+            background: {{$profile->profileSetting->theme_sidebar_background_color}};
+            color: lightgrey;
+            /* color: black; */
+        }
+
+        .chiller-theme .sidebar-wrapper .sidebar-header,
+        .chiller-theme .sidebar-wrapper .sidebar-search,
+        .chiller-theme .sidebar-wrapper .sidebar-menu {
+            border-top: 1px solid #3a3f48;
+        }
+
+        .chiller-theme .sidebar-wrapper .sidebar-header .user-info .user-role,
+        .chiller-theme .sidebar-wrapper .sidebar-header .user-info .user-status,
+        .chiller-theme .sidebar-wrapper .sidebar-search input.search-menu,
+        .chiller-theme .sidebar-wrapper .sidebar-search .input-group-text,
+        .chiller-theme .sidebar-wrapper .sidebar-brand>a,
+        .chiller-theme .sidebar-wrapper .sidebar-menu ul li a,
+        .chiller-theme .sidebar-footer>a {
+            color: #ffffff;
+        }
+
+        .chiller-theme .sidebar-wrapper .sidebar-menu ul li:hover>a,
+        .chiller-theme .sidebar-wrapper .sidebar-menu ul li.active>a,
+        .chiller-theme .sidebar-wrapper .sidebar-menu  ul li.sidebar-dropdown.active>a,
+        .chiller-theme .sidebar-wrapper .sidebar-header .user-info,
+        .chiller-theme .sidebar-wrapper .sidebar-brand>a:hover,
+        .chiller-theme .sidebar-footer>a:hover i {
+            /* color: #00A3E0; */
+            /* color: black; */
+            color: {{$profile->profileSetting->theme_sidebar_font_color}};
+        }
+
+        .page-wrapper.chiller-theme.toggled #close-sidebar:hover {
+            /* color: #00A3E0; */
+            /* color: black; */
+            color: {{$profile->profileSetting->theme_sidebar_font_color}};
+        }
+
+        .chiller-theme .sidebar-wrapper ul li:hover a i,
+        .chiller-theme .sidebar-wrapper .sidebar-dropdown .sidebar-submenu li a:hover:before,
+        .chiller-theme .sidebar-wrapper .sidebar-search input.search-menu:focus+span,
+        .chiller-theme .sidebar-wrapper .sidebar-menu .sidebar-dropdown.active a i {
+            /* color: #00A3E0; */
+            /* color: black; */
+            color: {{$profile->profileSetting->theme_sidebar_font_color}};
+            text-shadow:0px 0px 10px rgba(104, 208, 41, 0.6);
         }
     </style>
     @livewireStyles

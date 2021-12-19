@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
         // RolePermissionSeeder::class,
         // StaffPermission::class,
         // VmmfgTitleCategorySeeder::class,
+            ProfileSettingSeeder::class,
        ]);
     //    \App\Models\User::factory(150)->create();
     }

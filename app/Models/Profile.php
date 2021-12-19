@@ -16,6 +16,7 @@ class Profile extends Model
         'reg_no',
         'address_id',
         'country_id',
+        'is_primary',
     ];
 
     // relationships
@@ -32,6 +33,11 @@ class Profile extends Model
     public function primaryAddress()
     {
         return $this->belongsTo(Address::class, 'address_id');
+    }
+
+    public function profileSetting()
+    {
+        return $this->hasOne(ProfileSetting::class);
     }
 
     public function users()
