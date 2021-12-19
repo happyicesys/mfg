@@ -8,6 +8,7 @@
                 $jobsArr = $jobs->toArray();
                 $from = $jobsArr['from'];
                 $total = $jobsArr['total'];
+                $profile = \App\Models\Profile::where('is_primary', 1)->first();
             @endphp
             <div class="d-none d-sm-block">
                 <div class="form-group form-inline">
@@ -47,7 +48,7 @@
                             <div class="form-row">
                                 <div class="form-group col-4">
                                     <label>
-                                        Batch No
+                                        {{$profile->profileSetting ? $profile->profileSetting->vmmfg_job_batch_no_title : 'Batch No'}}
                                     </label>
                                     <input wire:model="filters.batch_no" type="text" class="form-control" placeholder="Batch No">
                                 </div>
@@ -172,9 +173,9 @@
                             {{-- <div class="form-row"> --}}
                                 <div class="form-group">
                                     <label>
-                                        Batch No
+                                        {{$profile->profileSetting ? $profile->profileSetting->vmmfg_job_batch_no_title : 'Batch No'}}
                                     </label>
-                                    <input wire:model="filters.batch_no" type="text" class="form-control" placeholder="Batch No">
+                                    <input wire:model="filters.batch_no" type="text" class="form-control" placeholder="{{$profile->profileSetting ? $profile->profileSetting->vmmfg_job_batch_no_title : 'Batch No'}}">
                                 </div>
                                 <div class="form-group">
                                     <label>
@@ -253,7 +254,7 @@
                             #
                         </th>
                         <x-th-data model="batch_no" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
-                            Batch
+                            {{$profile->profileSetting ? $profile->profileSetting->vmmfg_job_batch_no_title : 'Batch No'}}
                         </x-th-data>
                         <x-th-data model="model" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Model
@@ -321,7 +322,7 @@
                     </x-slot>
                     <x-slot name="content">
                         <x-input type="text" model="form.batch_no">
-                            Batch No
+                            {{$profile->profileSetting ? $profile->profileSetting->vmmfg_job_batch_no_title : 'Batch No'}}
                         </x-input>
                         <x-input type="text" model="form.model">
                             Model
@@ -444,7 +445,7 @@
                 </x-slot>
                 <x-slot name="content">
                     <x-input type="text" model="form.batch_no">
-                        Batch No
+                        {{$profile->profileSetting ? $profile->profileSetting->vmmfg_job_batch_no_title : 'Batch No'}}
                     </x-input>
                     <x-input type="text" model="form.model">
                         Model

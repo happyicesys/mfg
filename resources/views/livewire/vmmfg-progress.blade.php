@@ -8,6 +8,8 @@
                 $unitsArr = $units->toArray();
                 $from = $unitsArr['from'];
                 $total = $unitsArr['total'];
+
+                $profile = \App\Models\Profile::where('is_primary', 1)->first();
             @endphp
             <div class="">
                 <div>
@@ -79,13 +81,13 @@
                             #
                         </th>
                         <x-th-data model="batch_no" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
-                            Batch No
+                            {{$profile->profileSetting ? $profile->profileSetting->vmmfg_job_batch_no_title : 'Batch No'}}
                         </x-th-data>
                         <x-th-data model="unit_no" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Unit No
                         </x-th-data>
                         <x-th-data model="vend_id" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
-                            Vend ID#
+                            {{$profile->profileSetting ? $profile->profileSetting->vmmfg_unit_vend_id_title : 'Vend ID'}}
                         </x-th-data>
                         <x-th-data model="model" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Model
