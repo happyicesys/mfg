@@ -67,15 +67,6 @@ class Scope extends Component
 
     public function render()
     {
-
-        // $scopes = VmmfgScope::with([
-        //     'vmmfgTitles' => function($query) {
-        //         $query->orderBy('sequence', 'asc');
-        //     },
-        //     'vmmfgTitles.VmmfgItems' => function($query) {
-        //         $query->orderBy('sequence', 'asc');
-        //     }
-        // ]);
         $scopes = VmmfgScope::with(['vmmfgTitles', 'vmmfgTitles.VmmfgItems']);
 
         // advance search

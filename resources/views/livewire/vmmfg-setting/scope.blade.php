@@ -451,16 +451,17 @@
                         <textarea name="remarks" rows="5" wire:model.defer="item.remarks" class="form-control" placeholder="Desc"></textarea>
                     </div>
                     @if(isset($this->item) and $this->item->id)
-                        {{-- <div class="form-group">
+                        <div class="form-group">
                             <div class="form-check form-check-inline">
-                                <label class="form-check-label" for="is_required">Required to Response?</label>
+                                <label class="form-check-label" for="is_required">Required to Reply Text?</label>
                                 <input class="form-check-input ml-2" type="checkbox" name="is_required" wire:model.defer="item.is_required">
                             </div>
+{{--
                             <div class="form-check form-check-inline">
                                 <label class="form-check-label" for="is_required_upload">Required to Upload Image(s)?</label>
                                 <input class="form-check-input ml-2" type="checkbox" name="is_required_upload" wire:model.defer="item.is_required_upload">
-                            </div>
-                        </div> --}}
+                            </div> --}}
+                        </div>
                         <div class="form-group">
                             <label for="file">
                                 Upload File(s)

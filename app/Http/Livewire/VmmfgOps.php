@@ -40,9 +40,11 @@ class VmmfgOps extends Component
         'date_to' => '',
         'user_id' => '',
         'is_incomplete' => '',
+        'remarks' => [],
     ];
     public $editArea = [0];
     public $file;
+    public $remarks;
     public $zoomPictureUrl = '';
     public $users;
 
@@ -89,6 +91,7 @@ class VmmfgOps extends Component
         return [
             'form.job_id' => 'sometimes',
             'form.unit_id' => 'sometimes',
+            'form.remarks.*' => 'sometimes',
         ];
     }
 
@@ -96,6 +99,14 @@ class VmmfgOps extends Component
     public function render()
     {
         $vmmfgUnit = $this->mainCollections($this->form);
+
+        if($vmmfgUnit) {
+            if($vmmfgUnit->first()->vmmfgTasks) {
+                foreach($vmmfgUnit->first()->vmmfgTasks as $task) {
+                    $this->form['remarks'][$task->vmmfgItem->id] = $task->remarks;
+                }
+            }
+        }
 
         return view('livewire.vmmfg-ops', ['vmmfgUnit' => $vmmfgUnit]);
     }
@@ -141,6 +152,7 @@ class VmmfgOps extends Component
         }else {
             array_push($this->editArea, $itemId);
         }
+        $this->reset('remarks');
         $this->emit('refresh');
         // if($this->editArea === $itemId) {
         //     $this->editArea = '';
@@ -159,6 +171,7 @@ class VmmfgOps extends Component
             'done_by' => auth()->user()->id,
             'done_time' => Carbon::now(),
             'status' => VmmfgTask::STATUS_DONE,
+            'remarks' => $this->form['remarks'][$item->id],
             'undo_done_by' => null,
             'undo_done_time' => null,
         ]);
@@ -306,6 +319,7 @@ class VmmfgOps extends Component
             $vmmfgUnit = VmmfgUnit::query();
             $vmmfgUnit = $vmmfgUnit
                         ->with([
+                            'vmmfgTasks',
                             'vmmfgScope',
                             'vmmfgScope.vmmfgTitles',
                             'vmmfgScope.vmmfgTitles.vmmfgItems'

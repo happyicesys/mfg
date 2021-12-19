@@ -254,7 +254,7 @@
                                         @endif
                                     </span>
                                     <span class="ml-auto">
-                                        @if($item->attachments()->exists())
+                                        {{-- @if($item->attachments()->exists()) --}}
                                             {{-- @if($this->editArea !== $item->id) --}}
                                             @if(!array_search($item->id, $editArea, true))
                                                 <span class="" style="font-size: 13px;">
@@ -332,9 +332,10 @@
                                                 </a>
                                             </div>
 
-                                        @endif
+                                        {{-- @endif --}}
                                     </span>
                                 </div>
+{{--
                                 @if(!$item->attachments()->exists())
                                 <div class="row pt-1" >
                                     <span class="ml-auto" style="font-size: 13px;">
@@ -419,13 +420,14 @@
                                     </div>
                                 </div>
 
-                                @endif
+                                @endif --}}
 
                             {{-- </div> --}}
                             {{-- @if($this->editArea === $item->id) --}}
                             @if(array_search($item->id, $editArea, true))
                                 <div class="form-group" id="item-dropdown-{{$item->id}}">
-                                    @if($item->attachments)
+                                    @if($item->attachments()->exists())
+                                    {{-- @dd(count($item->attachments, $item->attachments) --}}
                                         @foreach($item->attachments as $attachment)
                                             <div class="row">
                                             @php
@@ -446,7 +448,11 @@
                                             </div>
                                         @endforeach
 
+                                        <hr>
+
                                         <div class="row">
+                                            {{-- <hr> --}}
+
                                             <div class="form-group pt-2">
                                                 <form wire:submit.prevent="uploadAttachment({{$item->id}})" enctype="multipart/form-data">
                                                     <label for="file">
@@ -497,6 +503,19 @@
                                             @endif
                                         </div>
                                     @endif
+
+                                    <hr>
+
+                                    {{-- @dd($this->form) --}}
+                                    <div class="form-group pt-3">
+                                        <label for="remarks">Remarks 备注</label>
+                                        @if($item->is_required)
+                                            <label for="art" style="color: red;">*</label>
+                                        @endif
+                                        {{-- <textarea name="remarks" class="form-control" rows="3" wire:model="form.remarks.{{$item->id}}" style="min-width: 100%;" placeholder="{{$item->is_required ? 'Compulsory to fill 必须填写' : '(Optional)'}}"></textarea> --}}
+                                        <textarea name="remarks" wire:model.defer="form.remarks.{{$item->id}}" class="form-control" rows="3" style="min-width: 100%;" placeholder="{{$item->is_required ? 'Compulsory to fill 必须填写' : '(Optional)'}}" {{isset($task) && $task->is_done ? 'disabled' : ''}} ></textarea>
+                                    </div>
+
                                     <div class="row pt-2">
                                         <span class="ml-auto" style="font-size: 13px;">
                                             @if($showDoneTimeDoneBy)
@@ -559,8 +578,18 @@
                                     </div>
                                     <div class="row">
                                         <span class="btn-group ml-auto">
+                                            @php
+                                                $disabled = false;
+                                                if($item->attachments()->exists() and (!$task or !$task->attachments()->exists())) {
+                                                    $disabled = true;
+                                                }
+                                                // dd($this->form['remarks']);
+                                                // if($item->is_required and (!isset($this->form['remarks'][$item->id]) or !$this->form['remarks'][$item->id])) {
+                                                //     $disabled = true;
+                                                // }
+                                            @endphp
                                             @if($showDone)
-                                                <button class="btn btn-outline-dark btn-xs-block" wire:key="item-done-normal-{{$item->id}}" wire:click.prevent="onDoneClicked({{$item}})" {{$task && $task->attachments()->exists() ? '' : 'disabled'}}>
+                                                <button class="btn btn-outline-dark btn-xs-block" wire:key="item-done-normal-{{$item->id}}" wire:click.prevent="onDoneClicked({{$item}})" {{$disabled ?  'disabled' : ''}}>
                                                     Done?
                                                 </button>
                                                 <button class="btn btn-danger btn-sm btn-xs-block" wire:key="item-cancelled-{{$item->id}}" wire:click.prevent="onCancelledClicked({{$item}})">

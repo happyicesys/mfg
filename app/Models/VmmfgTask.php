@@ -32,6 +32,7 @@ class VmmfgTask extends Model
         'undo_done_time',
         'cancelled_by',
         'cancelled_time',
+        'remarks',
     ];
 
     // protected $casts = [
