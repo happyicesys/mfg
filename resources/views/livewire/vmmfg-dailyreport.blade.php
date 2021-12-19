@@ -205,6 +205,9 @@
                         <x-th-data model="undo_done_time" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Undo Time
                         </x-th-data>
+                        <th class="text-center text-dark">
+                            Remarks
+                        </th>
                         {{-- <th></th> --}}
                     </tr>
                     @forelse($tasks as $index => $task)
@@ -256,6 +259,9 @@
                         </td>
                         <td class="text-center">
                             {{  $task->undo_done_time ? \Carbon\Carbon::parse($task->undo_done_time)->format('Y-m-d h:ia') : null }}
+                        </td>
+                        <td class="text-left">
+                            {{ $task->remarks }}
                         </td>
 {{--
                         <td class="text-center">

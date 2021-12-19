@@ -98,6 +98,9 @@
                 <th align="center">
                     Undo Time
                 </th>
+                <th align="center">
+                    Remarks
+                </th>
             </tr>
             </thead>
             <tbody>
@@ -149,6 +152,9 @@
                     <td align="center">
                         {{  $item->undo_done_time ? \Carbon\Carbon::parse($item->undo_done_time)->format('Y-m-d h:ia') : null }}
                     </td>
+                    <td align="left">
+                        {{$item->remarks}}
+                    </td>
                 </tr>
                 @empty
                 <tr>
@@ -159,7 +165,7 @@
             <tfoot>
                 <tr>
                     <td align="right" colspan="4">Total </td>
-                    <td align="right" colspan="10">{{ count($tasks) }}</td>
+                    <td align="right" colspan="11">{{ count($tasks) }}</td>
                 </tr>
             </tfoot>
         </table>
