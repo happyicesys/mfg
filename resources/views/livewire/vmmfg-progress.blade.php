@@ -127,7 +127,7 @@
                                 {{ $unit->vend_id }}
                             </td>
                             <td class="text-center">
-                                {{ $unit->vmmfgJob->model }}
+                                {{ $unit->model }}
                             </td>
                             <td class="text-center">
                                 {{ $unit->vmmfgJob->order_date }}

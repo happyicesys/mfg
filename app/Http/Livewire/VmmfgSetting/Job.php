@@ -132,6 +132,7 @@ class Job extends Component
                 'unit_no' => $this->unitForm['unit_number'] + $i,
                 'vmmfg_job_id' => $this->form->id,
                 'vmmfg_scope_id' => $this->unitForm['vmmfg_scope_id'],
+                'model' => $this->form->model,
             ]);
         }
 

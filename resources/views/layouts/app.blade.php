@@ -28,6 +28,7 @@
             background-image: url("{{ $profile->profileSetting->theme_background_url}}");
             background-repeat: no-repeat;
             background-size:cover;
+            background-color: white;
             max-width: 100%;
             max-height: 100%;
             height: auto;

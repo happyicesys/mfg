@@ -64,9 +64,10 @@ class VmmfgProgress extends Component
         }
 
         if($model = $this->filters['model']) {
-            $units = $units->whereHas('vmmfgJob', function($query) use ($model) {
-                $query->searchLike('model', $model);
-            });
+            $units = $units->searchLike('model', $model);
+            // $units = $units->whereHas('vmmfgJob', function($query) use ($model) {
+            //     $query->searchLike('model', $model);
+            // });
         }
 
         if($this->filters['is_completed'] !== '') {

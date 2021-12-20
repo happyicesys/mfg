@@ -52,6 +52,12 @@ class VmmfgOps extends Component
         'refresh' => '$refresh',
     ];
 
+    protected $queryString = [
+        'form',
+        'job_id',
+        'unit_id',
+    ];
+
     public function mount()
     {
         $this->jobs = VmmfgJob::orderBy('order_date', 'desc')->get();

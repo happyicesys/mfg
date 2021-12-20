@@ -8,6 +8,7 @@
                 $unitsArr = $units->toArray();
                 $from = $unitsArr['from'];
                 $total = $unitsArr['total'];
+                $profile = \App\Models\Profile::where('is_primary', 1)->first();
             @endphp
             <div class="">
                 <div>
@@ -28,9 +29,9 @@
                                 </div>
                                 <div class="form-group col-md-4 col-xs-12">
                                     <label>
-                                        Vend ID#
+                                        {{$profile->profileSetting ? $profile->profileSetting->vmmfg_unit_vend_id_title : 'Vend ID'}}
                                     </label>
-                                    <input wire:model="filters.vend_id" type="text" class="form-control" placeholder="Vend ID#">
+                                    <input wire:model="filters.vend_id" type="text" class="form-control" placeholder="{{$profile->profileSetting ? $profile->profileSetting->vmmfg_unit_vend_id_title : 'Vend ID'}}">
                                 </div>
                                 <div class="form-group col-md-4 col-xs-12">
                                     <label>
@@ -120,16 +121,16 @@
                             #
                         </th>
                         <x-th-data model="batch_no" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
-                            Batch No
+                            {{$profile->profileSetting ? $profile->profileSetting->vmmfg_job_batch_no_title : 'Batch No'}}
+                        </x-th-data>
+                        <x-th-data model="vend_id" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
+                            {{$profile->profileSetting ? $profile->profileSetting->vmmfg_unit_vend_id_title : 'Vend ID'}}
                         </x-th-data>
                         <x-th-data model="unit_no" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Unit No
                         </x-th-data>
-                        <x-th-data model="unit_no" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
+                        <x-th-data model="vmmfg_units.model" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Model
-                        </x-th-data>
-                        <x-th-data model="vend_id" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
-                            Vend ID#
                         </x-th-data>
                         <x-th-data model="order_date" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Start Date
@@ -151,13 +152,13 @@
                             {{ $unit->vmmfgJob->batch_no }}
                         </td>
                         <td class="text-center">
+                            {{ $unit->vend_id }}
+                        </td>
+                        <td class="text-center">
                             {{ $unit->unit_no }}
                         </td>
                         <td class="text-center">
-                            {{ $unit->vmmfgJob->model }}
-                        </td>
-                        <td class="text-center">
-                            {{ $unit->vend_id }}
+                            {{ $unit->model }}
                         </td>
                         <td class="text-center">
                             {{ $unit->vmmfgJob->order_date }}
@@ -188,11 +189,14 @@
                         Edit Unit
                     </x-slot>
                     <x-slot name="content">
+                        <x-input type="text" model="unitForm.vend_id">
+                            {{$profile->profileSetting ? $profile->profileSetting->vmmfg_unit_vend_id_title : 'Vend ID'}}
+                        </x-input>
                         <x-input type="text" model="unitForm.unit_no">
                             Unit No
                         </x-input>
-                        <x-input type="text" model="unitForm.vend_id">
-                            Vend ID#
+                        <x-input type="text" model="unitForm.model">
+                            Model
                         </x-input>
                         <div class="form-group">
                             <label for="completion_date">

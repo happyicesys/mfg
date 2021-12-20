@@ -36,6 +36,7 @@ class Unit extends Component
             'unitForm.unit_no' => 'required',
             'unitForm.vend_id' => 'sometimes',
             'unitForm.completion_date' => 'sometimes',
+            'unitForm.model' => 'sometimes',
         ];
     }
 
@@ -44,7 +45,7 @@ class Unit extends Component
     {
         $units = VmmfgUnit::with('vmmfgJob')
                         ->leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')
-                        ->select('*', 'vmmfg_units.id AS id', 'vmmfg_units.completion_date AS completion_date');
+                        ->select('*', 'vmmfg_units.id AS id', 'vmmfg_units.completion_date AS completion_date', 'vmmfg_units.model AS model');
 
         // advance search
         $units = $units

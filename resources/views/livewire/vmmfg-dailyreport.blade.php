@@ -226,7 +226,7 @@
                             {{ $task->vmmfgUnit->unit_no }}
                         </td>
                         <td class="text-center">
-                            {{ $task->vmmfgUnit->vmmfgJob->model }}
+                            {{ $task->vmmfgUnit->model }}
                         </td>
                         <td class="text-left" style="min-width: 100px;">
                             {{ $task->vmmfgItem && $task->vmmfgItem->vmmfgTitle ? $task->vmmfgItem->vmmfgTitle->sequence : '' }}

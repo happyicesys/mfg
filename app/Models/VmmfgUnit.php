@@ -18,6 +18,7 @@ class VmmfgUnit extends Model
         'vmmfg_scope_id',
         'vend_id',
         'completion_date',
+        'model',
     ];
 
     //relationships

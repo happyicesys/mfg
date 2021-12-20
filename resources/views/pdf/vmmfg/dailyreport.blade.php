@@ -120,7 +120,7 @@
                         {{ $item->vmmfgUnit->unit_no }}
                     </td>
                     <td align="center">
-                        {{ $item->vmmfgUnit->vmmfgJob->model }}
+                        {{ $item->vmmfgUnit->model }}
                     </td>
                     <td align="left">
                         {{ $item->vmmfgItem && $item->vmmfgItem->vmmfgTitle ? $item->vmmfgItem->vmmfgTitle->sequence : '' }}
