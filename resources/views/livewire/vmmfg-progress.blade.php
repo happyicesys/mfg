@@ -83,11 +83,11 @@
                         <x-th-data model="batch_no" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             {{$profile->profileSetting ? $profile->profileSetting->vmmfg_job_batch_no_title : 'Batch No'}}
                         </x-th-data>
-                        <x-th-data model="unit_no" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
-                            Unit No
-                        </x-th-data>
                         <x-th-data model="vend_id" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             {{$profile->profileSetting ? $profile->profileSetting->vmmfg_unit_vend_id_title : 'Vend ID'}}
+                        </x-th-data>
+                        <x-th-data model="unit_no" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
+                            Unit No
                         </x-th-data>
                         <x-th-data model="model" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Model
@@ -121,10 +121,10 @@
                                 {{ $unit->vmmfgJob->batch_no }}
                             </td>
                             <td class="text-center">
-                                {{ $unit->unit_no }}
+                                {{ $unit->vend_id }}
                             </td>
                             <td class="text-center">
-                                {{ $unit->vend_id }}
+                                {{ $unit->unit_no }}
                             </td>
                             <td class="text-center">
                                 {{ $unit->model }}
