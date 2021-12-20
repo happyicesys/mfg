@@ -92,6 +92,9 @@
                         <x-th-data model="model" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Model
                         </x-th-data>
+                        <x-th-data model="vmmfg_scopes.name" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
+                            Scope
+                        </x-th-data>
                         <x-th-data model="order_date" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Start Date
                         </x-th-data>
@@ -124,10 +127,15 @@
                                 {{ $unit->vend_id }}
                             </td>
                             <td class="text-center">
-                                {{ $unit->unit_no }}
+                                <a href="/vmmfg-ops?unit_id={{$unit->id}}">
+                                    {{ $unit->unit_no }}
+                                </a>
                             </td>
                             <td class="text-center">
                                 {{ $unit->model }}
+                            </td>
+                            <td class="text-center">
+                                {{ $unit->vmmfgScope->name }}
                             </td>
                             <td class="text-center">
                                 {{ $unit->vmmfgJob->order_date }}

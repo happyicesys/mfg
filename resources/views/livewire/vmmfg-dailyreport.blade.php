@@ -223,7 +223,9 @@
                             {{ $task->vmmfgUnit->vmmfgJob->batch_no }}
                         </td>
                         <td class="text-center">
-                            {{ $task->vmmfgUnit->unit_no }}
+                            <a href="/vmmfg-ops?unit_id={{$task->vmmfgUnit->id}}">
+                                {{ $task->vmmfgUnit->unit_no }}
+                            </a>
                         </td>
                         <td class="text-center">
                             {{ $task->vmmfgUnit->model }}

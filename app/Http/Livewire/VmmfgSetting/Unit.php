@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\VmmfgSetting;
 
+use App\Models\VmmfgScope;
 use App\Models\VmmfgUnit;
 use DB;
 use Carbon\Carbon;
@@ -27,6 +28,7 @@ class Unit extends Component
         'date_to' => '',
         'is_completed' => '0',
     ];
+    public $scopes;
 
     public VmmfgUnit $unitForm;
 
@@ -37,9 +39,14 @@ class Unit extends Component
             'unitForm.vend_id' => 'sometimes',
             'unitForm.completion_date' => 'sometimes',
             'unitForm.model' => 'sometimes',
+            'unitForm.vmmfg_scope_id' => 'sometimes',
         ];
     }
 
+    public function mount()
+    {
+        $this->scopes = VmmfgScope::latest()->get();
+    }
 
     public function render()
     {

@@ -1,5 +1,8 @@
 <div>
     @inject('vmmfgTask', 'App\Models\VmmfgTask')
+    @php
+        $profile = \App\Models\Profile::where('is_primary', 1)->first();
+    @endphp
     <div>
         <div>
             <x-flash></x-flash>
@@ -8,53 +11,12 @@
 
             <div class="">
                 <div>
-                    {{-- <div class="p-3" style="background-color: #d8d8d8;">
-                        <label for="filter" class="font-weight-bold"><u>Filters</u></label>
-                        <div class="form-row">
-                            <div class="form-group col-md-4 col-xs-12">
-                                <label>
-                                    User
-                                </label>
-                                <select name="user_id" wire:model="form.user_id" class="select form-control">
-                                    <option value="">Select...</option>
-                                    @foreach($users as $user)
-                                        <option value="{{$user->id}}">
-                                            {{$user->name}} ({{$user->roles[0]->name}})
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="form-group col-md-4 col-xs-12">
-                                <label>
-                                    Date From
-                                </label>
-
-                                <input wire:model="form.date_from" type="date" class="form-control" placeholder="Date From">
-                            </div>
-                            <div class="form-group col-md-4 col-xs-12">
-                                <label>
-                                    Date To
-                                </label>
-                                <input wire:model="form.date_to" type="date" class="form-control" placeholder="Date To">
-                            </div>
-                        </div>
-                    </div> --}}
-
                     <div class="bg-light p-3">
-                        {{-- <div class="form-row"> --}}
+{{--
                             <div class="form-group">
                                 <label>
                                     Batch No
                                 </label>
-{{--
-                                <x-input-select2 wire:model.defer="batch_no">
-                                    <option value="">Select...</option>
-                                    @foreach($jobs as $job)
-                                        <option value="{{$job->id}}">
-                                            #{{$job->batch_no}} - {{$job->model}}
-                                        </option>
-                                    @endforeach
-                                </x-input-select2> --}}
                                 <select name="batch_no" wire:model="job_id" class="select form-control">
                                     <option value="">Select..</option>
                                     @foreach($jobs as $job)
@@ -65,55 +27,79 @@
                                         </option>
                                     @endforeach
                                 </select>
-                            </div>
-                            {{-- @dd($this->batch_no) --}}
+                            </div> --}}
 
-                            @if($this->form['job_id'])
+                            {{-- @if($this->form['job_id']) --}}
                                 <div class="form-group">
                                     <label>
-                                        Unit No
+                                        {{$profile->profileSetting ? $profile->profileSetting->vmmfg_job_batch_no_title : 'Batch No'}} -
+                                        {{$profile->profileSetting ? $profile->profileSetting->vmmfg_unit_vend_id_title : 'Vend ID'}}
+                                        - #Unit No
+                                        (Model)
+                                        - Scope
+                                        (Start Date)
+                                        (Completion Date)
                                     </label>
-                                    <select name="unit_no" wire:model="unit_id" class="select form-control">
+                                    <select name="unit_id" wire:model="unit_id" wire:ignore class="select form-control">
                                         <option value="">Select..</option>
-                                        @foreach($this->job->vmmfgUnits as $unit)
+                                        @foreach($units as $unit)
                                             <option value="{{$unit->id}}">
-                                                #{{$unit->unit_no}}
+                                                {{$unit->vmmfgJob->batch_no}}
                                                 @if($unit->vend_id)
-                                                    [{{$unit->vend_id}}]
+                                                   - {{$unit->vend_id}}
+                                                @endif
+                                                @if($unit->unit_no)
+                                                   - #{{$unit->unit_no}}
+                                                @endif
+                                                @if($unit->model)
+                                                    ({{$unit->model}})
+                                                @endif
+                                                @if($unit->vmmfgScope)
+                                                   - {{$unit->vmmfgScope->name}}
+                                                @endif
+                                                @if($unit->vmmfgJob->order_date)
+                                                    (Start: {{$unit->vmmfgJob->order_date}})
                                                 @endif
                                                 @if($unit->completion_date)
-                                                        (Complete: {{$unit->completion_date}})
+                                                    (Complete: {{$unit->completion_date}})
                                                 @endif
                                             </option>
                                         @endforeach
                                     </select>
-                                    {{-- <x-input-select2 wire:model.defer="unit_no">
-                                        <option value="">Select...</option>
-                                        @foreach($this->job->vmmfgUnits as $unit)
+                                    {{-- <x-input-select2 model="unit_id">
+                                        <option value="">Select..</option>
+                                        @foreach($units as $unit)
                                             <option value="{{$unit->id}}">
-                                                #{{$unit->unit_no}}
+                                                {{$unit->vmmfgJob->batch_no}}
+                                                @if($unit->vend_id)
+                                                   - {{$unit->vend_id}}
+                                                @endif
+                                                @if($unit->unit_no)
+                                                   #{{$unit->unit_no}}
+                                                @endif
+                                                @if($unit->model)
+                                                    ({{$unit->model}})
+                                                @endif
+                                                @if($unit->vmmfgScope)
+                                                   - ({{$unit->vmmfgScope->name}})
+                                                @endif
+                                                @if($unit->vmmfgJob->order_date)
+                                                    (Start: {{$unit->vmmfgJob->order_date}})
+                                                @endif
+                                                @if($unit->completion_date)
+                                                    (Complete: {{$unit->completion_date}})
+                                                @endif
                                             </option>
                                         @endforeach
                                     </x-input-select2> --}}
                                 </div>
-{{--
-                                @if($vmmfgUnit)
-                                <div class="form-group">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" wire:model="is_incomplete">
-                                        <label class="form-check-label" for="is_incomplete">
-                                            Show Incomplete
-                                        </label>
-                                    </div>
-                                </div>
-                                @endif --}}
-                            @endif
+                            {{-- @endif --}}
 
                         {{-- </div> --}}
                         <div class="form-group">
                             {{-- <div class="btn-group"> --}}
 
-                                @if($this->form['unit_id'])
+                                @if($this->unit_id)
                                     <button class="btn btn-success btn-block" wire:click="exportPdf">
                                         <i class="far fa-file-pdf"></i>
                                         Export PDF

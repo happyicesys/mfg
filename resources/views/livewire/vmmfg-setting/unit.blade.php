@@ -132,6 +132,9 @@
                         <x-th-data model="vmmfg_units.model" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Model
                         </x-th-data>
+                        <x-th-data model="vmmfg_units.vmmfg_scope_id" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
+                            Scope
+                        </x-th-data>
                         <x-th-data model="order_date" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Start Date
                         </x-th-data>
@@ -155,10 +158,15 @@
                             {{ $unit->vend_id }}
                         </td>
                         <td class="text-center">
-                            {{ $unit->unit_no }}
+                            <a href="/vmmfg-ops?unit_id={{$unit->id}}">
+                                {{ $unit->unit_no }}
+                            </a>
                         </td>
                         <td class="text-center">
                             {{ $unit->model }}
+                        </td>
+                        <td class="text-center">
+                            {{ $unit->vmmfgScope->name }}
                         </td>
                         <td class="text-center">
                             {{ $unit->vmmfgJob->order_date }}
@@ -198,6 +206,19 @@
                         <x-input type="text" model="unitForm.model">
                             Model
                         </x-input>
+                        <div class="form-group">
+                            <label for="vmmfg_scope_id">
+                                Scope
+                            </label>
+                            <select name="vmmfg_scope_id" wire:model="unitForm.vmmfg_scope_id" class="select form-control">
+                                <option value="">Select..</option>
+                                @foreach($this->scopes as $scope)
+                                    <option value="{{$scope->id}}">
+                                        {{$scope->name}} @if($scope->remarks)({{$scope->remarks}})@endif
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                         <div class="form-group">
                             <label for="completion_date">
                                 Completion Date
