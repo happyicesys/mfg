@@ -23,7 +23,7 @@
                                 </div>
                                 <div class="form-group col-md-4 col-xs-12">
                                     <label>
-                                        Batch No
+                                        {{$profile->profileSetting ? $profile->profileSetting->vmmfg_job_batch_no_title : 'Batch No'}}
                                     </label>
                                     <input wire:model="filters.batch_no" type="text" class="form-control" placeholder="Batch No">
                                 </div>
