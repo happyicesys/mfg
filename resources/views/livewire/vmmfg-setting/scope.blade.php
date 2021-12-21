@@ -188,7 +188,9 @@
                         <x-th-data model="remarks" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Remarks
                         </x-th-data>
-                        <th></th>
+                        <th class="text-center">
+                            Action
+                        </th>
                     </tr>
                     @forelse($scopes as $index => $scope)
                     <tr class="row_edit" wire:loading.class.delay="opacity-2" wire:key="row-{{$index}}">
@@ -205,9 +207,14 @@
                             {{ $scope->remarks }}
                         </td>
                         <td class="text-center">
-                            <button type="button" wire:key="edit-scope-{{$scope->id}}" wire:click="edit({{$scope}})" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#edit-scope">
-                                <i class="fas fa-edit"></i>
-                            </button>
+                            <div class="btn-group">
+                                <button type="button" wire:key="edit-scope-{{$scope->id}}" wire:click="edit({{$scope}})" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#edit-scope">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-primary" wire:key="replicate-scope-{{$scope->id}}"  onclick="return confirm('Are you sure you want to Replicate?') || event.stopImmediatePropagation()" wire:click.prevent="replicateScope({{$scope}})">
+                                    <i class="fas fa-clone"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     @empty
@@ -273,13 +280,14 @@
                         </div>
                         <hr> --}}
                         @if(isset($this->scope))
-                        <div class="form-group">
-                            <button type="button" class="btn btn-success btn-md" data-toggle="modal" data-target="#title-modal" wire:click="createTitle({{$this->scope}})">
-                                <i class="fas fa-plus-circle"></i>
-                                Title
-                            </button>
-                        </div>
-                            <ul class="list-group">
+                            <div class="form-group">
+                                <button type="button" class="btn btn-success btn-md" data-toggle="modal" data-target="#title-modal" wire:click="createTitle({{$this->scope}})">
+                                    <i class="fas fa-plus-circle"></i>
+                                    Title
+                                </button>
+                            </div>
+                            <ul class="list-group"  wire:key="scope-{{$this->scope->id}}">
+                                @if($this->scope->vmmfgTitles()->exists())
                                 @foreach($this->scope->vmmfgTitles as $titleIndex => $title)
                                 <li class="list-group-item mt-2" style="background-color: #9bc2cf;" wire:key="title-{{$titleIndex}}">
                                     <div class="form-group">
@@ -321,21 +329,24 @@
                                         </div>
                                     @endif --}}
                                 </li>
-                                    @foreach($title->vmmfgItems as $itemIndex => $item)
-                                    <li class="list-group-item ml-2" style="background-color: #e6f3f7;" wire:key="item-{{$itemIndex}}">
-                                        <div class="form-group">
-                                            <span class="float-left">
-                                                {{$item->sequence}}.  {{$item->name}}
-                                            </span>
-                                            <span class="float-right">
-                                                <button type="button" wire:click="editTask({{$item}})" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#task-modal">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                            </span>
-                                        </div>
-                                    </li>
-                                    @endforeach
+                                    @if($title->vmmfgItems()->exists())
+                                        @foreach($title->vmmfgItems as $itemIndex => $item)
+                                        <li class="list-group-item ml-2" style="background-color: #e6f3f7;" wire:key="item-{{$itemIndex}}">
+                                            <div class="form-group">
+                                                <span class="float-left">
+                                                    {{$item->sequence}}.  {{$item->name}}
+                                                </span>
+                                                <span class="float-right">
+                                                    <button type="button" wire:click="editTask({{$item}})" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#task-modal">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        </li>
+                                        @endforeach
+                                    @endif
                                 @endforeach
+                                @endif
                             </ul>
                         @endif
                     </x-slot>

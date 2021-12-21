@@ -2,6 +2,9 @@
 @extends('pdf.base')
 
 @section('content')
+    @php
+        $profile = \App\Models\Profile::where('is_primary', 1)->first();
+    @endphp
     <table width="100%" style="font-size: 13px;">
         <tr>
             <td style="padding-bottom: 0.2em; text-align: right">
@@ -10,25 +13,57 @@
                 </span>
             </td>
         </tr>
-        <tr>
-            <td class="text" valign="top" style="text-align: right">
-                <table align="right">
-                    <tr style="font-size: 13px;">
-                        <td>Batch No</td>
-                        <td>:</td>
-                        <td style="text-align: right">{{ $filtersData['jobBatchNo'] }}</td>
-                    </tr>
-                    <tr style="font-size: 13px;">
-                        <td>Unit No</td>
-                        <td>:</td>
-                        <td style="text-align: right">{{ $filtersData['unitNo'] }}</td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
     </table>
 
     <div class="items">
+        <table style="width:100%; padding-top: 15px;">
+            <tr>
+                <th align="center">
+                    {{$profile->profileSetting ? $profile->profileSetting->vmmfg_job_batch_no_title : 'Batch No'}}
+                </th>
+                <th align="center">
+                    {{$profile->profileSetting ? $profile->profileSetting->vmmfg_unit_vend_id_title : 'Vend ID'}}
+                </th>
+                <th align="center">
+                    Unit No
+                </th>
+                <th align="center">
+                    Model
+                </th>
+                <th align="center">
+                    Scope
+                </th>
+                <th align="center">
+                    Start Date
+                </th>
+                <th align="center">
+                    Completion Date
+                </th>
+            </tr>
+            <tr>
+                <td align="center">
+                    {{ $vmmfgUnit->first()->vmmfgJob->batch_no }}
+                </td>
+                <td align="center">
+                    {{ $vmmfgUnit->first()->vend_id }}
+                </td>
+                <td align="center">
+                    {{ $vmmfgUnit->first()->unit_no }}
+                </td>
+                <td align="center">
+                    {{ $vmmfgUnit->first()->model }}
+                </td>
+                <td align="center">
+                    {{ $vmmfgUnit->first()->vmmfgScope->name }}
+                </td>
+                <td align="center">
+                    {{ $vmmfgUnit->first()->vmmfgJob->order_date }}
+                </td>
+                <td align="center">
+                    {{ $vmmfgUnit->first()->completion_date }}
+                </td>
+            </tr>
+        </table>
         @foreach($vmmfgUnit->first()->vmmfgScope->vmmfgTitles as $index => $title)
             @php
                 $sumItem = 0;

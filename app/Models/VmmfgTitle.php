@@ -23,6 +23,11 @@ class VmmfgTitle extends Model
         return $this->hasMany(VmmfgItem::class)->orderBy('sequence', 'asc')->orderBy('created_at', 'desc');
     }
 
+    public function vmmfgScope()
+    {
+        return $this->belongsTo(VmmfgScope::class);
+    }
+
     public function vmmfgTitleCategory()
     {
         return $this->belongsTo(VmmfgTitleCategory::class)->orderBy('name', 'asc');

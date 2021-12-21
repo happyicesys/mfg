@@ -98,7 +98,6 @@ class Scope extends Component
 
     public function edit(VmmfgScope $scope)
     {
-        // dd($scope->toArray());
         $this->scope = $scope;
     }
 
@@ -125,6 +124,14 @@ class Scope extends Component
             foreach($this->scope->vmmfgTitles as $title) {
                 if($title) {
                     foreach($title->vmmfgItems as $item) {
+                        if($item->attachments()->exists()) {
+                            foreach($item->attachments as $attachment) {
+                                if(Attachment::where('full_url', $attachment->full_url)->count() === 1) {
+                                    Storage::disk('digitaloceanspaces')->delete($attachment->url);
+                                }
+                                $attachment->delete();
+                            }
+                        }
                         $item->delete();
                     }
                 }
@@ -132,6 +139,7 @@ class Scope extends Component
             }
         }
         $this->scope->delete();
+        $this->emit('refresh');
         $this->emit('updated');
         session()->flash('success', 'Your entry has been removed');
     }
@@ -285,10 +293,11 @@ class Scope extends Component
 
     public function deleteAttachment(Attachment $attachment)
     {
-        $deleteFile = Storage::disk('digitaloceanspaces')->delete($attachment->url);
-        if($deleteFile){
-            $attachment->delete();
+        if(Attachment::where('full_url', $attachment->full_url)->count() === 1) {
+            Storage::disk('digitaloceanspaces')->delete($attachment->url);
         }
+        $attachment->delete();
+
         $this->emit('updated');
         session()->flash('success', 'Entry has been removed');
     }
@@ -296,5 +305,43 @@ class Scope extends Component
     public function downloadAttachment(Attachment $attachment)
     {
         return Storage::disk('digitaloceanspaces')->download($attachment->url);
+    }
+
+    public function replicateScope(VmmfgScope $scope)
+    {
+        $replicatedScope = $scope->replicate()->fill([
+            'name' => $scope->name.'-replicated'
+        ]);
+        $replicatedScope->save();
+
+        if($scope->vmmfgTitles()->exists()) {
+            foreach($scope->vmmfgTitles as $title) {
+                $replicatedTitle = '';
+                $replicatedTitle = $title->replicate()->fill([
+                    'vmmfg_scope_id' => $replicatedScope->id,
+                ]);
+                $replicatedTitle->save();
+
+                if($title->vmmfgItems()->exists()) {
+                    foreach($title->vmmfgItems as $item) {
+                        $replicatedItem = '';
+                        $replicatedItem = $item->replicate()->fill([
+                            'vmmfg_title_id' => $replicatedTitle->id,
+                        ]);
+                        $replicatedItem->save();
+
+                        if($item->attachments()->exists()) {
+                            foreach($item->attachments as $attachment) {
+                                $replicatedAttachment = '';
+                                $replicatedAttachment = $attachment->replicate()->fill([
+                                    'modelable_id' => $replicatedItem->id
+                                ]);
+                                $replicatedAttachment->save();
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
