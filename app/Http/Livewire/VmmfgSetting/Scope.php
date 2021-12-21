@@ -189,6 +189,12 @@ class Scope extends Component
 
     public function deleteTitle()
     {
+        // if($this->title->vmmfgItems()->exists()) {
+        //     foreach($this->title->vmmfgItems() as $item) {
+        //         // $item
+        //     }
+        // }
+
         $this->title->vmmfgItems()->delete();
         $this->title->delete();
         // $this->title = new VmmfgTitle;

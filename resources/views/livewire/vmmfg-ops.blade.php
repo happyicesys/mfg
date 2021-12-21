@@ -9,110 +9,118 @@
             <h2>QA/QC</h2>
             <hr>
 
-            <div class="">
-                <div>
-                    <div class="bg-light p-3">
+            <div class="bg-light p-3">
 {{--
-                            <div class="form-group">
-                                <label>
-                                    Batch No
-                                </label>
-                                <select name="batch_no" wire:model="job_id" class="select form-control">
-                                    <option value="">Select..</option>
-                                    @foreach($jobs as $job)
-                                        <option value="{{$job->id}}">
-                                            #{{$job->batch_no}} - {{$job->model}}
-                                            @if($job->vmmfgUnits) ({{count($job->vmmfgUnits)}} units) @endif
-                                            @if($job->order_date) (Start: {{$job->order_date}}) @endif
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div> --}}
+                    <div class="form-group">
+                        <label>
+                            Batch No
+                        </label>
+                        <select name="batch_no" wire:model="job_id" class="select form-control">
+                            <option value="">Select..</option>
+                            @foreach($jobs as $job)
+                                <option value="{{$job->id}}">
+                                    #{{$job->batch_no}} - {{$job->model}}
+                                    @if($job->vmmfgUnits) ({{count($job->vmmfgUnits)}} units) @endif
+                                    @if($job->order_date) (Start: {{$job->order_date}}) @endif
+                                </option>
+                            @endforeach
+                        </select>
+                    </div> --}}
 
-                            {{-- @if($this->form['job_id']) --}}
-                                <div class="form-group">
-                                    <label>
-                                        {{$profile->profileSetting ? $profile->profileSetting->vmmfg_job_batch_no_title : 'Batch No'}} -
-                                        {{$profile->profileSetting ? $profile->profileSetting->vmmfg_unit_vend_id_title : 'Vend ID'}}
-                                        - #Unit No
-                                        (Model)
-                                        - Scope
-                                        (Start Date)
-                                        (Completion Date)
-                                    </label>
-                                    <select name="unit_id" wire:model="unit_id" wire:ignore class="select form-control">
-                                        <option value="">Select..</option>
-                                        @foreach($units as $unit)
-                                            <option value="{{$unit->id}}">
-                                                {{$unit->vmmfgJob->batch_no}}
-                                                @if($unit->vend_id)
-                                                   - {{$unit->vend_id}}
-                                                @endif
-                                                @if($unit->unit_no)
-                                                   - #{{$unit->unit_no}}
-                                                @endif
-                                                @if($unit->model)
-                                                    ({{$unit->model}})
-                                                @endif
-                                                @if($unit->vmmfgScope)
-                                                   - {{$unit->vmmfgScope->name}}
-                                                @endif
-                                                @if($unit->vmmfgJob->order_date)
-                                                    (Start: {{$unit->vmmfgJob->order_date}})
-                                                @endif
-                                                @if($unit->completion_date)
-                                                    (Complete: {{$unit->completion_date}})
-                                                @endif
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    {{-- <x-input-select2 model="unit_id">
-                                        <option value="">Select..</option>
-                                        @foreach($units as $unit)
-                                            <option value="{{$unit->id}}">
-                                                {{$unit->vmmfgJob->batch_no}}
-                                                @if($unit->vend_id)
-                                                   - {{$unit->vend_id}}
-                                                @endif
-                                                @if($unit->unit_no)
-                                                   #{{$unit->unit_no}}
-                                                @endif
-                                                @if($unit->model)
-                                                    ({{$unit->model}})
-                                                @endif
-                                                @if($unit->vmmfgScope)
-                                                   - ({{$unit->vmmfgScope->name}})
-                                                @endif
-                                                @if($unit->vmmfgJob->order_date)
-                                                    (Start: {{$unit->vmmfgJob->order_date}})
-                                                @endif
-                                                @if($unit->completion_date)
-                                                    (Complete: {{$unit->completion_date}})
-                                                @endif
-                                            </option>
-                                        @endforeach
-                                    </x-input-select2> --}}
-                                </div>
-                            {{-- @endif --}}
-
-                        {{-- </div> --}}
+                    {{-- @if($this->form['job_id']) --}}
                         <div class="form-group">
-                            {{-- <div class="btn-group"> --}}
-
-                                @if($this->unit_id)
-                                    <button class="btn btn-success btn-block" wire:click="exportPdf">
-                                        <i class="far fa-file-pdf"></i>
-                                        Export PDF
-                                    </button>
-                                @endif
-                                <button wire:click.prevent="resetFilters()" class="btn btn-outline-dark btn-block">Reset</button>
-                            {{-- </div> --}}
+                            <label>
+                                {{$profile->profileSetting ? $profile->profileSetting->vmmfg_job_batch_no_title : 'Batch No'}} -
+                                {{$profile->profileSetting ? $profile->profileSetting->vmmfg_unit_vend_id_title : 'Vend ID'}}
+                                - #Unit No
+                                (Model)
+                                - Scope
+                                (Start Date)
+                                (Completion Date)
+                            </label>
+                            <select name="unit_id" wire:model="unit_id" wire:ignore class="select form-control">
+                                <option value="">Select..</option>
+                                @foreach($units as $unit)
+                                    <option value="{{$unit->id}}">
+                                        {{$unit->vmmfgJob->batch_no}}
+                                        @if($unit->vend_id)
+                                            - {{$unit->vend_id}}
+                                        @endif
+                                        @if($unit->unit_no)
+                                            - #{{$unit->unit_no}}
+                                        @endif
+                                        @if($unit->model)
+                                            ({{$unit->model}})
+                                        @endif
+                                        @if($unit->vmmfgScope)
+                                            - {{$unit->vmmfgScope->name}}
+                                        @endif
+                                        @if($unit->vmmfgJob->order_date)
+                                            (Start: {{$unit->vmmfgJob->order_date}})
+                                        @endif
+                                        @if($unit->completion_date)
+                                            (Complete: {{$unit->completion_date}})
+                                        @endif
+                                    </option>
+                                @endforeach
+                            </select>
+                            {{-- <x-input-select2 model="unit_id">
+                                <option value="">Select..</option>
+                                @foreach($units as $unit)
+                                    <option value="{{$unit->id}}">
+                                        {{$unit->vmmfgJob->batch_no}}
+                                        @if($unit->vend_id)
+                                            - {{$unit->vend_id}}
+                                        @endif
+                                        @if($unit->unit_no)
+                                            #{{$unit->unit_no}}
+                                        @endif
+                                        @if($unit->model)
+                                            ({{$unit->model}})
+                                        @endif
+                                        @if($unit->vmmfgScope)
+                                            - ({{$unit->vmmfgScope->name}})
+                                        @endif
+                                        @if($unit->vmmfgJob->order_date)
+                                            (Start: {{$unit->vmmfgJob->order_date}})
+                                        @endif
+                                        @if($unit->completion_date)
+                                            (Complete: {{$unit->completion_date}})
+                                        @endif
+                                    </option>
+                                @endforeach
+                            </x-input-select2> --}}
                         </div>
-                    </div>
+                    {{-- @endif --}}
+
+                {{-- </div> --}}
+                <div class="form-group">
+                    {{-- <div class="btn-group"> --}}
+
+                        @if($this->unit_id)
+                            <button class="btn btn-success btn-block" wire:click="exportPdf">
+                                <i class="far fa-file-pdf"></i>
+                                Export PDF
+                            </button>
+                        @endif
+                        <button wire:click.prevent="resetFilters()" class="btn btn-outline-dark btn-block">Reset</button>
+                    {{-- </div> --}}
                 </div>
             </div>
 
             @if($vmmfgUnit)
+            <div class="form-group">
+                <table class="table table-bordered">
+                    <tr>
+                        <td class="text-center col-2 font-weight-bold">
+                            Scope
+                        </td>
+                        <td class="col-10">
+                            {{$vmmfgUnit->first()->vmmfgScope->name}}
+                        </td>
+                    </tr>
+                </table>
+            </div>
             {{-- @dd($vmmfgUnit->toArray()) --}}
                 <ul class="list-group" wire:key="unit-list-{{$vmmfgUnit->first()->id}}">
                     @forelse($vmmfgUnit->first()->vmmfgScope->vmmfgTitles as $index => $title)

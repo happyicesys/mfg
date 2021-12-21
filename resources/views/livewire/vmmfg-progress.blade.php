@@ -106,11 +106,15 @@
                         <th class="text-center text-dark">
                             Completion (%)
                         </th>
+                        <th class="text-center text-dark">
+                            Checking
+                        </th>
                     </tr>
                     @forelse($units as $index => $unit)
                         @php
                             $totalItemCount = 0;
                             $totalTaskCount = 0;
+                            $totalCheckedTaskCount = 0;
                             $color = '';
                         @endphp
                         <tr class="row_edit" wire:loading.class.delay="opacity-2" wire:key="row-{{$unit->id}}">
@@ -144,6 +148,7 @@
                                 @php
                                     $itemCount = 0;
                                     $taskCount = 0;
+                                    $checkedTaskCount = 0;
                                     $eachColor = '';
 
                                     $taskCount = $unit
@@ -154,6 +159,15 @@
                                             });
                                         })->whereIn('status', [1, 2, 98])
                                         ->count();
+
+                                    $checkedTaskCount = $unit
+                                                        ->vmmfgTasks()
+                                                        ->whereHas('vmmfgItem', function($query) use ($vmmfgTitleCategory) {
+                                                            $query->whereHas('vmmfgTitle', function($query) use ($vmmfgTitleCategory) {
+                                                                $query->where('vmmfg_title_category_id', $vmmfgTitleCategory->id);
+                                                            });
+                                                        })->where('is_checked', true)
+                                                        ->count();
 
                                     foreach($unit->vmmfgScope->vmmfgTitles as $title) {
                                         if($title->vmmfg_title_category_id === $vmmfgTitleCategory->id) {
@@ -174,6 +188,7 @@
 //
                                     $totalItemCount += $itemCount;
                                     $totalTaskCount += $taskCount;
+                                    $totalCheckedTaskCount += $checkedTaskCount;
 
                                 @endphp
                                 <td class="text-center text-dark {{$eachColor}}">
@@ -182,12 +197,23 @@
                                 </td>
                             @endforeach
                             @php
+                                $color = '';
+                                $checkedColor = '';
+
                                 $progressPercent = round($totalTaskCount/($totalItemCount ? $totalItemCount : 1) * 100);
 
                                 if($progressPercent == 100) {
                                     $color = 'bg-success';
                                 }else if($progressPercent >= 80 and $progressPercent < 100) {
                                     $color = 'bg-warning';
+                                }
+
+                                $checkedProgressPercent = round($totalCheckedTaskCount/($totalItemCount ? $totalItemCount : 1) * 100);
+
+                                if($checkedProgressPercent == 100) {
+                                    $checkedColor = 'bg-success';
+                                }else if($checkedProgressPercent >= 80 and $checkedProgressPercent < 100) {
+                                    $checkedColor = 'bg-warning';
                                 }
                             @endphp
                             {{-- @dd($unit->toArray()) --}}
@@ -196,6 +222,10 @@
                             </td> --}}
                             <td class="text-center text-dark {{$color}}">
                                 {{ $progressPercent }}
+                            </td>
+                            <td class="text-center text-dark {{$checkedColor}}">
+                                {{ $totalCheckedTaskCount }} /
+                                {{ $totalItemCount }}
                             </td>
                         </tr>
                     @empty
