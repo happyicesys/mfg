@@ -4,6 +4,7 @@
             <x-flash></x-flash>
             <h2>VM MFG Scopes Settings</h2>
             <hr>
+            @inject('vmmfgUnits', 'App\Models\VmmfgUnit')
             @php
                 $scopesArr = $scopes->toArray();
                 $from = $scopesArr['from'];
@@ -352,18 +353,32 @@
                     </x-slot>
                     <x-slot name="footer">
                         {{-- normal view --}}
-                        <button type="submit" class="btn btn-danger d-none d-sm-block" wire:click.prevent="delete">
-                            <i class="fas fa-trash"></i>
-                            Delete
-                        </button>
-                        <button type="submit" class="btn btn-success d-none d-sm-block" wire:click.prevent="save">
-                            <i class="fas fa-save"></i>
-                            Save
-                        </button>
+                        <div class="btn-group">
+                            @php
+                                $vmmfgUnitCount = 0;
+                                if(isset($this->scope)) {
+                                    $vmmfgUnitCount = $vmmfgUnits->where('vmmfg_scope_id', $this->scope->id)->count();
+                                }
+                            @endphp
+                            <button type="submit" class="btn btn-danger d-none d-sm-block" wire:click.prevent="delete" {{$vmmfgUnitCount > 0 ? 'disabled' : ''}}>
+                                <i class="fas fa-trash"></i>
+                                Delete
+                                @if($vmmfgUnitCount > 0)
+                                    - {{$vmmfgUnitCount}} unit(s) still using this scope
+                                @endif
+                            </button>
+                            <button type="submit" class="btn btn-success d-none d-sm-block" wire:click.prevent="save">
+                                <i class="fas fa-save"></i>
+                                Save
+                            </button>
+                        </div>
                         {{-- phone view --}}
-                        <button type="submit" class="btn btn-danger btn-block d-block d-sm-none" wire:click.prevent="delete">
+                        <button type="submit" class="btn btn-danger btn-block d-block d-sm-none" wire:click.prevent="delete" {{$vmmfgUnitCount > 0 ? 'disabled' : ''}}>
                             <i class="fas fa-trash"></i>
                             Delete
+                            @if($vmmfgUnitCount > 0)
+                                - {{$vmmfgUnitCount}} unit(s) still using this scope
+                            @endif
                         </button>
                         <button type="submit" class="btn btn-success btn-block d-block d-sm-none" wire:click.prevent="save">
                             <i class="fas fa-save"></i>
@@ -529,14 +544,16 @@
                 </x-slot>
                 <x-slot name="footer">
                     {{-- normal view --}}
-                    <button type="submit" class="btn btn-danger d-none d-sm-block" wire:click.prevent="deleteTask">
-                        <i class="fas fa-trash"></i>
-                        Delete
-                    </button>
-                    <button type="submit" class="btn btn-success d-none d-sm-block" wire:click.prevent="saveTask">
-                        <i class="fas fa-save"></i>
-                        Save
-                    </button>
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-danger d-none d-sm-block" wire:click.prevent="deleteTask">
+                            <i class="fas fa-trash"></i>
+                            Delete
+                        </button>
+                        <button type="submit" class="btn btn-success d-none d-sm-block" wire:click.prevent="saveTask">
+                            <i class="fas fa-save"></i>
+                            Save
+                        </button>
+                    </div>
                     {{-- phone view --}}
                     <button type="submit" class="btn btn-danger btn-block d-block d-sm-none" wire:click.prevent="deleteTask">
                         <i class="fas fa-trash"></i>

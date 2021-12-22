@@ -10,113 +10,104 @@
             <hr>
 
             <div class="bg-light p-3">
-{{--
-                    <div class="form-group">
-                        <label>
-                            Batch No
-                        </label>
-                        <select name="batch_no" wire:model="job_id" class="select form-control">
-                            <option value="">Select..</option>
-                            @foreach($jobs as $job)
-                                <option value="{{$job->id}}">
-                                    #{{$job->batch_no}} - {{$job->model}}
-                                    @if($job->vmmfgUnits) ({{count($job->vmmfgUnits)}} units) @endif
-                                    @if($job->order_date) (Start: {{$job->order_date}}) @endif
-                                </option>
-                            @endforeach
-                        </select>
-                    </div> --}}
-
-                    {{-- @if($this->form['job_id']) --}}
-                        <div class="form-group">
-                            <label>
-                                {{$profile->profileSetting ? $profile->profileSetting->vmmfg_job_batch_no_title : 'Batch No'}} -
-                                {{$profile->profileSetting ? $profile->profileSetting->vmmfg_unit_vend_id_title : 'Vend ID'}}
-                                - #Unit No
-                                (Model)
-                                - Scope
-                                (Start Date)
-                                (Completion Date)
-                            </label>
-                            <select name="unit_id" wire:model="unit_id" wire:ignore class="select form-control">
-                                <option value="">Select..</option>
-                                @foreach($units as $unit)
-                                    <option value="{{$unit->id}}">
-                                        {{$unit->vmmfgJob->batch_no}}
-                                        @if($unit->vend_id)
-                                            - {{$unit->vend_id}}
-                                        @endif
-                                        @if($unit->unit_no)
-                                            - #{{$unit->unit_no}}
-                                        @endif
-                                        @if($unit->model)
-                                            ({{$unit->model}})
-                                        @endif
-                                        @if($unit->vmmfgScope)
-                                            - {{$unit->vmmfgScope->name}}
-                                        @endif
-                                        @if($unit->vmmfgJob->order_date)
-                                            (Start: {{$unit->vmmfgJob->order_date}})
-                                        @endif
-                                        @if($unit->completion_date)
-                                            (Complete: {{$unit->completion_date}})
-                                        @endif
-                                    </option>
-                                @endforeach
-                            </select>
-                            {{-- <x-input-select2 model="unit_id">
-                                <option value="">Select..</option>
-                                @foreach($units as $unit)
-                                    <option value="{{$unit->id}}">
-                                        {{$unit->vmmfgJob->batch_no}}
-                                        @if($unit->vend_id)
-                                            - {{$unit->vend_id}}
-                                        @endif
-                                        @if($unit->unit_no)
-                                            #{{$unit->unit_no}}
-                                        @endif
-                                        @if($unit->model)
-                                            ({{$unit->model}})
-                                        @endif
-                                        @if($unit->vmmfgScope)
-                                            - ({{$unit->vmmfgScope->name}})
-                                        @endif
-                                        @if($unit->vmmfgJob->order_date)
-                                            (Start: {{$unit->vmmfgJob->order_date}})
-                                        @endif
-                                        @if($unit->completion_date)
-                                            (Complete: {{$unit->completion_date}})
-                                        @endif
-                                    </option>
-                                @endforeach
-                            </x-input-select2> --}}
-                        </div>
-                    {{-- @endif --}}
-
-                {{-- </div> --}}
                 <div class="form-group">
-                    {{-- <div class="btn-group"> --}}
+                    <label>
+                        {{$profile->profileSetting ? $profile->profileSetting->vmmfg_job_batch_no_title : 'Batch No'}} -
+                        {{$profile->profileSetting ? $profile->profileSetting->vmmfg_unit_vend_id_title : 'Vend ID'}}
+                        - #Unit No
+                        (Model)
+                        - Scope
+                        (Start Date)
+                        (Completion Date)
+                    </label>
+                    <select name="unit_id" wire:model="unit_id" wire:ignore class="select form-control">
+                        <option value="">Select..</option>
+                        @foreach($units as $unit)
+                            @if(!$unit->completion_date)
+                            <option value="{{$unit->id}}">
+                                {{$unit->vmmfgJob->batch_no}}
+                                @if($unit->vend_id)
+                                    - {{$unit->vend_id}}
+                                @endif
+                                @if($unit->unit_no)
+                                    - #{{$unit->unit_no}}
+                                @endif
+                                @if($unit->model)
+                                    ({{$unit->model}})
+                                @endif
+                                @if($unit->vmmfgScope)
+                                    - {{$unit->vmmfgScope->name}}
+                                @endif
+                                @if($unit->vmmfgJob->order_date)
+                                    (Start: {{$unit->vmmfgJob->order_date}})
+                                @endif
+                                @if($unit->completion_date)
+                                    (Complete: {{$unit->completion_date}})
+                                @endif
+                            </option>
+                            @endif
+                        @endforeach
+                    </select>
+                </div>
 
-                        @if($this->unit_id)
-                            <button class="btn btn-success btn-block" wire:click="exportPdf">
-                                <i class="far fa-file-pdf"></i>
-                                Export PDF
-                            </button>
-                        @endif
-                        <button wire:click.prevent="resetFilters()" class="btn btn-outline-dark btn-block">Reset</button>
-                    {{-- </div> --}}
+                <div class="form-group">
+                    @if($this->unit_id)
+                        <button class="btn btn-success btn-block" wire:click="exportPdf">
+                            <i class="far fa-file-pdf"></i>
+                            Export PDF
+                        </button>
+                    @endif
+                    <button wire:click.prevent="resetFilters()" class="btn btn-outline-dark btn-block">Reset</button>
                 </div>
             </div>
 
             @if($vmmfgUnit)
-            <div class="form-group">
-                <table class="table table-bordered">
-                    <tr>
-                        <td class="text-center col-2 font-weight-bold">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <tr class="table-secondary">
+                        <th class="text-center font-weight-bold text-dark">
+                            {{$profile->profileSetting ? $profile->profileSetting->vmmfg_job_batch_no_title : 'Batch No'}}
+                        </th>
+                        <th class="text-center font-weight-bold text-dark">
+                            {{$profile->profileSetting ? $profile->profileSetting->vmmfg_unit_vend_id_title : 'Vend ID'}}
+                        </th>
+                        <th class="text-center font-weight-bold text-dark">
+                            Unit No
+                        </th>
+                        <th class="text-center font-weight-bold text-dark">
+                            Model
+                        </th>
+                        <th class="text-center font-weight-bold text-dark">
                             Scope
+                        </th>
+                        <th class="text-center font-weight-bold text-dark">
+                            Start Date
+                        </th>
+                        <th class="text-center font-weight-bold text-dark">
+                            End Date
+                        </th>
+                    </tr>
+                    <tr class="row_edit">
+                        <td class="text-center">
+                            {{ $vmmfgUnit->first()->vmmfgJob->batch_no }}
                         </td>
-                        <td class="col-10">
-                            {{$vmmfgUnit->first()->vmmfgScope->name}}
+                        <td class="text-center">
+                            {{ $vmmfgUnit->first()->vend_id }}
+                        </td>
+                        <td class="text-center">
+                            {{ $vmmfgUnit->first()->unit_no }}
+                        </td>
+                        <td class="text-center">
+                            {{ $vmmfgUnit->first()->model }}
+                        </td>
+                        <td class="text-center">
+                            {{ $vmmfgUnit->first()->vmmfgScope->name }}
+                        </td>
+                        <td class="text-center">
+                            {{ $vmmfgUnit->first()->vmmfgJob->order_date }}
+                        </td>
+                        <td class="text-center">
+                            {{ $vmmfgUnit->first()->completion_date }}
                         </td>
                     </tr>
                 </table>
@@ -500,6 +491,7 @@
 
                                     <hr>
 
+                                    {{-- @dd($errors->has('form.remarks.'.$item->id), $errors->toArray()); --}}
                                     {{-- @dd($this->form) --}}
                                     <div class="form-group pt-3">
                                         <label for="remarks">Remarks 备注</label>
@@ -507,7 +499,15 @@
                                             <label for="art" style="color: red;">*</label>
                                         @endif
                                         {{-- <textarea name="remarks" class="form-control" rows="3" wire:model="form.remarks.{{$item->id}}" style="min-width: 100%;" placeholder="{{$item->is_required ? 'Compulsory to fill 必须填写' : '(Optional)'}}"></textarea> --}}
-                                        <textarea name="remarks" wire:model.defer="form.remarks.{{$item->id}}" wire:ignore class="form-control" rows="3" style="min-width: 100%;" placeholder="{{$item->is_required ? 'Compulsory to fill 必须填写' : '(Optional)'}}" {{isset($task) && $task->is_done ? 'disabled' : ''}} ></textarea>
+                                        <textarea name="remarks" wire:model.defer="form.remarks.{{$item->id}}" class="form-control  @error('form.remarks.'.$item->id) is-invalid @enderror" rows="3" style="min-width: 100%;" placeholder="{{$item->is_required ? 'Compulsory to fill 必须填写' : '(Optional)'}}" {{isset($task) && $task->is_done ? 'disabled' : ''}} ></textarea>
+                                        @error('form.remarks.'.$item->id)
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                        {{-- <button class="btn btn-success" wire:click.prevent="saveRemarks()">
+                                            <i class="far fa-save"></i>
+                                        </button> --}}
                                     </div>
 
                                     <div class="row pt-2">

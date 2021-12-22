@@ -170,6 +170,14 @@ class VmmfgOps extends Component
 
     public function onDoneClicked(VmmfgItem $item)
     {
+        if($item->is_required) {
+            $this->validate([
+                'form.remarks.'.$item->id => 'required',
+            ], [
+                'form.remarks.'.$item->id.'.required' => 'This remarks field is compulsory'
+            ]);
+        }
+
         VmmfgTask::updateOrCreate([
             'vmmfg_item_id' => $item->id,
             'vmmfg_unit_id' => $this->unit_id,
@@ -325,6 +333,7 @@ class VmmfgOps extends Component
             $vmmfgUnit = VmmfgUnit::query();
             $vmmfgUnit = $vmmfgUnit
                         ->with([
+                            'vmmfgJob',
                             'vmmfgTasks',
                             'vmmfgScope',
                             'vmmfgScope.vmmfgTitles',
