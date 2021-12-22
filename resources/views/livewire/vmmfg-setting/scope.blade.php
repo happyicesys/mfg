@@ -360,7 +360,7 @@
                                     $vmmfgUnitCount = $vmmfgUnits->where('vmmfg_scope_id', $this->scope->id)->count();
                                 }
                             @endphp
-                            <button type="submit" class="btn btn-danger d-none d-sm-block" wire:click.prevent="delete" {{$vmmfgUnitCount > 0 ? 'disabled' : ''}}>
+                            <button type="submit" class="btn btn-danger d-none d-sm-block" onclick="confirm('Are you sure you want to remove this scope?') || event.stopImmediatePropagation()" wire:click.prevent="delete" {{$vmmfgUnitCount > 0 ? 'disabled' : ''}}>
                                 <i class="fas fa-trash"></i>
                                 Delete
                                 @if($vmmfgUnitCount > 0)
@@ -373,7 +373,7 @@
                             </button>
                         </div>
                         {{-- phone view --}}
-                        <button type="submit" class="btn btn-danger btn-block d-block d-sm-none" wire:click.prevent="delete" {{$vmmfgUnitCount > 0 ? 'disabled' : ''}}>
+                        <button type="submit" class="btn btn-danger btn-block d-block d-sm-none" onclick="confirm('Are you sure you want to remove this scope?') || event.stopImmediatePropagation()" wire:click.prevent="delete" {{$vmmfgUnitCount > 0 ? 'disabled' : ''}}>
                             <i class="fas fa-trash"></i>
                             Delete
                             @if($vmmfgUnitCount > 0)
