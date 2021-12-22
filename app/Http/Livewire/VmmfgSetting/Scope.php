@@ -2,12 +2,15 @@
 
 namespace App\Http\Livewire\VmmfgSetting;
 
+use App\Exports\VmmfgScopeExcel;
 use App\Models\Attachment;
 use App\Models\VmmfgItem;
 use App\Models\VmmfgScope;
 use App\Models\VmmfgTitle;
 use App\Models\VmmfgTitleCategory;
+use Carbon\Carbon;
 use DB;
+use Excel;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
@@ -343,5 +346,11 @@ class Scope extends Component
                 }
             }
         }
+    }
+
+    public function exportExcel(VmmfgScope $scope)
+    {
+        return Excel::download(new VmmfgScopeExcel($scope), 'scope_'.Carbon::now()->format('ymdHis').'.xlsx');
+        // dd('here');
     }
 }

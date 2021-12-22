@@ -281,13 +281,22 @@
                         </div>
                         <hr> --}}
                         @if(isset($this->scope))
-                            <div class="form-group">
+                            <div class="btn-group">
                                 <button type="button" class="btn btn-success btn-md" data-toggle="modal" data-target="#title-modal" wire:click="createTitle({{$this->scope}})">
                                     <i class="fas fa-plus-circle"></i>
                                     Title
                                 </button>
+                                <button class="btn btn-outline-primary btn-md" wire:click="exportExcel({{$this->scope}})">
+                                    <i class="far fa-file-excel"></i>
+                                    Excel
+                                </button>
+{{--
+                                <a href="/vmmfg-scope/{{$this->scope->id}}/export-excel" class="btn btn-outline-primary btn-md">
+                                    <i class="far fa-file-excel"></i>
+                                    Excel
+                                </a> --}}
                             </div>
-                            <ul class="list-group"  wire:key="scope-{{$this->scope->id}}">
+                            <ul class="list-group pt-2" wire:key="scope-{{$this->scope->id}}">
                                 @if($this->scope->vmmfgTitles()->exists())
                                 @foreach($this->scope->vmmfgTitles as $titleIndex => $title)
                                 <li class="list-group-item mt-2" style="background-color: #9bc2cf;" wire:key="title-{{$titleIndex}}">

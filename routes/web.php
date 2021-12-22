@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ExportExcelController;
 use App\Http\Livewire\Admin;
 use App\Http\Livewire\AppSetting;
 use App\Http\Livewire\Customer;
