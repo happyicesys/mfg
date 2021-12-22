@@ -507,7 +507,7 @@
                                             <label for="art" style="color: red;">*</label>
                                         @endif
                                         {{-- <textarea name="remarks" class="form-control" rows="3" wire:model="form.remarks.{{$item->id}}" style="min-width: 100%;" placeholder="{{$item->is_required ? 'Compulsory to fill 必须填写' : '(Optional)'}}"></textarea> --}}
-                                        <textarea name="remarks" wire:model.defer="form.remarks.{{$item->id}}" class="form-control" rows="3" style="min-width: 100%;" placeholder="{{$item->is_required ? 'Compulsory to fill 必须填写' : '(Optional)'}}" {{isset($task) && $task->is_done ? 'disabled' : ''}} ></textarea>
+                                        <textarea name="remarks" wire:model.defer="form.remarks.{{$item->id}}" wire:ignore class="form-control" rows="3" style="min-width: 100%;" placeholder="{{$item->is_required ? 'Compulsory to fill 必须填写' : '(Optional)'}}" {{isset($task) && $task->is_done ? 'disabled' : ''}} ></textarea>
                                     </div>
 
                                     <div class="row pt-2">
@@ -578,9 +578,9 @@
                                                     $disabled = true;
                                                 }
                                                 // dd($this->form['remarks']);
-                                                // if($item->is_required and (!isset($this->form['remarks'][$item->id]) or !$this->form['remarks'][$item->id])) {
-                                                //     $disabled = true;
-                                                // }
+                                                if($item->is_required and (!isset($this->form['remarks'][$item->id]) or !$this->form['remarks'][$item->id])) {
+                                                    $disabled = true;
+                                                }
                                             @endphp
                                             @if($showDone)
                                                 <button class="btn btn-outline-dark btn-xs-block" wire:key="item-done-normal-{{$item->id}}" wire:click.prevent="onDoneClicked({{$item}})" {{$disabled ?  'disabled' : ''}}>
