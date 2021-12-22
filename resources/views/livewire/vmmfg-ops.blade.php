@@ -578,9 +578,9 @@
                                                     $disabled = true;
                                                 }
                                                 // dd($this->form['remarks']);
-                                                if($item->is_required and (!isset($this->form['remarks'][$item->id]) or !$this->form['remarks'][$item->id])) {
-                                                    $disabled = true;
-                                                }
+                                                // if($item->is_required and (!isset($this->form['remarks'][$item->id]) or !$this->form['remarks'][$item->id])) {
+                                                //     $disabled = true;
+                                                // }
                                             @endphp
                                             @if($showDone)
                                                 <button class="btn btn-outline-dark btn-xs-block" wire:key="item-done-normal-{{$item->id}}" wire:click.prevent="onDoneClicked({{$item}})" {{$disabled ?  'disabled' : ''}}>
