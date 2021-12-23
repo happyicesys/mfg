@@ -186,7 +186,7 @@ class VmmfgOps extends Component
             'done_by' => auth()->user()->id,
             'done_time' => Carbon::now(),
             'status' => VmmfgTask::STATUS_DONE,
-            'remarks' => $this->form['remarks'][$item->id],
+            'remarks' => isset($this->form['remarks'][$item->id]) ? $this->form['remarks'][$item->id] : null,
             'undo_done_by' => null,
             'undo_done_time' => null,
         ]);
