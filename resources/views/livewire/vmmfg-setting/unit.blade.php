@@ -169,7 +169,7 @@
                             {{ $unit->vmmfgScope->name }}
                         </td>
                         <td class="text-center">
-                            {{ $unit->vmmfgJob->order_date }}
+                            {{ $unit->order_date }}
                         </td>
                         <td class="text-center">
                             {{ $unit->completion_date }}
@@ -218,6 +218,12 @@
                                     </option>
                                 @endforeach
                             </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="completion_date">
+                                Start Date
+                            </label>
+                            <input type="date" class="form-control" wire:model.defer="unitForm.order_date">
                         </div>
                         <div class="form-group">
                             <label for="completion_date">

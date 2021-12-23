@@ -44,6 +44,7 @@ class Unit extends Component
             'unitForm.completion_date' => 'sometimes',
             'unitForm.model' => 'sometimes',
             'unitForm.vmmfg_scope_id' => 'sometimes',
+            'unitForm.order_date' => 'sometimes',
         ];
     }
 
@@ -56,7 +57,13 @@ class Unit extends Component
     {
         $units = VmmfgUnit::with('vmmfgJob')
                         ->leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')
-                        ->select('*', 'vmmfg_units.id AS id', 'vmmfg_units.completion_date AS completion_date', 'vmmfg_units.model AS model');
+                        ->select(
+                            '*',
+                            'vmmfg_units.id AS id',
+                            'vmmfg_units.completion_date AS completion_date',
+                            'vmmfg_units.model AS model',
+                            'vmmfg_units.order_date AS order_date'
+                        );
 
         // advance search
         $units = $units
@@ -71,12 +78,12 @@ class Unit extends Component
 
         if($dateFrom = $this->filters['date_from']) {
             $units = $units->where(function($query) use ($dateFrom) {
-                $query->searchFromDate('order_date', $dateFrom);
+                $query->searchFromDate('vmmfg_units.order_date', $dateFrom);
             });
         }
         if($dateTo = $this->filters['date_to']) {
             $units = $units->where(function($query) use ($dateTo) {
-                $query->searchToDate('order_date', $dateTo);
+                $query->searchToDate('vmmfg_units.order_date', $dateTo);
             });
         }
 
@@ -94,7 +101,7 @@ class Unit extends Component
         if($sortKey = $this->sortKey) {
             $units = $units->orderBy($sortKey, $this->sortAscending ? 'asc' : 'desc');
         }else {
-            $units = $units->orderBy('order_date')->orderBy('batch_no')->orderBy('unit_no');
+            $units = $units->orderBy('vmmfg_units.order_date')->orderBy('batch_no')->orderBy('unit_no');
         }
 
         $units = $units->paginate($this->itemPerPage);
@@ -121,8 +128,10 @@ class Unit extends Component
 
     public function save()
     {
+        // dd($this->unitForm->toArray());
         $this->validate();
         $this->unitForm->save();
+        $this->emit('refresh');
         $this->emit('updated');
         session()->flash('success', 'Your entry has been updated');
     }

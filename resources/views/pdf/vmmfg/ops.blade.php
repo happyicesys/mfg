@@ -57,7 +57,7 @@
                     {{ $vmmfgUnit->first()->vmmfgScope->name }}
                 </td>
                 <td align="center">
-                    {{ $vmmfgUnit->first()->vmmfgJob->order_date }}
+                    {{ $vmmfgUnit->first()->order_date }}
                 </td>
                 <td align="center">
                     {{ $vmmfgUnit->first()->completion_date }}

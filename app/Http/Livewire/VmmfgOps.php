@@ -61,7 +61,7 @@ class VmmfgOps extends Component
         $this->users = User::whereHas('roles', function($query) {
             $query->whereNotIn('name', ['superadmin']);
         })->orderBy('name', 'asc')->get();
-        $this->units = VmmfgUnit::with('vmmfgJob')->leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')->select('*', 'vmmfg_units.id AS id', 'vmmfg_units.model AS model')->orderBy('order_date')->orderBy('batch_no')->orderBy('unit_no')->get();
+        $this->units = VmmfgUnit::with('vmmfgJob')->leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')->select('*', 'vmmfg_units.id AS id', 'vmmfg_units.model AS model', 'vmmfg_units.order_date AS order_date')->orderBy('vmmfg_units.order_date')->orderBy('batch_no')->orderBy('unit_no')->get();
     }
 
     // public function updatedJobId($value)

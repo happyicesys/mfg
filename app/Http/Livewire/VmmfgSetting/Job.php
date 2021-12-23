@@ -33,6 +33,7 @@ class Job extends Component
         'unit_quantity' => '',
         'unit_number' => '',
         'vmmfg_scope_id' => '',
+        'order_date' => '',
     ];
 
     public VmmfgJob $form;
@@ -95,6 +96,7 @@ class Job extends Component
     {
         $this->form = $job;
         $this->units = $job->vmmfgUnits;
+        $this->unitForm['order_date'] = $job->order_date;
     }
 
     public function create()
@@ -124,7 +126,8 @@ class Job extends Component
         $this->validate([
             'unitForm.unit_quantity' => 'required|integer',
             'unitForm.unit_number' => 'required|integer',
-            'unitForm.vmmfg_scope_id' => 'sometimes',
+            'unitForm.vmmfg_scope_id' => 'required',
+            'unitForm.order_date' => 'required',
         ]);
 
         for($i = 0; $i < $this->unitForm['unit_quantity']; $i++) {
@@ -133,6 +136,7 @@ class Job extends Component
                 'vmmfg_job_id' => $this->form->id,
                 'vmmfg_scope_id' => $this->unitForm['vmmfg_scope_id'],
                 'model' => $this->form->model,
+                'order_date' => $this->unitForm['order_date'],
             ]);
         }
 

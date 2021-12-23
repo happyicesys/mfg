@@ -356,6 +356,12 @@
                                             <th class="text-center text-dark">
                                                 Scope
                                             </th>
+                                            <th class="text-center text-dark">
+                                                Start Date
+                                            </th>
+                                            <th class="text-center text-dark">
+                                                Completion Date
+                                            </th>
                                         </tr>
                                         @forelse($units as $index => $unit)
                                         <tr>
@@ -366,10 +372,13 @@
                                                 {{ $unit->unit_no }}
                                             </td>
                                             <td class="text-left">
-                                                @php
-                                                    // dd($unit->toArray());
-                                                @endphp
                                                 {{ $unit->vmmfgScope ? $unit->vmmfgScope->name : '' }}
+                                            </td>
+                                            <td class="text-center">
+                                                {{ $unit->order_date }}
+                                            </td>
+                                            <td class="text-center">
+                                                {{ $unit->completion_date }}
                                             </td>
                                         </tr>
                                         @empty
@@ -394,6 +403,12 @@
                         <div>
                             @if($showBatchGenerateUnits)
                                 <div class="bg-light">
+                                    <div class="form-group">
+                                        <label for="order_date">
+                                            Start Date
+                                        </label>
+                                        <input type="date" class="form-control" wire:model.defer="unitForm.order_date">
+                                    </div>
                                     <div class="form-group">
                                         <x-input type="text" model="unitForm.unit_quantity">
                                             How Many Units?

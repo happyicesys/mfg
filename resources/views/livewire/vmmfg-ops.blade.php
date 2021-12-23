@@ -38,8 +38,8 @@
                                 @if($unit->vmmfgScope)
                                     - {{$unit->vmmfgScope->name}}
                                 @endif
-                                @if($unit->vmmfgJob->order_date)
-                                    (Start: {{$unit->vmmfgJob->order_date}})
+                                @if($unit->order_date)
+                                    (Start: {{$unit->order_date}})
                                 @endif
                                 @if($unit->completion_date)
                                     (Complete: {{$unit->completion_date}})
@@ -104,7 +104,7 @@
                             {{ $vmmfgUnit->first()->vmmfgScope->name }}
                         </td>
                         <td class="text-center">
-                            {{ $vmmfgUnit->first()->vmmfgJob->order_date }}
+                            {{ $vmmfgUnit->first()->order_date }}
                         </td>
                         <td class="text-center">
                             {{ $vmmfgUnit->first()->completion_date }}

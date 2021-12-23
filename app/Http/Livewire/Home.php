@@ -33,11 +33,11 @@ class Home extends Component
         $dataArr = [];
 
         $jobs = VmmfgUnit::leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')
-                    ->select(DB::raw('COUNT(vmmfg_units.id) AS count'), DB::raw('MONTH(order_date) AS order_month'), DB::raw('MONTH(vmmfg_units.completion_date) AS completion_month'))
+                    ->select(DB::raw('COUNT(vmmfg_units.id) AS count'), DB::raw('MONTH(vmmfg_units.order_date) AS order_month'), DB::raw('MONTH(vmmfg_units.completion_date) AS completion_month'))
                     ->where(function($query) use ($thisYear) {
-                        $query->whereYear('order_date', '=', $thisYear)->orWhereYear('vmmfg_units.completion_date', '=', $thisYear);
+                        $query->whereYear('vmmfg_units.order_date', '=', $thisYear)->orWhereYear('vmmfg_units.completion_date', '=', $thisYear);
                     })
-                    ->groupBy(DB::raw('MONTH(order_date)'))
+                    ->groupBy(DB::raw('MONTH(vmmfg_units.order_date)'))
                     ->groupBy(DB::raw('MONTH(vmmfg_units.completion_date)'))
                     ->get();
 

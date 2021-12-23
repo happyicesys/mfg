@@ -142,7 +142,7 @@
                                 {{ $unit->vmmfgScope->name }}
                             </td>
                             <td class="text-center">
-                                {{ $unit->vmmfgJob->order_date }}
+                                {{ $unit->order_date }}
                             </td>
                             @foreach($vmmfgTitleCategories as $vmmfgTitleCategory)
                                 @php

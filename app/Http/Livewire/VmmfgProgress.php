@@ -86,7 +86,7 @@ class VmmfgProgress extends Component
         if($sortKey = $this->sortKey) {
             $units = $units->orderBy($sortKey, $this->sortAscending ? 'asc' : 'desc');
         }else {
-            $units = $units->orderBy(DB::raw('DATE(order_date)'), 'asc')->orderBy('batch_no')->orderBy('unit_no', 'asc');
+            $units = $units->orderBy(DB::raw('DATE(vmmfg_units.order_date)'), 'asc')->orderBy('batch_no')->orderBy('unit_no', 'asc');
         }
 
         $units = $units->paginate($this->itemPerPage);

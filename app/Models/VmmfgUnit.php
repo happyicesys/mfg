@@ -19,6 +19,7 @@ class VmmfgUnit extends Model
         'vend_id',
         'completion_date',
         'model',
+        'order_date',
     ];
 
     //relationships
@@ -39,6 +40,13 @@ class VmmfgUnit extends Model
 
     // getter
     public function getCompletionDateAttribute($value)
+    {
+        if($value) {
+            return Carbon::parse($value)->format('Y-m-d');
+        }
+    }
+
+    public function getOrderDateAttribute($value)
     {
         if($value) {
             return Carbon::parse($value)->format('Y-m-d');
