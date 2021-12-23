@@ -227,12 +227,20 @@
                         </div>
                     </x-slot>
                     <x-slot name="footer">
-                        <button type="submit" class="btn btn-success d-none d-sm-block" wire:click.prevent="save">
-                            Submit
-                        </button>
-                        <button type="submit" class="btn btn-success btn-block d-block d-sm-none" wire:click.prevent="save">
-                            Submit
-                        </button>
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-danger d-none d-sm-block" onclick="return confirm('Are you sure you want to delete this unit?') || event.stopImmediatePropagation()" wire:click.prevent="delete">
+                                Delete
+                            </button>
+                            <button type="submit" class="btn btn-danger btn-block d-block d-sm-none" onclick="return confirm('Are you sure you want to delete this unit?') || event.stopImmediatePropagation()" wire:click.prevent="delete">
+                                Delete
+                            </button>
+                            <button type="submit" class="btn btn-success d-none d-sm-block" wire:click.prevent="save">
+                                Submit
+                            </button>
+                            <button type="submit" class="btn btn-success btn-block d-block d-sm-none" wire:click.prevent="save">
+                                Submit
+                            </button>
+                        </div>
                     </x-slot>
                 </x-modal>
             {{-- </form> --}}

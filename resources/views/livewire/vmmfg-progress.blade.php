@@ -166,7 +166,9 @@
                                                             $query->whereHas('vmmfgTitle', function($query) use ($vmmfgTitleCategory) {
                                                                 $query->where('vmmfg_title_category_id', $vmmfgTitleCategory->id);
                                                             });
-                                                        })->where('is_checked', true)
+                                                        })->where(function($query) {
+                                                            $query->where('is_checked', true)->orWhere('status', 98);
+                                                        })
                                                         ->count();
 
                                     foreach($unit->vmmfgScope->vmmfgTitles as $title) {

@@ -32,6 +32,10 @@ class Unit extends Component
 
     public VmmfgUnit $unitForm;
 
+    protected $listeners = [
+        'refresh' => '$refresh',
+    ];
+
     public function rules()
     {
         return [
@@ -121,6 +125,25 @@ class Unit extends Component
         $this->unitForm->save();
         $this->emit('updated');
         session()->flash('success', 'Your entry has been updated');
+    }
+
+    public function delete()
+    {
+        if($this->unitForm->vmmfgTasks()->exists()) {
+            foreach($this->unitForm->vmmfgTasks() as $task) {
+                if($task->attachments()->exists()) {
+                    foreach($task->attachments() as $attachment) {
+                        Storage::disk('digitaloceanspaces')->delete($attachment->url);
+                        $attachment->delete();
+                    }
+                }
+                $task->delete();
+            }
+        }
+        $this->unitForm->delete();
+        $this->emit('refresh');
+        $this->emit('updated');
+        session()->flash('success', 'Your entry has been deleted');
     }
 
     public function resetFilters()

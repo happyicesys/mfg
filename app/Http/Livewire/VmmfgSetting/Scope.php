@@ -22,8 +22,8 @@ class Scope extends Component
 
     protected $paginationTheme = 'bootstrap';
     public $itemPerPage = 100;
-    public $sortKey = 'created_at';
-    public $sortAscending = false;
+    public $sortKey = '';
+    public $sortAscending = true;
     public $showEditModal = false;
     public $showFilters = false;
     public $showCreateTitleArea = false;
@@ -81,6 +81,8 @@ class Scope extends Component
 
         if($sortKey = $this->sortKey) {
             $scopes = $scopes->orderBy($sortKey, $this->sortAscending ? 'asc' : 'desc');
+        }else {
+            $scopes = $scopes->orderBy('remarks', 'desc');
         }
 
         $scopes = $scopes->paginate($this->itemPerPage);
