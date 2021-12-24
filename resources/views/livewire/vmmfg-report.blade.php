@@ -2,7 +2,7 @@
     <div>
         <div>
             <x-flash></x-flash>
-            <h2>Excel Report</h2>
+            <h2>Excel Report (Remarks)</h2>
             <hr>
             <div class="">
                 <div>
