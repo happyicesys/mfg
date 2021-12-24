@@ -31,7 +31,7 @@ class VmmfgReport extends Component
     ];
 
     public $scopes;
-    public $scope;
+    // public $scope;
 
     protected $listeners = [
         'refresh' => '$refresh',
@@ -47,12 +47,12 @@ class VmmfgReport extends Component
 
     public function render()
     {
-        // $scope = $this->mainQuery();
-        // $scope = $this->queryFilter($scope, $this->filters);
-        // $scope = $scope->first();
-        // $this->scope = $scope;
+        $scope = $this->mainQuery();
+        $scope = $this->queryFilter($scope, $this->filters);
+        $scope = $scope->first();
+        $this->scope = $scope;
 
-        return view('livewire.vmmfg-report');
+        return view('livewire.vmmfg-report', ['scope' => $scope]);
     }
 
     public function onPrevNextDateClicked($direction, $model)
@@ -70,6 +70,12 @@ class VmmfgReport extends Component
 
     public function exportExcel()
     {
+        $this->validate([
+            'filters.vmmfg_scope_id' => 'required',
+        ], [
+            'filters.vmmfg_scope_id.required' => 'Please select the scope'
+        ]);
+
         $scope = $this->mainQuery();
         $scope = $this->queryFilter($scope, $this->filters);
         $scope = $scope->first();

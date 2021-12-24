@@ -12,7 +12,7 @@
                                 <label>
                                     Scope
                                 </label>
-                                <select name="vmmfg_scope_id" wire:model="filters.vmmfg_scope_id" class="select form-control">
+                                <select name="vmmfg_scope_id" wire:model="filters.vmmfg_scope_id" class="select form-control @error('filters.vmmfg_scope_id') is-invalid @enderror">
                                     <option value="">Select..</option>
                                     @foreach($scopes as $scope)
                                         <option value="{{$scope->id}}">
@@ -21,6 +21,11 @@
                                         </option>
                                     @endforeach
                                 </select>
+                                @error('filters.vmmfg_scope_id')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
                             </div>
                             <div class="form-group col-md-4 col-xs-12">
                                 <label>
