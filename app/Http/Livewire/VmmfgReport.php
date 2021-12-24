@@ -47,10 +47,10 @@ class VmmfgReport extends Component
 
     public function render()
     {
-        $scope = $this->mainQuery();
-        $scope = $this->queryFilter($scope, $this->filters);
-        $scope = $scope->first();
-        $this->scope = $scope;
+        // $scope = $this->mainQuery();
+        // $scope = $this->queryFilter($scope, $this->filters);
+        // $scope = $scope->first();
+        // $this->scope = $scope;
 
         return view('livewire.vmmfg-report');
     }
@@ -70,7 +70,16 @@ class VmmfgReport extends Component
 
     public function exportExcel()
     {
-        return Excel::download(new VmmfgRemarksExcel($this->scope, $this->filters), 'remarks_'.Carbon::now()->format('ymdHis').'.xlsx');
+        $scope = $this->mainQuery();
+        $scope = $this->queryFilter($scope, $this->filters);
+        $scope = $scope->first();
+
+        return Excel::download(new VmmfgRemarksExcel($scope, $this->filters), 'remarks_'.Carbon::now()->format('ymdHis').'.xlsx');
+    }
+
+    public function resetFilters()
+    {
+        $this->reset('filters');
     }
 
     private function mainQuery()
@@ -86,8 +95,7 @@ class VmmfgReport extends Component
             'vmmfgTitles',
             'vmmfgTitles.vmmfgTitleCategory',
             'vmmfgTitles.vmmfgItems',
-            'vmmfgTitles.vmmfgItems.vmmfgTasks' ,
-            'vmmfgTitles.vmmfgItems.vmmfgTasks.vmmfgUnit'
+            'vmmfgUnits'
                 => function($query) use ($filters) {
                     if($dateFrom = $filters['date_from']) {
                         $query->whereDate('order_date', '>=', $dateFrom);
@@ -106,7 +114,9 @@ class VmmfgReport extends Component
                         });
                     }
 
-                }
+                },
+            'vmmfgUnits.vmmfgTasks',
+            'vmmfgUnits.vmmfgJob'
         ]);
 
         if($scopeId = $filters['vmmfg_scope_id']) {

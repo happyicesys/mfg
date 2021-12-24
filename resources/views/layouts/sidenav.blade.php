@@ -90,10 +90,10 @@
         <li class="{{ $name == 'vmmfg-ops-dailyreport' ? 'active' : '' }}">
           <a href="{{ route('vmmfg-ops-dailyreport') }}"><i class="far fa-list-alt"></i>Daily Report</a>
         </li>
-{{--
+
         <li class="{{ $name == 'vmmfg-report' ? 'active' : '' }}">
           <a href="{{ route('vmmfg-report') }}"><i class="far fa-file-excel"></i>Excel Report</a>
-        </li> --}}
+        </li>
         @endcan
 
 

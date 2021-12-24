@@ -24,7 +24,7 @@
                             </div>
                             <div class="form-group col-md-4 col-xs-12">
                                 <label>
-                                    Date From
+                                    Start Date From
                                 </label>
                                 <div class="input-group">
                                     <input type="date" class="form-control" wire:model.defer="filters.date_from">
@@ -43,7 +43,7 @@
                             </div>
                             <div class="form-group col-md-4 col-xs-12">
                                 <label>
-                                    Date To
+                                    Start Date To
                                 </label>
                                 <div class="input-group">
                                     <input type="date" class="form-control" wire:model.defer="filters.date_to">

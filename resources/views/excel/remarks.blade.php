@@ -4,16 +4,56 @@
         <th>{{ $scope->name }}</th>
     </tr>
     <tr>
-        <th>Date From</th>
+        <th>S.Date From</th>
         <th>{{ $filters['date_from'] }}</th>
     </tr>
     <tr>
-        <th>Date To</th>
+        <th>S.Date To</th>
         <th>{{ $filters['date_to'] }}</th>
     </tr>
     <tr>
         <th>Is Completed?</th>
-        <th>{{ $filters['is_completed'] }}</th>
+        <th>{{ $filters['is_completed'] ? 'Yes' : 'No' }}</th>
+    </tr>
+</table>
+
+@php
+    $units = $scope->vmmfgUnits;
+    // dd($scope->toArray(), $units->toArray());
+@endphp
+
+<table>
+    <tr>
+        <th></th>
+        <th></th>
+        @if($units)
+            @foreach($units as $unit)
+                <th>
+                    <b>
+                        @if($unit->vmmfgJob)
+                            {{ $unit->vmmfgJob->batch_no }}
+                        @endif
+                        @if($unit->vend_id)
+                            ({{ $unit->vend_id }})
+                        @endif
+                        #{{ $unit->unit_no }}
+                    </b>
+                </th>
+            @endforeach
+        @endif
+    </tr>
+    <tr>
+        <th></th>
+        <th></th>
+        @if($units)
+            @foreach($units as $unit)
+                <th>
+                    <b>
+                        Start: {{ $unit->order_date }}
+                    </b>
+                </th>
+            @endforeach
+        @endif
     </tr>
 </table>
 
@@ -21,19 +61,31 @@
 <table>
     <tr>
         <th>
-            {{ $title->sequence }} - {{ $title->name }}
-            @if($title->vmmfgTitleCategory)
-             ({{ $title->vmmfgTitleCategory->name }})
-            @endif
+            <b>
+                {{ $title->sequence }} - {{ $title->name }}
+                @if($title->vmmfgTitleCategory)
+                ({{ $title->vmmfgTitleCategory->name }})
+                @endif
+            </b>
         </th>
     </tr>
     @if($title->vmmfgItems()->exists())
         @foreach($title->vmmfgItems()->orderBy('sequence')->get() as $item)
         <tr>
             <td></td>
-            <td>
+            <td style="wrap-text: true;">
                 {{ $item->sequence }} - {{ $item->name }}
             </td>
+
+            @if($units)
+                @foreach($units as $unit)
+                    <td>
+                        @if($task = $unit->vmmfgTasks()->where('vmmfg_item_id', $item->id)->first())
+                            {{ $task->remarks }}
+                        @endif
+                    </td>
+                @endforeach
+            @endif
         </tr>
         @endforeach
     @endif

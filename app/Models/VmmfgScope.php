@@ -21,4 +21,9 @@ class VmmfgScope extends Model
     {
         return $this->hasMany(VmmfgTitle::class)->orderBy('sequence', 'asc')->orderBy('created_at', 'desc');
     }
+
+    public function vmmfgUnits()
+    {
+        return $this->hasMany(VmmfgUnit::class);
+    }
 }
