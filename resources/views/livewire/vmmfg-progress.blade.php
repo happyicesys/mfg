@@ -107,7 +107,7 @@
                             Completion (%)
                         </th>
                         <th class="text-center text-dark">
-                            Checking
+                            Checked
                         </th>
                     </tr>
                     @forelse($units as $index => $unit)
