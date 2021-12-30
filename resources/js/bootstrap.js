@@ -47,3 +47,10 @@ Alpine.start();
 import ApexCharts from 'apexcharts';
 window.ApexCharts = ApexCharts;
 
+import * as FilePond from 'filepond';
+window.FilePond = FilePond;
+
+import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
+window.FilePondPluginImagePreview = FilePondPluginImagePreview;
+
+

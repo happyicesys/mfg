@@ -434,10 +434,9 @@
                                         @endforeach
 
                                         <hr>
-
+{{--
                                         <div class="row">
-                                            {{-- <hr> --}}
-
+                                            <hr>
                                             <div class="form-group pt-2">
                                                 <form wire:submit.prevent="uploadAttachment({{$item->id}})" enctype="multipart/form-data">
                                                     <label for="file">
@@ -449,7 +448,9 @@
                                                     </button>
                                                 </form>
                                             </div>
-                                        </div>
+                                        </div> --}}
+                                        <hr>
+                                        <x-input-file class="form-control-file"  wire:model="file" wire:key="upload-item-{{$item->id}}" id="{{$item->id}}" multiple></x-input-file>
                                         <div class="form-group">
                                             @if($task and $task->attachments)
                                                 @foreach($task->attachments as $attachment)

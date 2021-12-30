@@ -112,6 +112,15 @@
         </li>
         @endcan
 {{--
+        @can('vmmfg-setting-access')
+        <li class="header-menu">
+          <span>VM Mfg Inventory</span>
+        </li>
+        <li class="{{ $name == 'vmmfg-inventory-bom' ? 'active' : '' }}">
+          <a href="{{ route('vmmfg-inventory-bom') }}"><i class="fas fa-clipboard-list"></i>BOM</a>
+        </li>
+        @endcan --}}
+{{--
         <li class="{{ $name == 'app-setting' ? 'active' : '' }}">
           <a href="{{ route('app-setting') }}"><i class="fas fa-mobile-alt"></i>App Setting</a>
         </li>

@@ -10,6 +10,7 @@ use App\Http\Livewire\Profile;
 use App\Http\Livewire\SelfSetting;
 use App\Http\Livewire\Setting;
 use App\Http\Livewire\VmmfgDailyreport;
+use App\Http\Livewire\VmmfgInventoryBom;
 use App\Http\Livewire\VmmfgOps;
 use App\Http\Livewire\VmmfgProgress;
 use App\Http\Livewire\VmmfgReport;
@@ -53,6 +54,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/vmmfg-setting-job', VmmfgSettingJob::class)->name('vmmfg-setting-job');
         Route::get('/vmmfg-setting-unit', VmmfgSettingUnit::class)->name('vmmfg-setting-unit');
         Route::get('/vmmfg-setting-scope', VmmfgSettingScope::class)->name('vmmfg-setting-scope');
+    });
+
+    Route::group(['middleware' => ['permission:vmmfg-inventory-access']], function() {
+        Route::get('/vmmfg-inventory-bom', VmmfgInventoryBom::class)->name('vmmfg-inventory-bom');
     });
 });
 

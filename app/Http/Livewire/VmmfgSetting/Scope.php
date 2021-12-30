@@ -24,11 +24,7 @@ class Scope extends Component
     public $itemPerPage = 100;
     public $sortKey = '';
     public $sortAscending = true;
-    public $showEditModal = false;
     public $showFilters = false;
-    public $showCreateTitleArea = false;
-    public $showCreateTaskArea = '';
-    public $selected = [];
     public $filters = [
         'search' => '',
         'name' => '',

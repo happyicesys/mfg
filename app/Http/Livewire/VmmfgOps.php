@@ -47,6 +47,7 @@ class VmmfgOps extends Component
     public $zoomPictureUrl = '';
     public $units;
     public $users;
+    public $fileRefId = '';
 
     protected $listeners = [
         'refresh' => '$refresh',
@@ -212,16 +213,18 @@ class VmmfgOps extends Component
         session()->flash('success', 'Your entry has been updated');
     }
 
-    public function uploadAttachment($itemId)
+    public function updatedFile()
+    // public function uploadAttachment($itemId)
     {
+        // dd('here', $this->file, $this->fileRefId);
         $this->validate([
             'file' => 'sometimes',
         ]);
-        $task = VmmfgTask::where('vmmfg_item_id', $itemId)->where('vmmfg_unit_id', $this->unit_id)->first();
+        $task = VmmfgTask::where('vmmfg_item_id', $this->fileRefId)->where('vmmfg_unit_id', $this->unit_id)->first();
 
         if(!$task) {
             $task = VmmfgTask::create([
-                'vmmfg_item_id' => $itemId,
+                'vmmfg_item_id' => $this->fileRefId,
                 'vmmfg_unit_id' => $this->unit_id,
                 'status' => VmmfgTask::STATUS_NEW,
             ]);
