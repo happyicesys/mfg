@@ -2,7 +2,7 @@
 
 <div>
     <div wire:ignore>
-        <select class="form-control" id="{{$model}}">
+        <select class="form-control" id="{{$model}}" {{$attributes}}>
             <option value="">Select..</option>
             {{$slot}}
         </select>

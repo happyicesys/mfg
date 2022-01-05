@@ -98,6 +98,9 @@
                         <x-th-data model="order_date" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Start Date
                         </x-th-data>
+                        <x-th-data model="completion_date" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
+                            Completion Date
+                        </x-th-data>
                         @foreach($vmmfgTitleCategories as $vmmfgTitleCategory)
                             <th class="text-center text-dark">
                                 {{$vmmfgTitleCategory->name}}
@@ -143,6 +146,9 @@
                             </td>
                             <td class="text-center">
                                 {{ $unit->order_date }}
+                            </td>
+                            <td class="text-center">
+                                {{ $unit->completion_date }}
                             </td>
                             @foreach($vmmfgTitleCategories as $vmmfgTitleCategory)
                                 @php

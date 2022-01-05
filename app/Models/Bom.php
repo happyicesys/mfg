@@ -15,8 +15,8 @@ class Bom extends Model
     ];
 
     // relationships
-    public function bomGroups()
+    public function bomHeaders()
     {
-        return $this->hasMany(BomGroup::class);
+        return $this->hasMany(BomHeader::class);
     }
 }

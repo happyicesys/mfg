@@ -448,20 +448,11 @@
                 </x-slot>
                 <x-slot name="footer">
                     {{-- normal view --}}
-                    <button type="submit" class="btn btn-danger d-none d-sm-block" wire:click.prevent="deleteTitle">
+                    <button type="submit" class="btn btn-danger btn-xs-block" wire:click.prevent="deleteTitle">
                         <i class="fas fa-trash"></i>
                         Delete
                     </button>
-                    <button type="submit" class="btn btn-success d-none d-sm-block" wire:click.prevent="saveTitle">
-                        <i class="fas fa-save"></i>
-                        Save
-                    </button>
-                    {{-- phone view --}}
-                    <button type="submit" class="btn btn-danger btn-block d-block d-sm-none" wire:click.prevent="deleteTitle">
-                        <i class="fas fa-trash"></i>
-                        Delete
-                    </button>
-                    <button type="submit" class="btn btn-success btn-block d-block d-sm-none" wire:click.prevent="saveTitle">
+                    <button type="submit" class="btn btn-success btn-xs-block" wire:click.prevent="saveTitle">
                         <i class="fas fa-save"></i>
                         Save
                     </button>

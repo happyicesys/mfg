@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
             // ProfileSettingSeeder::class,
             BomCategorySeeder::class,
             BomItemTypeSeeder::class,
-            VmmfgInventoryAccessSeeder::class,
+            // VmmfgInventoryAccessSeeder::class,
        ]);
     //    \App\Models\User::factory(150)->create();
     }

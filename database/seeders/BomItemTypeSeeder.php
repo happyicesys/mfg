@@ -15,6 +15,10 @@ class BomItemTypeSeeder extends Seeder
     public function run()
     {
         BomItemType::create([
+            'name' => 'ASM',
+        ]);
+
+        BomItemType::create([
             'name' => 'Part',
         ]);
 

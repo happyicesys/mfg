@@ -47,6 +47,8 @@ $(document).ready(function () {
     }
 
     window.livewire.on('updated', () => {
+        // $(this).closest('modal').modal('hide');
+        // $(this).closest('modal-backdrop').remove();
         $('.modal').modal('hide');
         $('.modal-backdrop').remove();
 

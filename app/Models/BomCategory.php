@@ -14,6 +14,16 @@ class BomCategory extends Model
     ];
 
     // relationships
+    public function bomGroups()
+    {
+        return $this->hasMany(BomGroup::class);
+    }
+
+    public function bomItems()
+    {
+        return $this->hasMany(BomItem::class);
+    }
+
     public function bomSubCategories()
     {
         return $this->hasMany(BomSubCategory::class);

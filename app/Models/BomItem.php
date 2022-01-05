@@ -10,17 +10,37 @@ class BomItem extends Model
     use HasFactory;
 
     protected $fillable = [
+        'code',
         'name',
         'remarks',
-        'bom_group_id',
-        'bom_sub_category_id',
         'bom_item_type_id',
+        'is_inventory',
+        'is_consumable',
+        'available_qty',
+        'is_header',
+        'is_sub_header',
+        'is_part',
     ];
 
     // relationships
-    public function bomGroups()
+    public function attachments()
     {
-        return $this->belongsToMany(BomGroup::class);
+        return $this->morphMany(Attachment::class, 'modelable');
+    }
+
+    public function bomCategory()
+    {
+        return $this->belongsTo(BomCategory::class);
+    }
+
+    public function bomContents()
+    {
+        return $this->hasMany(bomContent::class);
+    }
+
+    public function bomHeaders()
+    {
+        return $this->hasMany(BomHeader::class);
     }
 
     public function bomSubCategory()
@@ -32,4 +52,27 @@ class BomItem extends Model
     {
         return $this->belongsTo(BomItemType::class);
     }
+
+    // getter
+    public function getCodeAttribute($value)
+    {
+        if($value) {
+            return $value;
+        }
+    }
+
+    // setter
+    // public function setIsInventoryAttribute($value)
+    // {
+    //     if($value) {
+    //         $this->attributes['is_inventory'] = $value;
+    //     }
+    // }
+
+    // public function setIsConsumableAttribute($value)
+    // {
+    //     if($value) {
+    //         $this->attributes['is_consumable'] = $value;
+    //     }
+    // }
 }

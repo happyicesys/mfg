@@ -1,4 +1,5 @@
 <div>
+    <div>
     <x-flash></x-flash>
     <h2>VM MFG BOM</h2>
     <hr>
@@ -209,27 +210,141 @@
                 <textarea name="remarks" wire:model="bom.remarks" rows="5" class="form-control" placeholder="Remarks"></textarea>
             </div>
             <hr>
-            {{-- @if(isset($this->scope))
+            @if(isset($bom))
                 <div class="btn-group">
-                    <button type="button" class="btn btn-success btn-md" data-toggle="modal" data-target="#title-modal" wire:click="createTitle({{$this->scope}})">
+                    <button type="button" class="btn btn-success btn-md" data-toggle="modal" data-target="#header-modal" wire:click.prevent="createHeader({{$bom}})">
                         <i class="fas fa-plus-circle"></i>
-                        Title
-                    </button>
-                    <button class="btn btn-outline-primary btn-md" wire:click="exportExcel({{$this->scope}})">
-                        <i class="far fa-file-excel"></i>
-                        Excel
+                        Group
                     </button>
                 </div>
-                <ul class="list-group pt-2" wire:key="scope-{{$this->scope->id}}">
-                    @if($this->scope->vmmfgTitles()->exists())
-                    @foreach($this->scope->vmmfgTitles as $titleIndex => $title)
+                @if($bom->bomHeaders()->exists())
+                    <div class="table-responsive pt-3">
+                        <table class="table table-bordered table-sm">
+                            <tr class="d-flex">
+                                <th class="col-md-2 bg-secondary text-white text-center">
+                                    Cat1/Cat2
+                                </th>
+                                <th class="col-md-1 bg-secondary text-white text-center">
+                                    Type
+                                </th>
+                                <th class="col-md-2 bg-secondary text-white text-center">
+                                    Code
+                                </th>
+                                <th class="col-md-4 bg-secondary text-white text-center">
+                                    Name
+                                </th>
+                                <th class="col-md-1 bg-secondary text-white text-center">
+                                    Qty
+                                </th>
+                                <th class="col-md-2 bg-secondary text-white text-center">
+                                    Action
+                                </th>
+                            </tr>
+                        </table>
+                    </div>
+                @endif
+
+                <div class="table-responsive">
+                    @if($bom->bomHeaders()->exists())
+                        @foreach($bom->bomHeaders as $bomHeaderIndex => $bomHeader)
+                        <table class="table table-borderless table-sm" wire:key="header-table-{{$bomHeaderIndex}}">
+                            <tr class="d-flex border border-secondary">
+                                <th class="col-md-2 bg-info text-dark">
+                                    {{$bomHeader->sequence}}.
+                                    @if($bomHeader->bomCategory)
+                                        <span class="badge badge-dark">
+                                            {{$bomHeader->bomCategory->name}}
+                                        </span>
+                                    @endif
+                                </th>
+                                <th class="col-md-1 bg-info">
+                                    @if(isset($bomHeader->bomItem) and isset($bomHeader->bomItem->bomItemType))
+                                        <span class="badge badge-dark">
+                                            {{ $bomHeader->bomItem->bomItemType->name }}
+                                        </span>
+                                    @endif
+                                </th>
+                                <th class="col-md-2 bg-info text-dark">
+                                    {{$bomHeader->bomItem ? $bomHeader->bomItem->code : null}}
+                                </th>
+                                <th class="col-md-4 bg-info text-dark">
+                                    {{$bomHeader->bomItem ? $bomHeader->bomItem->name : null}}
+                                </th>
+                                <th class="col-md-1 bg-info text-dark text-center">
+                                    {{$bomHeader->qty }}
+                                </th>
+                                <td class="col-md-2 bg-info text-center">
+                                    <div class="btn-group">
+                                        <button type="button" wire:click="editHeader({{$bomHeader}})" wire:key="header-edit-{{$bomHeaderIndex}}" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#header-modal">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-warning btn-sm" wire:click="createSubGroup({{$bomHeader}})" wire:key="header-create-sub-group-{{$bomHeaderIndex}}" data-toggle="modal" data-target="#content-modal">
+                                            <i class="fas fa-plus-circle"></i>
+                                            S.Group
+                                        </button>
+                                        <button type="button" class="btn btn-success btn-sm" wire:click="createContent({{$bomHeader}})" wire:key="header-create-content-{{$bomHeaderIndex}}" data-toggle="modal" data-target="#content-modal">
+                                            <i class="fas fa-plus-circle"></i>
+                                            Part
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            @if($bomHeader->bomContents()->exists())
+                                @foreach($bomHeader->bomContents as $bomContent)
+                                    <tr class="d-flex border border-secondary ml-3">
+                                        <th class="col-md-2 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-dark">
+                                            {{$bomContent->sequence}}.
+                                            @if($bomContent->bomSubCategory)
+                                                <span class="badge badge-dark">
+                                                    {{$bomContent->bomSubCategory->name}}
+                                                </span>
+                                            @endif
+                                        </th>
+                                        <th class="col-md-1 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}}">
+                                            @if(isset($bomContent->bomItem) and isset($bomContent->bomItem->bomItemType))
+                                                <span class="badge badge-dark">
+                                                    {{ $bomContent->bomItem->bomItemType->name }}
+                                                </span>
+                                            @endif
+                                        </th>
+                                        <th class="col-md-2 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-dark">
+                                            {{$bomContent->bomItem->code}}
+                                            @if($bomContent->bomItem->bomContents()->count() > 1)
+                                                <small>
+                                                    <span class="badge badge-pill badge-danger">&nbsp;</span>
+                                                </small>
+                                            @endif
+                                        </th>
+                                        <th class="col-md-4 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-dark">
+                                            {{$bomContent->bomItem->name}}
+                                        </th>
+                                        <th class="col-md-1 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-dark text-center">
+                                            {{$bomContent->qty}}
+                                        </th>
+                                        <td class="col-md-2 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-center">
+                                            <div class="btn-group">
+                                                <button type="button" wire:click="editPart({{$bomContent}})" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#content-modal">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endif
+                        </table>
+                        @endforeach
+                    @endif
+                </div>
+                {{-- <ul class="list-group pt-2" wire:key="bom-{{$bom->id}}">
+                    @if($bom->bomGroups()->exists())
+                    @foreach($bom->bomGroups as $bomGroup)
                     <li class="list-group-item mt-2" style="background-color: #9bc2cf;" wire:key="title-{{$titleIndex}}">
                         <div class="form-group">
                             <span class="float-left">
-                                {{$title->sequence}}.  {{$title->name}}
-                                @if($title->vmmfgTitleCategory)
+                                {{$bomGroup->sequence}}.  {{$bomGroup->name}}
+                                @if($bomGroup->bomCategory)
                                     <span class="badge badge-warning">
-                                        {{$title->vmmfgTitleCategory->name}}
+                                        {{$bomGroup->bomCategory->name}}
                                     </span>
                                 @endif
                             </span>
@@ -264,8 +379,8 @@
                         @endif
                     @endforeach
                     @endif
-                </ul>
-            @endif --}}
+                </ul> --}}
+            @endif
         </x-slot>
         <x-slot name="footer"></x-slot>
         {{-- <x-slot name="footer">
@@ -328,152 +443,306 @@
             </button>
         </x-slot>
     </x-modal>
-{{--
-    <x-modal id="title-modal">
+
+    <x-modal id="header-modal">
         <x-slot name="title">
-            @if(isset($this->title) and $this->title->id) Edit Title: {{$this->title->sequence}}. {{$this->title->name}} @else Create Title @endif
+            @if(isset($bomHeaderForm->id)) Edit Group: {{$bomHeaderForm->bomItem->sequence}}. {{$bomHeaderForm->bomItem->name}} @else Create Group @endif
         </x-slot>
         <x-slot name="content">
-            <x-input type="text" model="title.sequence">
+            <div class="form-group">
+                <div class="form-check form-check-inline">
+                    <label class="form-check-label" for="is_required">Select from Existing Group?</label>
+                    <input class="form-check-input ml-2" type="checkbox" name="is_existing" wire:model="bomHeaderForm.is_existing">
+                </div>
+            </div>
+            <hr>
+            <x-input type="text" model="bomHeaderForm.sequence">
                 Sequence
             </x-input>
-            <x-input type="text" model="title.name">
-                Name
-            </x-input>
-            <div class="form-group">
-                <label>
-                    Category
-                </label>
-                <select name="vmmfg_title_category_id" wire:model.defer="title.vmmfg_title_category_id" class="select form-control">
-                    <option value="">None</option>
-                    @foreach($vmmfgTitleCategories as $vmmfgTitleCategory)
-                        <option value="{{$vmmfgTitleCategory->id}}">
-                            {{$vmmfgTitleCategory->name}}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+            @if(isset($bomHeaderForm->is_existing) and $bomHeaderForm->is_existing)
+            <hr>
+                <div class="form-group">
+                    <label>
+                        Existing Group
+                    </label>
+                    <select class="select form-control" wire:model.defer="bomHeaderForm.bom_item_id">
+                        <option value="">Select..</option>
+                        @foreach($bomItemGroups as $bomItem)
+                            <option value="{{$bomItem->id}}" {{isset($bomHeaderForm->bom_item_id) && ($bomItem->id == $bomHeaderForm->bom_item_id) ? 'selected' : ''}}>
+                                {{$bomItem->code}} - {{$bomItem->name}}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('bomHeaderForm.bom_category_id')
+                        <span style="color: red;">
+                            <small>
+                                {{ $message }}
+                            </small>
+                        </span>
+                    @enderror
+                </div>
+            <hr>
+            @else
+                <hr>
+                @if(!isset($bomHeaderForm->id))
+                    <div class="form-group">
+                        <h3 class="badge badge-info">
+                            Create New
+                        </h3>
+                    </div>
+                @endif
+                <x-input type="text" model="bomHeaderForm.code">
+                    Group Code
+                </x-input>
+                <x-input type="text" model="bomHeaderForm.name">
+                    Group Name
+                </x-input>
+                <div class="form-group">
+                    <label>
+                        Type
+                    </label>
+                    <select class="select form-control" wire:model.defer="bomHeaderForm.bom_item_type_id">
+                        <option value="">Select..</option>
+                        @foreach($bomItemTypes as $bomItemType)
+                            <option value="{{$bomItemType->id}}" {{isset($bomHeaderForm->bomItem->bomItemType->id) && ($bomItemType->id == $bomHeaderForm->bomItem->bomItemType->id) ? 'selected' : ''}}>
+                                {{ $bomItemType->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('bomHeaderForm.bom_item_type_id')
+                        <span style="color: red;">
+                            <small>
+                                {{ $message }}
+                            </small>
+                        </span>
+                    @enderror
+                </div>
+                <hr>
+                <div class="form-group">
+                    <label>
+                        QA/QC
+                    </label>
+                    <select class="select form-control" wire:model.defer="bomHeaderForm.vmmfg_item_id">
+                        <option value="">Select..</option>
+                        @foreach($vmmfgItems as $vmmfgItem)
+                            <option value="{{$vmmfgItem->id}}" {{isset($bomHeaderForm->bomItem->vmmfg_item_id) && ($vmmfgItem->id == $bomHeaderForm->bomItem->vmmfg_item_id) ? 'selected' : ''}}>
+                                ({{ $vmmfgItem->vmmfgTitle->sequence }}) - ({{ $vmmfgItem->sequence }}) {{ $vmmfgItem->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('bomHeaderForm.vmmfg_item_id')
+                        <span style="color: red;">
+                            <small>
+                                {{ $message }}
+                            </small>
+                        </span>
+                    @enderror
+                </div>
+            @endif
+                {{-- @dd($bomGroupForm->toArray()) --}}
+                <div class="form-group">
+                    <label>
+                        Category1
+                    </label>
+                    <select class="select form-control" wire:model.defer="bomHeaderForm.bom_category_id">
+                        <option value="">Select..</option>
+                        @foreach($bomCategories as $bomCategory)
+                            <option value="{{$bomCategory->id}}" {{isset($bomHeaderForm->bom_category_id) && ($bomCategory->id == $bomHeaderForm->bom_category_id) ? 'selected' : ''}}>
+                                {{$bomCategory->name}}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('bomHeaderForm.bom_category_id')
+                        <span style="color: red;">
+                            <small>
+                                {{ $message }}
+                            </small>
+                        </span>
+                    @enderror
+                </div>
+                <x-input type="text" model="bomHeaderForm.qty">
+                    Qty
+                </x-input>
         </x-slot>
         <x-slot name="footer">
-
-            <button type="submit" class="btn btn-danger d-none d-sm-block" wire:click.prevent="deleteTitle">
-                <i class="fas fa-trash"></i>
-                Delete
-            </button>
-            <button type="submit" class="btn btn-success d-none d-sm-block" wire:click.prevent="saveTitle">
-                <i class="fas fa-save"></i>
-                Save
-            </button>
-
-            <button type="submit" class="btn btn-danger btn-block d-block d-sm-none" wire:click.prevent="deleteTitle">
-                <i class="fas fa-trash"></i>
-                Delete
-            </button>
-            <button type="submit" class="btn btn-success btn-block d-block d-sm-none" wire:click.prevent="saveTitle">
+            @if($bomHeaderForm->is_edit)
+                <button type="submit" class="btn btn-danger btn-xs-block" onclick="return confirm('Are you sure you want to Delete the Group and Unbind the Parts?') || event.stopImmediatePropagation()" wire:click.prevent="deleteHeader">
+                    <i class="fas fa-trash"></i>
+                    Delete
+                </button>
+            @endif
+            <button type="submit" class="btn btn-success btn-xs-block" wire:click.prevent="saveHeader">
                 <i class="fas fa-save"></i>
                 Save
             </button>
         </x-slot>
     </x-modal>
 
-    <x-modal id="task-modal">
-        <x-slot name="title">
-            @if(isset($this->item) and $this->item->id) Edit Task: {{$this->item->sequence}}. {{$this->item->name}} @else Create Task @endif
-        </x-slot>
-        <x-slot name="content">
-            <x-input type="text" model="item.sequence">
-                Sequence
-            </x-input>
-            <x-input type="text" model="item.name">
-                Name
-            </x-input>
-            <div class="form-group">
-                <label for="remarks">
-                    Desc
-                </label>
-                <textarea name="remarks" rows="5" wire:model.defer="item.remarks" class="form-control" placeholder="Desc"></textarea>
-            </div>
-            @if(isset($this->item) and $this->item->id)
+        <x-modal id="content-modal">
+            <x-slot name="title">
+                @if(isset($bomContentForm->id))
+                    Edit
+                    @if($bomContentForm->is_group)
+                    Sub Group:
+                    @else
+                    Part:
+                    @endif
+                    {{$bomContentForm->bomItem->sequence}}. {{$bomContentForm->bomItem->name}}
+                @else
+                    Create
+                    @if($bomContentForm->is_group)
+                    Sub Group
+                    @else
+                    Part
+                    @endif
+                @endif
+            </x-slot>
+            <x-slot name="content">
                 <div class="form-group">
                     <div class="form-check form-check-inline">
-                        <label class="form-check-label" for="is_required">Required to Reply Text?</label>
-                        <input class="form-check-input ml-2" type="checkbox" name="is_required" wire:model.defer="item.is_required">
+                        <label class="form-check-label" for="is_required">
+                            Select from Existing
+                            @if($bomContentForm->is_group)
+                            Sub Group
+                            @else
+                            Part
+                            @endif
+                            ?
+                        </label>
+                        <input class="form-check-input ml-2" type="checkbox" name="is_existing" wire:model="bomContentForm.is_existing">
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="file">
-                        Upload File(s)
-                    </label>
-                    <input type="file" class="form-control-file" wire:model="file">
-                </div>
-                <div class="form-group">
-                    @if($this->item->attachments)
-                        @foreach($this->item->attachments as $attachmentIndex => $attachment)
-                        <div class="card" style="max-width:600px;width:100%;" wire:key="attachment-{{$attachmentIndex}}">
-                                @php
-                                    $ext = pathinfo($attachment->full_url, PATHINFO_EXTENSION);
-                                @endphp
-                                @if($ext === 'pdf')
-                                    <embed src="{{$attachment->full_url}}" type="application/pdf" class="card-img-top" style="min-height: 500px;">
-                                @elseif($ext === 'mov' or $ext === 'mp4')
-                                    <div class="embed-responsive embed-responsive-16by9">
-                                        <video class=" embed-responsive-item video-js" controls>
-                                            <source src="{{$attachment->full_url}}">
-                                            Your browser does not support the video tag.
-                                        </video>
-                                    </div>
-                                @else
-                                    <img class="card-img-top" src="{{$attachment->full_url}}" alt="">
-                                @endif
-                                <div class="card-body">
-                                    <div class="btn-group d-none d-sm-block">
-                                        <button type="button" class="btn btn-warning" wire:click="downloadAttachment({{$attachment}})">
-                                            <i class="fas fa-cloud-download-alt"></i>
-                                            Download
-                                        </button>
-                                        <button type="button" class="btn btn-danger" wire:click="deleteAttachment({{$attachment}})">
-                                            <i class="fas fa-trash"></i>
-                                            Delete
-                                        </button>
-                                    </div>
-                                    <div class="d-block d-sm-none">
-                                        <button type="button" class="btn btn-block btn-warning" wire:click="downloadAttachment({{$attachment}})">
-                                            <i class="fas fa-cloud-download-alt"></i>
-                                            Download
-                                        </button>
-                                        <button type="button" class="btn btn-block btn-danger" wire:click="deleteAttachment({{$attachment}})">
-                                            <i class="fas fa-trash"></i>
-                                            Delete
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
+                <hr>
+                <x-input type="text" model="bomContentForm.sequence">
+                    Sequence
+                </x-input>
+                @if(isset($bomContentForm->is_existing) and $bomContentForm->is_existing)
+                    <div class="form-group">
+                        <label>
+                            Existing
+                            @if($bomContentForm->is_group)
+                            Sub Group
+                            @else
+                            Part
+                            @endif
+                        </label>
+                        <select class="select form-control" wire:model.defer="bomContentForm.bom_item_id">
+                            <option value="">Select..</option>
+                            @foreach($bomItemSubGroups as $bomItem)
+                                <option value="{{$bomItem->id}}" {{isset($bomContentForm->bom_item_id) && ($bomItem->id == $bomContentForm->bom_item_id) ? 'selected' : ''}}>
+                                    {{$bomItem->code}} - {{$bomItem->name}}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('bomContentForm.bom_category_id')
+                            <span style="color: red;">
+                                <small>
+                                    {{ $message }}
+                                </small>
+                            </span>
+                        @enderror
+                    </div>
+                @else
+                    <hr>
+                    @if(!isset($bomContentForm->id))
+                        <div class="form-group">
+                            <h3 class="badge badge-info">
+                                Create New
+                            </h3>
+                        </div>
                     @endif
-                </div>
-            @endif
-        </x-slot>
-        <x-slot name="footer">
-
-            <div class="btn-group">
-                <button type="submit" class="btn btn-danger d-none d-sm-block" wire:click.prevent="deleteTask">
-                    <i class="fas fa-trash"></i>
-                    Delete
-                </button>
-                <button type="submit" class="btn btn-success d-none d-sm-block" wire:click.prevent="saveTask">
+                    <x-input type="text" model="bomContentForm.code">
+                        @if($bomContentForm->is_group) Sub Group @else Part @endif Code
+                    </x-input>
+                    <x-input type="text" model="bomContentForm.name">
+                        @if($bomContentForm->is_group) Sub Group @else Part @endif Name
+                    </x-input>
+                    <div class="form-group">
+                        <label>
+                            Type
+                        </label>
+                        <select class="select form-control" wire:model.defer="bomContentForm.bom_item_type_id">
+                            <option value="">Select..</option>
+                            @foreach($bomItemTypes as $bomItemType)
+                                <option value="{{$bomItemType->id}}" {{isset($bomContentForm->bomItem->bomItemType->id) && ($bomItemType->id == $bomContentForm->bomItem->bomItemType->id) ? 'selected' : ''}}>
+                                    {{ $bomItemType->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('bomContentForm.bom_item_type_id')
+                            <span style="color: red;">
+                                <small>
+                                    {{ $message }}
+                                </small>
+                            </span>
+                        @enderror
+                    </div>
+                    @if(!$bomContentForm->is_group)
+                        <div class="form-group">
+                            <div class="form-check form-check-inline">
+                                <label class="form-check-label" for="is_required">Is Inventory?</label>
+                                <input class="form-check-input ml-2" type="checkbox" name="is_inventory" wire:model="bomContentForm.is_inventory">
+                            </div>
+                        </div>
+                    @endif
+                    <hr>
+                @endif
+                    <div class="form-group">
+                        <label>
+                            QA/QC
+                        </label>
+                        <select class="select form-control" wire:model.defer="bomContentForm.vmmfg_item_id">
+                            <option value="">Select..</option>
+                            @foreach($vmmfgItems as $vmmfgItem)
+                                <option value="{{$vmmfgItem->id}}" {{isset($bomContentForm->bomItem->vmmfg_item_id) && ($vmmfgItem->id == $bomContentForm->bomItem->vmmfg_item_id) ? 'selected' : ''}}>
+                                    ({{ $vmmfgItem->vmmfgTitle->sequence }}) - ({{ $vmmfgItem->sequence }}) {{ $vmmfgItem->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('bomContentForm.vmmfg_item_id')
+                            <span style="color: red;">
+                                <small>
+                                    {{ $message }}
+                                </small>
+                            </span>
+                        @enderror
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            Category2
+                        </label>
+                        <select class="select form-control" wire:model.defer="bomContentForm.bom_sub_category_id">
+                            <option value="">Select..</option>
+                            @foreach($bomSubCategories as $bomSubCategory)
+                                <option value="{{$bomSubCategory->id}}" {{isset($bomContentForm->bom_sub_category_id) && ($bomSubCategory->id == $bomContentForm->bom_sub_category_id) ? 'selected' : ''}}>
+                                    {{$bomSubCategory->name}}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('bomContentForm.bom_sub_category_id')
+                            <span style="color: red;">
+                                <small>
+                                    {{ $message }}
+                                </small>
+                            </span>
+                        @enderror
+                    </div>
+                    <x-input type="text" model="bomContentForm.qty">
+                        Qty
+                    </x-input>
+            </x-slot>
+            <x-slot name="footer">
+                @if($bomContentForm->is_edit)
+                    <button type="submit" class="btn btn-danger btn-xs-block" onclick="return confirm('Are you sure you want to Delete the Unbind this?') || event.stopImmediatePropagation()" wire:click.prevent="deletePart">
+                        <i class="fas fa-trash"></i>
+                        Delete
+                    </button>
+                @endif
+                <button type="submit" class="btn btn-success btn-xs-block" wire:click.prevent="savePart">
                     <i class="fas fa-save"></i>
                     Save
                 </button>
-            </div>
-
-            <button type="submit" class="btn btn-danger btn-block d-block d-sm-none" wire:click.prevent="deleteTask">
-                <i class="fas fa-trash"></i>
-                Delete
-            </button>
-            <button type="submit" class="btn btn-success btn-block d-block d-sm-none" wire:click.prevent="saveTask">
-                <i class="fas fa-save"></i>
-                Save
-            </button>
-        </x-slot>
-    </x-modal> --}}
+            </x-slot>
+        </x-modal>
+    </div>
 </div>

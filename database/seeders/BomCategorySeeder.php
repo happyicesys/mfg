@@ -55,10 +55,6 @@ class BomCategorySeeder extends Seeder
             'name' => 'Actuator Door',
             'bom_category_id' => $bomCategory2->id,
         ]);
-        BomSubCategory::create([
-            'name' => 'Exit Box',
-            'bom_category_id' => $bomCategory2->id,
-        ]);
 
         $bomCategory3 = BomCategory::create([
             'name' => 'Metal Door & Boards'

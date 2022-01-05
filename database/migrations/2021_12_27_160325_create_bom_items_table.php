@@ -15,11 +15,15 @@ class CreateBomItemsTable extends Migration
     {
         Schema::create('bom_items', function (Blueprint $table) {
             $table->id();
+            $table->string('code')->nullable();
             $table->string('name');
             $table->text('remarks')->nullable();
-            // $table->bigInteger('bom_group_id')->nullable();
-            $table->bigInteger('bom_sub_category_id')->nullable();
             $table->bigInteger('bom_item_type_id')->nullable();
+            $table->boolean('is_inventory')->default(true);
+            $table->boolean('is_header')->default(false);
+            $table->boolean('is_sub_header')->default(false);
+            $table->boolean('is_part')->default(false);
+            $table->bigInteger('available_qty')->default(0);
             $table->timestamps();
         });
     }

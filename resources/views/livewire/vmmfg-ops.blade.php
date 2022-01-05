@@ -432,8 +432,6 @@
                                             @endif
                                             </div>
                                         @endforeach
-
-                                        <hr>
 {{--
                                         <div class="row">
                                             <hr>

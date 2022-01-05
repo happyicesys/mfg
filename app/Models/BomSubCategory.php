@@ -11,7 +11,6 @@ class BomSubCategory extends Model
 
     protected $fillable = [
         'name',
-        'bom_category_id',
     ];
 
     // relationships

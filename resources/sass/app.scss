@@ -177,3 +177,16 @@ p {
 // filepond
 @import "~filepond/dist/filepond.min.css";
 @import "~filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css";
+
+// hr section title
+.section-title {
+    margin-bottom: 1rem;
+    font-size: 1.35rem;
+    color: #797979;
+    font-weight: bold;
+}
+.section-sub-title {
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    color: #797979;
+}
