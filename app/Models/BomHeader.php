@@ -31,7 +31,7 @@ class BomHeader extends Model
 
     public function bomContents()
     {
-        return $this->hasMany(BomContent::class);
+        return $this->hasMany(BomContent::class)->orderBy('sequence');
     }
 
     public function bomItem()

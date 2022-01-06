@@ -17,6 +17,6 @@ class Bom extends Model
     // relationships
     public function bomHeaders()
     {
-        return $this->hasMany(BomHeader::class);
+        return $this->hasMany(BomHeader::class)->orderBy('sequence');
     }
 }

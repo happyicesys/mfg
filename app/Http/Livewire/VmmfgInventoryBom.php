@@ -310,7 +310,7 @@ class VmmfgInventoryBom extends Component
                                         ->orderBy('bom_items.code')
                                         ->get();
         $this->bomContentForm->is_edit = false;
-        $this->bomContentForm->sequence = BomContent::where('bom_header_id', $this->bomHeader->id)->max('sequence') + 1;
+        $this->bomContentForm->sequence = $this->incrementNestedSequence(BomContent::where('bom_header_id', $this->bomHeader->id)->max('sequence'));
     }
 
     public function createContent(BomHeader $bomHeader)
@@ -329,7 +329,7 @@ class VmmfgInventoryBom extends Component
                                     ->orderBy('name')
                                     ->get();
         $this->bomContentForm->is_edit = false;
-        $this->bomContentForm->sequence = BomContent::where('bom_header_id', $this->bomHeader->id)->max('sequence') + 1;
+        $this->bomContentForm->sequence = $this->incrementNestedSequence(BomContent::where('bom_header_id', $this->bomHeader->id)->max('sequence'));
     }
 
     public function savePart()
@@ -431,6 +431,16 @@ class VmmfgInventoryBom extends Component
         $this->emit('refresh');
 
         session()->flash('success', 'Entry has been deleted');
+    }
+
+    private function incrementNestedSequence($value)
+    {
+        for($updatedValue = explode( ".", $value ), $i = count($updatedValue) - 1; $i > -1; --$i) {
+            if ( ++$updatedValue[$i] < 10 || !$i ) break;
+            $updatedValue[$i] = 0;
+        }
+        $updatedValue = implode( ".", $updatedValue );
+        return $updatedValue;
     }
 
 }
