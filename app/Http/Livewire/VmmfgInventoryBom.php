@@ -76,6 +76,7 @@ class VmmfgInventoryBom extends Component
     public $bomItemGroups;
     public $bomItemParts;
     public $bomItemSubGroups;
+    public $file;
 
     protected $listeners = [
         'refresh' => '$refresh',
@@ -113,6 +114,7 @@ class VmmfgInventoryBom extends Component
             'bomContentForm.is_inventory' => 'sometimes',
             'bomContentForm.is_sub_header' => 'sometimes',
             'bomContentForm.is_part' => 'sometimes',
+            'file' => 'sometimes',
         ];
     }
 
@@ -143,10 +145,11 @@ class VmmfgInventoryBom extends Component
         $boms = Bom::with([
             'bomHeaders',
             'bomHeaders.bomItem',
+            'bomHeaders.bomItem.attachments',
             'bomHeaders.bomCategory',
             'bomHeaders.vmmfgItem',
             'bomHeaders.bomContents.bomItem',
-            'bomHeaders.bomContents.bomItem',
+            'bomHeaders.bomContents.bomItem.attachments',
             'bomHeaders.bomContents.bomSubCategory',
             'bomHeaders.bomContents.vmmfgItem',
         ]);
@@ -162,6 +165,7 @@ class VmmfgInventoryBom extends Component
         }
 
         $boms = $boms->paginate($this->itemPerPage);
+        // dd($boms->toArray());
 
         return view('livewire.vmmfg-inventory-bom', ['boms' => $boms]);
     }
@@ -205,6 +209,7 @@ class VmmfgInventoryBom extends Component
         $this->bomHeaderForm = new BomHeader;
         $this->bomHeaderForm->is_edit = false;
         $this->bomHeaderForm->sequence = BomHeader::where('bom_id', $this->bom->id)->max('sequence') + 1;
+        $this->reset('file');
     }
 
     public function editHeader(BomHeader $bomHeader)
@@ -276,7 +281,16 @@ class VmmfgInventoryBom extends Component
             }
         }
 
+        if($this->bomHeader->bomItem and $this->file) {
+            $url = $this->file->storePublicly('bom', 'digitaloceanspaces');
+            $fullUrl = Storage::url($url);
+            $this->bomHeader->bomItem->attachments()->create([
+                'url' => $url,
+                'full_url' => $fullUrl,
+            ]);
+        }
 
+        $this->reset('file');
         $this->emit('refresh');
         session()->flash('success', 'Entry has been created');
     }
@@ -310,7 +324,12 @@ class VmmfgInventoryBom extends Component
                                         ->orderBy('bom_items.code')
                                         ->get();
         $this->bomContentForm->is_edit = false;
-        $this->bomContentForm->sequence = $this->incrementNestedSequence(BomContent::where('bom_header_id', $this->bomHeader->id)->max('sequence'));
+        $this->bomContentForm->sequence = $this->incrementNestedSequence(
+                                            $this->getBomContentLastSequence(
+                                                BomContent::where('bom_header_id', $this->bomHeader->id)->get()
+                                            )
+                                        );
+        $this->reset('file');
     }
 
     public function createContent(BomHeader $bomHeader)
@@ -329,7 +348,12 @@ class VmmfgInventoryBom extends Component
                                     ->orderBy('name')
                                     ->get();
         $this->bomContentForm->is_edit = false;
-        $this->bomContentForm->sequence = $this->incrementNestedSequence(BomContent::where('bom_header_id', $this->bomHeader->id)->max('sequence'));
+        $this->bomContentForm->sequence = $this->incrementNestedSequence(
+                                            $this->getBomContentLastSequence(
+                                                BomContent::where('bom_header_id', $this->bomHeader->id)->get()
+                                            )
+                                        );
+        $this->reset('file');
     }
 
     public function savePart()
@@ -389,7 +413,16 @@ class VmmfgInventoryBom extends Component
             ]);
         }
 
+        if($this->bomContent->bomItem and $this->file) {
+            $url = $this->file->storePublicly('bom', 'digitaloceanspaces');
+            $fullUrl = Storage::url($url);
+            $this->bomContent->bomItem->attachments()->create([
+                'url' => $url,
+                'full_url' => $fullUrl,
+            ]);
+        }
 
+        $this->reset('file');
         $this->emit('refresh');
         session()->flash('success', 'Entry has been created');
     }
@@ -433,6 +466,22 @@ class VmmfgInventoryBom extends Component
         session()->flash('success', 'Entry has been deleted');
     }
 
+    public function deleteAttachment(Attachment $attachment)
+    {
+        if(Attachment::where('full_url', $attachment->full_url)->count() === 1) {
+            Storage::disk('digitaloceanspaces')->delete($attachment->url);
+        }
+        $attachment->delete();
+
+        $this->emit('updated');
+        session()->flash('success', 'Entry has been removed');
+    }
+
+    public function downloadAttachment(Attachment $attachment)
+    {
+        return Storage::disk('digitaloceanspaces')->download($attachment->url);
+    }
+
     private function incrementNestedSequence($value)
     {
         for($updatedValue = explode( ".", $value ), $i = count($updatedValue) - 1; $i > -1; --$i) {
@@ -441,6 +490,21 @@ class VmmfgInventoryBom extends Component
         }
         $updatedValue = implode( ".", $updatedValue );
         return $updatedValue;
+    }
+
+    private function getBomContentLastSequence($collections)
+    {
+        $lastSequence = 0;
+        $sequenceArr = [];
+        if($collections) {
+            for($i=0; $i < count($collections); $i++) {
+                array_push($sequenceArr, $collections[$i]['sequence']);
+            }
+        }
+        natsort($sequenceArr);
+        $lastSequence = end($sequenceArr);
+
+        return $lastSequence;
     }
 
 }

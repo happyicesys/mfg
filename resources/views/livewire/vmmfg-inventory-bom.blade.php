@@ -290,7 +290,7 @@
                                 </td>
                             </tr>
                             @if($bomHeader->bomContents()->exists())
-                                @foreach($bomHeader->bomContents as $bomContent)
+                                @foreach($bomHeader->bomContents->sortBy('sequence', SORT_NATURAL) as $bomContent)
                                     <tr class="d-flex border border-secondary ml-3">
                                         <th class="col-md-2 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-dark">
                                             {{$bomContent->sequence}}.
@@ -517,6 +517,57 @@
                         </span>
                     @enderror
                 </div>
+                <div class="form-group">
+                    <label for="file">
+                        Upload File(s)
+                    </label>
+                    <input type="file" class="form-control-file" wire:model.defer="file">
+                </div>
+                <div class="form-group">
+                    @if(isset($bomHeaderForm->bomItem->attachments))
+                        @foreach($bomHeaderForm->bomItem->attachments as $attachmentIndex => $attachment)
+                        <div class="card" style="max-width:600px;width:100%;" wire:key="attachment-{{$attachmentIndex}}">
+                                @php
+                                    $ext = pathinfo($attachment->full_url, PATHINFO_EXTENSION);
+                                @endphp
+                                @if($ext === 'pdf')
+                                    <embed src="{{$attachment->full_url}}" type="application/pdf" class="card-img-top" style="min-height: 500px;">
+                                @elseif($ext === 'mov' or $ext === 'mp4')
+                                    <div class="embed-responsive embed-responsive-16by9">
+                                        <video class=" embed-responsive-item video-js" controls>
+                                            <source src="{{$attachment->full_url}}">
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    </div>
+                                @else
+                                    <img class="card-img-top" src="{{$attachment->full_url}}" alt="">
+                                @endif
+                                <div class="card-body">
+                                    <div class="btn-group d-none d-sm-block">
+                                        <button type="button" class="btn btn-warning" wire:click="downloadAttachment({{$attachment}})">
+                                            <i class="fas fa-cloud-download-alt"></i>
+                                            Download
+                                        </button>
+                                        <button type="button" class="btn btn-danger" wire:click="deleteAttachment({{$attachment}})">
+                                            <i class="fas fa-trash"></i>
+                                            Delete
+                                        </button>
+                                    </div>
+                                    <div class="d-block d-sm-none">
+                                        <button type="button" class="btn btn-block btn-warning" wire:click="downloadAttachment({{$attachment}})">
+                                            <i class="fas fa-cloud-download-alt"></i>
+                                            Download
+                                        </button>
+                                        <button type="button" class="btn btn-block btn-danger" wire:click="deleteAttachment({{$attachment}})">
+                                            <i class="fas fa-trash"></i>
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    @endif
+                </div>
                 <hr>
                 <div class="form-group">
                     <label>
@@ -685,6 +736,57 @@
                             </div>
                         </div>
                     @endif
+                    <div class="form-group">
+                        <label for="file">
+                            Upload File(s)
+                        </label>
+                        <input type="file" class="form-control-file" wire:model.defer="file">
+                    </div>
+                    <div class="form-group">
+                        @if(isset($bomContentForm->bomItem->attachments))
+                            @foreach($bomContentForm->bomItem->attachments as $attachmentIndex => $attachment)
+                            <div class="card" style="max-width:600px;width:100%;" wire:key="attachment-{{$attachmentIndex}}">
+                                    @php
+                                        $ext = pathinfo($attachment->full_url, PATHINFO_EXTENSION);
+                                    @endphp
+                                    @if($ext === 'pdf')
+                                        <embed src="{{$attachment->full_url}}" type="application/pdf" class="card-img-top" style="min-height: 500px;">
+                                    @elseif($ext === 'mov' or $ext === 'mp4')
+                                        <div class="embed-responsive embed-responsive-16by9">
+                                            <video class=" embed-responsive-item video-js" controls>
+                                                <source src="{{$attachment->full_url}}">
+                                                Your browser does not support the video tag.
+                                            </video>
+                                        </div>
+                                    @else
+                                        <img class="card-img-top" src="{{$attachment->full_url}}" alt="">
+                                    @endif
+                                    <div class="card-body">
+                                        <div class="btn-group d-none d-sm-block">
+                                            <button type="button" class="btn btn-warning" wire:click="downloadAttachment({{$attachment}})">
+                                                <i class="fas fa-cloud-download-alt"></i>
+                                                Download
+                                            </button>
+                                            <button type="button" class="btn btn-danger" wire:click="deleteAttachment({{$attachment}})">
+                                                <i class="fas fa-trash"></i>
+                                                Delete
+                                            </button>
+                                        </div>
+                                        <div class="d-block d-sm-none">
+                                            <button type="button" class="btn btn-block btn-warning" wire:click="downloadAttachment({{$attachment}})">
+                                                <i class="fas fa-cloud-download-alt"></i>
+                                                Download
+                                            </button>
+                                            <button type="button" class="btn btn-block btn-danger" wire:click="deleteAttachment({{$attachment}})">
+                                                <i class="fas fa-trash"></i>
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @endif
+                    </div>
                     <hr>
                 @endif
                     <div class="form-group">
