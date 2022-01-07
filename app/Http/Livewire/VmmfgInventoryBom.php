@@ -77,6 +77,7 @@ class VmmfgInventoryBom extends Component
     public $bomItemParts;
     public $bomItemSubGroups;
     public $file;
+    public $attachments;
 
     protected $listeners = [
         'refresh' => '$refresh',
@@ -210,10 +211,13 @@ class VmmfgInventoryBom extends Component
         $this->bomHeaderForm->is_edit = false;
         $this->bomHeaderForm->sequence = BomHeader::where('bom_id', $this->bom->id)->max('sequence') + 1;
         $this->reset('file');
+        $this->reset('attachments');
     }
 
     public function editHeader(BomHeader $bomHeader)
     {
+        $this->reset('file');
+        $this->reset('attachments');
         $this->bomHeader = $bomHeader;
         $this->bomHeaderForm = $bomHeader;
         $this->bomHeaderForm->code = $bomHeader->bomItem->code;
@@ -240,51 +244,44 @@ class VmmfgInventoryBom extends Component
             ]);
         }
         if($this->bomHeaderForm->is_edit) {
-            // dd($this->bomHeaderForm->toArray());
             $this->bomHeader->update([
                 'sequence' => $this->bomHeaderForm->sequence,
                 'bom_category_id' => $this->bomHeaderForm->bom_category_id,
                 'vmmfg_item_id' => $this->bomHeaderForm->vmmfg_item_id,
                 'qty' => $this->bomHeaderForm->qty,
             ]);
-            $this->bomHeader->bomItem()->update([
+            $bomHeaderItem = $this->bomHeader->bomItem()->update([
                 'code' => $this->bomHeaderForm->code,
                 'name' => $this->bomHeaderForm->name,
                 'bom_item_type_id' => $this->bomHeaderForm->bom_item_type_id,
             ]);
+            $currentBomHeader = $this->bomHeader;
         }else {
             if($this->bomHeaderForm->is_existing) {
-                $this->bomHeader->create([
-                    'sequence' => $this->bomHeaderForm->sequence,
-                    'bom_id' => $this->bom->id,
-                    'bom_category_id' => $this->bomHeaderForm->bom_category_id,
-                    'bom_item_id' => $this->bomHeaderForm->bom_item_id,
-                    'vmmfg_item_id' => $this->bomHeaderForm->vmmfg_item_id,
-                    'qty' => $this->bomHeaderForm->qty,
-                ]);
+                $bomItemId = $this->bomHeaderForm->bom_item_id;
             }else {
-                $bomItem = BomItem::create([
+                $bomHeaderItem = BomItem::create([
                     'code' => $this->bomHeaderForm->code,
                     'name' => $this->bomHeaderForm->name,
                     'bom_item_type_id' => $this->bomHeaderForm->bom_item_type_id,
                     'is_header' => true,
                 ]);
-
-                $this->bomHeader->create([
-                    'sequence' => $this->bomHeaderForm->sequence,
-                    'bom_id' => $this->bom->id,
-                    'bom_category_id' => $this->bomHeaderForm->bom_category_id,
-                    'bom_item_id' => $bomItem->id,
-                    'vmmfg_item_id' => $this->bomHeaderForm->vmmfg_item_id,
-                    'qty' => $this->bomHeaderForm->qty,
-                ]);
+                $bomItemId = $bomHeaderItem->id;
             }
+            $currentBomHeader = $this->bomHeader->create([
+                'sequence' => $this->bomHeaderForm->sequence,
+                'bom_id' => $this->bom->id,
+                'bom_category_id' => $this->bomHeaderForm->bom_category_id,
+                'bom_item_id' => $bomItemId,
+                'vmmfg_item_id' => $this->bomHeaderForm->vmmfg_item_id,
+                'qty' => $this->bomHeaderForm->qty,
+            ]);
         }
 
-        if($this->bomHeader->bomItem and $this->file) {
+        if($currentBomHeader->bomItem and $this->file) {
             $url = $this->file->storePublicly('bom', 'digitaloceanspaces');
             $fullUrl = Storage::url($url);
-            $this->bomHeader->bomItem->attachments()->create([
+            $currentBomHeader->bomItem->attachments()->create([
                 'url' => $url,
                 'full_url' => $fullUrl,
             ]);
@@ -330,6 +327,7 @@ class VmmfgInventoryBom extends Component
                                             )
                                         );
         $this->reset('file');
+        $this->reset('attachments');
     }
 
     public function createContent(BomHeader $bomHeader)
@@ -354,6 +352,7 @@ class VmmfgInventoryBom extends Component
                                             )
                                         );
         $this->reset('file');
+        $this->reset('attachments');
     }
 
     public function savePart()
@@ -382,17 +381,18 @@ class VmmfgInventoryBom extends Component
                 'vmmfg_item_id' => $this->bomContentForm->vmmfg_item_id,
                 'qty' => $this->bomContentForm->qty,
             ]);
-            $this->bomContent->bomItem()->update([
+            $bomContentItem = $this->bomContent->bomItem()->update([
                 'code' => $this->bomContentForm->code,
                 'name' => $this->bomContentForm->name,
                 'bom_item_type_id' => $this->bomContentForm->bom_item_type_id,
                 'is_inventory' => $this->bomContentForm->is_inventory ? $this->bomContentForm->is_inventory : false,
             ]);
+            $currentBomContent = $this->bomContent;
         }else {
             if($this->bomContentForm->is_existing) {
                 $bomItemId = $this->bomContentForm->bom_item_id;
             }else {
-                $bomItem = BomItem::create([
+                $bomContentItem = BomItem::create([
                     'code' => $this->bomContentForm->code,
                     'name' => $this->bomContentForm->name,
                     'bom_item_type_id' => $this->bomContentForm->bom_item_type_id,
@@ -400,9 +400,9 @@ class VmmfgInventoryBom extends Component
                     'is_sub_header' => $this->bomContentForm->is_group ? true : false,
                     'is_part' => $this->bomContentForm->is_group ? false : true,
                 ]);
-                $bomItemId = $bomItem->id;
+                $bomItemId = $bomContentItem->id;
             }
-            $this->bomContent->create([
+            $currentBomContent = $this->bomContent->create([
                 'sequence' => $this->bomContentForm->sequence,
                 'bom_header_id' => $this->bomHeader->id,
                 'bom_sub_category_id' => $this->bomContentForm->bom_sub_category_id,
@@ -413,10 +413,10 @@ class VmmfgInventoryBom extends Component
             ]);
         }
 
-        if($this->bomContent->bomItem and $this->file) {
+        if($currentBomContent->bomItem and $this->file) {
             $url = $this->file->storePublicly('bom', 'digitaloceanspaces');
             $fullUrl = Storage::url($url);
-            $this->bomContent->bomItem->attachments()->create([
+            $currentBomContent->bomItem->attachments()->create([
                 'url' => $url,
                 'full_url' => $fullUrl,
             ]);
@@ -429,6 +429,8 @@ class VmmfgInventoryBom extends Component
 
     public function editPart(BomContent $bomContent)
     {
+        $this->reset('file');
+        $this->reset('attachments');
         $this->bomHeader = $bomContent->bomHeader;
         $this->bomContent = $bomContent;
         $this->bomContentForm = $bomContent;
@@ -480,6 +482,12 @@ class VmmfgInventoryBom extends Component
     public function downloadAttachment(Attachment $attachment)
     {
         return Storage::disk('digitaloceanspaces')->download($attachment->url);
+    }
+
+    public function viewAttachmentsByBomItem(BomItem $bomItem)
+    {
+        $this->reset('attachments');
+        $this->attachments = $bomItem->attachments;
     }
 
     private function incrementNestedSequence($value)

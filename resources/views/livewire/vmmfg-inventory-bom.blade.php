@@ -280,12 +280,17 @@
                                         </button>
                                         <button type="button" class="btn btn-warning btn-sm" wire:click="createSubGroup({{$bomHeader}})" wire:key="header-create-sub-group-{{$bomHeaderIndex}}" data-toggle="modal" data-target="#content-modal">
                                             <i class="fas fa-plus-circle"></i>
-                                            S.Group
+                                            SubG
                                         </button>
                                         <button type="button" class="btn btn-success btn-sm" wire:click="createContent({{$bomHeader}})" wire:key="header-create-content-{{$bomHeaderIndex}}" data-toggle="modal" data-target="#content-modal">
                                             <i class="fas fa-plus-circle"></i>
-                                            Part
+                                            P
                                         </button>
+                                        @if($bomHeader->bomItem->attachments()->exists())
+                                            <button type="button" class="btn btn-outline-dark btn-sm" wire:click="viewAttachmentsByBomItem({{$bomHeader->bomItem}})" wire:key="header-view-attachment-{{$bomHeaderIndex}}" data-toggle="modal" data-target="#attachment-modal">
+                                                <i class="far fa-images"></i>
+                                            </button>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
@@ -326,6 +331,11 @@
                                                 <button type="button" wire:click="editPart({{$bomContent}})" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#content-modal">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
+                                                @if($bomContent->bomItem->attachments()->exists())
+                                                    <button type="button" class="btn btn-outline-dark btn-sm" wire:click="viewAttachmentsByBomItem({{$bomContent->bomItem}})" wire:key="content-view-attachment-{{$bomContent->id}}" data-toggle="modal" data-target="#attachment-modal">
+                                                        <i class="far fa-images"></i>
+                                                    </button>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>
@@ -629,222 +639,279 @@
         </x-slot>
     </x-modal>
 
-        <x-modal id="content-modal">
-            <x-slot name="title">
-                @if(isset($bomContentForm->id))
-                    Edit
-                    @if($bomContentForm->is_group)
-                    Sub Group:
-                    @else
-                    Part:
-                    @endif
-                    {{$bomContentForm->bomItem->sequence}}. {{$bomContentForm->bomItem->name}}
+    <x-modal id="content-modal">
+        <x-slot name="title">
+            @if(isset($bomContentForm->id))
+                Edit
+                @if($bomContentForm->is_group)
+                Sub Group:
                 @else
-                    Create
-                    @if($bomContentForm->is_group)
-                    Sub Group
-                    @else
-                    Part
-                    @endif
+                Part:
                 @endif
-            </x-slot>
-            <x-slot name="content">
-                <div class="form-group">
-                    <div class="form-check form-check-inline">
-                        <label class="form-check-label" for="is_required">
-                            Select from Existing
-                            @if($bomContentForm->is_group)
-                            Sub Group
-                            @else
-                            Part
-                            @endif
-                            ?
-                        </label>
-                        <input class="form-check-input ml-2" type="checkbox" name="is_existing" wire:model="bomContentForm.is_existing">
-                    </div>
-                </div>
-                <hr>
-                <x-input type="text" model="bomContentForm.sequence">
-                    Sequence
-                </x-input>
-                @if(isset($bomContentForm->is_existing) and $bomContentForm->is_existing)
-                    <div class="form-group">
-                        <label>
-                            Existing
-                            @if($bomContentForm->is_group)
-                            Sub Group
-                            @else
-                            Part
-                            @endif
-                        </label>
-                        <select class="select form-control" wire:model.defer="bomContentForm.bom_item_id">
-                            <option value="">Select..</option>
-                            @foreach($bomItemSubGroups as $bomItem)
-                                <option value="{{$bomItem->id}}" {{isset($bomContentForm->bom_item_id) && ($bomItem->id == $bomContentForm->bom_item_id) ? 'selected' : ''}}>
-                                    {{$bomItem->code}} - {{$bomItem->name}}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('bomContentForm.bom_category_id')
-                            <span style="color: red;">
-                                <small>
-                                    {{ $message }}
-                                </small>
-                            </span>
-                        @enderror
-                    </div>
+                {{$bomContentForm->bomItem->sequence}}. {{$bomContentForm->bomItem->name}}
+            @else
+                Create
+                @if($bomContentForm->is_group)
+                Sub Group
                 @else
-                    <hr>
-                    @if(!isset($bomContentForm->id))
-                        <div class="form-group">
-                            <h3 class="badge badge-info">
-                                Create New
-                            </h3>
-                        </div>
-                    @endif
-                    <x-input type="text" model="bomContentForm.code">
-                        @if($bomContentForm->is_group) Sub Group @else Part @endif Code
-                    </x-input>
-                    <x-input type="text" model="bomContentForm.name">
-                        @if($bomContentForm->is_group) Sub Group @else Part @endif Name
-                    </x-input>
+                Part
+                @endif
+            @endif
+        </x-slot>
+        <x-slot name="content">
+            <div class="form-group">
+                <div class="form-check form-check-inline">
+                    <label class="form-check-label" for="is_required">
+                        Select from Existing
+                        @if($bomContentForm->is_group)
+                        Sub Group
+                        @else
+                        Part
+                        @endif
+                        ?
+                    </label>
+                    <input class="form-check-input ml-2" type="checkbox" name="is_existing" wire:model="bomContentForm.is_existing">
+                </div>
+            </div>
+            <hr>
+            <x-input type="text" model="bomContentForm.sequence">
+                Sequence
+            </x-input>
+            @if(isset($bomContentForm->is_existing) and $bomContentForm->is_existing)
+                <div class="form-group">
+                    <label>
+                        Existing
+                        @if($bomContentForm->is_group)
+                        Sub Group
+                        @else
+                        Part
+                        @endif
+                    </label>
+                    <select class="select form-control" wire:model.defer="bomContentForm.bom_item_id">
+                        <option value="">Select..</option>
+                        @foreach($bomItemSubGroups as $bomItem)
+                            <option value="{{$bomItem->id}}" {{isset($bomContentForm->bom_item_id) && ($bomItem->id == $bomContentForm->bom_item_id) ? 'selected' : ''}}>
+                                {{$bomItem->code}} - {{$bomItem->name}}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('bomContentForm.bom_category_id')
+                        <span style="color: red;">
+                            <small>
+                                {{ $message }}
+                            </small>
+                        </span>
+                    @enderror
+                </div>
+            @else
+                <hr>
+                @if(!isset($bomContentForm->id))
                     <div class="form-group">
-                        <label>
-                            Type
-                        </label>
-                        <select class="select form-control" wire:model.defer="bomContentForm.bom_item_type_id">
-                            <option value="">Select..</option>
-                            @foreach($bomItemTypes as $bomItemType)
-                                <option value="{{$bomItemType->id}}" {{isset($bomContentForm->bomItem->bomItemType->id) && ($bomItemType->id == $bomContentForm->bomItem->bomItemType->id) ? 'selected' : ''}}>
-                                    {{ $bomItemType->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('bomContentForm.bom_item_type_id')
-                            <span style="color: red;">
-                                <small>
-                                    {{ $message }}
-                                </small>
-                            </span>
-                        @enderror
+                        <h3 class="badge badge-info">
+                            Create New
+                        </h3>
                     </div>
-                    @if(!$bomContentForm->is_group)
-                        <div class="form-group">
-                            <div class="form-check form-check-inline">
-                                <label class="form-check-label" for="is_required">Is Inventory?</label>
-                                <input class="form-check-input ml-2" type="checkbox" name="is_inventory" wire:model="bomContentForm.is_inventory">
-                            </div>
+                @endif
+                <x-input type="text" model="bomContentForm.code">
+                    @if($bomContentForm->is_group) Sub Group @else Part @endif Code
+                </x-input>
+                <x-input type="text" model="bomContentForm.name">
+                    @if($bomContentForm->is_group) Sub Group @else Part @endif Name
+                </x-input>
+                <div class="form-group">
+                    <label>
+                        Type
+                    </label>
+                    <select class="select form-control" wire:model.defer="bomContentForm.bom_item_type_id">
+                        <option value="">Select..</option>
+                        @foreach($bomItemTypes as $bomItemType)
+                            <option value="{{$bomItemType->id}}" {{isset($bomContentForm->bomItem->bomItemType->id) && ($bomItemType->id == $bomContentForm->bomItem->bomItemType->id) ? 'selected' : ''}}>
+                                {{ $bomItemType->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('bomContentForm.bom_item_type_id')
+                        <span style="color: red;">
+                            <small>
+                                {{ $message }}
+                            </small>
+                        </span>
+                    @enderror
+                </div>
+                @if(!$bomContentForm->is_group)
+                    <div class="form-group">
+                        <div class="form-check form-check-inline">
+                            <label class="form-check-label" for="is_required">Is Inventory?</label>
+                            <input class="form-check-input ml-2" type="checkbox" name="is_inventory" wire:model="bomContentForm.is_inventory">
                         </div>
-                    @endif
-                    <div class="form-group">
-                        <label for="file">
-                            Upload File(s)
-                        </label>
-                        <input type="file" class="form-control-file" wire:model.defer="file">
                     </div>
-                    <div class="form-group">
-                        @if(isset($bomContentForm->bomItem->attachments))
-                            @foreach($bomContentForm->bomItem->attachments as $attachmentIndex => $attachment)
-                            <div class="card" style="max-width:600px;width:100%;" wire:key="attachment-{{$attachmentIndex}}">
-                                    @php
-                                        $ext = pathinfo($attachment->full_url, PATHINFO_EXTENSION);
-                                    @endphp
-                                    @if($ext === 'pdf')
-                                        <embed src="{{$attachment->full_url}}" type="application/pdf" class="card-img-top" style="min-height: 500px;">
-                                    @elseif($ext === 'mov' or $ext === 'mp4')
-                                        <div class="embed-responsive embed-responsive-16by9">
-                                            <video class=" embed-responsive-item video-js" controls>
-                                                <source src="{{$attachment->full_url}}">
-                                                Your browser does not support the video tag.
-                                            </video>
-                                        </div>
-                                    @else
-                                        <img class="card-img-top" src="{{$attachment->full_url}}" alt="">
-                                    @endif
-                                    <div class="card-body">
-                                        <div class="btn-group d-none d-sm-block">
-                                            <button type="button" class="btn btn-warning" wire:click="downloadAttachment({{$attachment}})">
-                                                <i class="fas fa-cloud-download-alt"></i>
-                                                Download
-                                            </button>
-                                            <button type="button" class="btn btn-danger" wire:click="deleteAttachment({{$attachment}})">
-                                                <i class="fas fa-trash"></i>
-                                                Delete
-                                            </button>
-                                        </div>
-                                        <div class="d-block d-sm-none">
-                                            <button type="button" class="btn btn-block btn-warning" wire:click="downloadAttachment({{$attachment}})">
-                                                <i class="fas fa-cloud-download-alt"></i>
-                                                Download
-                                            </button>
-                                            <button type="button" class="btn btn-block btn-danger" wire:click="deleteAttachment({{$attachment}})">
-                                                <i class="fas fa-trash"></i>
-                                                Delete
-                                            </button>
-                                        </div>
+                @endif
+                <div class="form-group">
+                    <label for="file">
+                        Upload File(s)
+                    </label>
+                    <input type="file" class="form-control-file" wire:model.defer="file">
+                </div>
+                <div class="form-group">
+                    @if(isset($bomContentForm->bomItem->attachments))
+                        @foreach($bomContentForm->bomItem->attachments as $attachmentIndex => $attachment)
+                        <div class="card" style="max-width:600px;width:100%;" wire:key="attachment-{{$attachmentIndex}}">
+                                @php
+                                    $ext = pathinfo($attachment->full_url, PATHINFO_EXTENSION);
+                                @endphp
+                                @if($ext === 'pdf')
+                                    <embed src="{{$attachment->full_url}}" type="application/pdf" class="card-img-top" style="min-height: 500px;">
+                                @elseif($ext === 'mov' or $ext === 'mp4')
+                                    <div class="embed-responsive embed-responsive-16by9">
+                                        <video class=" embed-responsive-item video-js" controls>
+                                            <source src="{{$attachment->full_url}}">
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    </div>
+                                @else
+                                    <img class="card-img-top" src="{{$attachment->full_url}}" alt="">
+                                @endif
+                                <div class="card-body">
+                                    <div class="btn-group d-none d-sm-block">
+                                        <button type="button" class="btn btn-warning" wire:click="downloadAttachment({{$attachment}})">
+                                            <i class="fas fa-cloud-download-alt"></i>
+                                            Download
+                                        </button>
+                                        <button type="button" class="btn btn-danger" wire:click="deleteAttachment({{$attachment}})">
+                                            <i class="fas fa-trash"></i>
+                                            Delete
+                                        </button>
+                                    </div>
+                                    <div class="d-block d-sm-none">
+                                        <button type="button" class="btn btn-block btn-warning" wire:click="downloadAttachment({{$attachment}})">
+                                            <i class="fas fa-cloud-download-alt"></i>
+                                            Download
+                                        </button>
+                                        <button type="button" class="btn btn-block btn-danger" wire:click="deleteAttachment({{$attachment}})">
+                                            <i class="fas fa-trash"></i>
+                                            Delete
+                                        </button>
                                     </div>
                                 </div>
-                            @endforeach
-                        @endif
-                    </div>
-                    <hr>
-                @endif
-                    <div class="form-group">
-                        <label>
-                            QA/QC
-                        </label>
-                        <select class="select form-control" wire:model.defer="bomContentForm.vmmfg_item_id">
-                            <option value="">Select..</option>
-                            @foreach($vmmfgItems as $vmmfgItem)
-                                <option value="{{$vmmfgItem->id}}" {{isset($bomContentForm->bomItem->vmmfg_item_id) && ($vmmfgItem->id == $bomContentForm->bomItem->vmmfg_item_id) ? 'selected' : ''}}>
-                                    ({{ $vmmfgItem->vmmfgTitle->sequence }}) - ({{ $vmmfgItem->sequence }}) {{ $vmmfgItem->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('bomContentForm.vmmfg_item_id')
-                            <span style="color: red;">
-                                <small>
-                                    {{ $message }}
-                                </small>
-                            </span>
-                        @enderror
-                    </div>
-                    <div class="form-group">
-                        <label>
-                            Category2
-                        </label>
-                        <select class="select form-control" wire:model.defer="bomContentForm.bom_sub_category_id">
-                            <option value="">Select..</option>
-                            @foreach($bomSubCategories as $bomSubCategory)
-                                <option value="{{$bomSubCategory->id}}" {{isset($bomContentForm->bom_sub_category_id) && ($bomSubCategory->id == $bomContentForm->bom_sub_category_id) ? 'selected' : ''}}>
-                                    {{$bomSubCategory->name}}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('bomContentForm.bom_sub_category_id')
-                            <span style="color: red;">
-                                <small>
-                                    {{ $message }}
-                                </small>
-                            </span>
-                        @enderror
-                    </div>
-                    <x-input type="text" model="bomContentForm.qty">
-                        Qty
-                    </x-input>
-            </x-slot>
-            <x-slot name="footer">
-                @if($bomContentForm->is_edit)
-                    <button type="submit" class="btn btn-danger btn-xs-block" onclick="return confirm('Are you sure you want to Delete the Unbind this?') || event.stopImmediatePropagation()" wire:click.prevent="deletePart">
-                        <i class="fas fa-trash"></i>
-                        Delete
-                    </button>
-                @endif
-                <button type="submit" class="btn btn-success btn-xs-block" wire:click.prevent="savePart">
-                    <i class="fas fa-save"></i>
-                    Save
+                            </div>
+                        @endforeach
+                    @endif
+                </div>
+                <hr>
+            @endif
+                <div class="form-group">
+                    <label>
+                        QA/QC
+                    </label>
+                    <select class="select form-control" wire:model.defer="bomContentForm.vmmfg_item_id">
+                        <option value="">Select..</option>
+                        @foreach($vmmfgItems as $vmmfgItem)
+                            <option value="{{$vmmfgItem->id}}" {{isset($bomContentForm->bomItem->vmmfg_item_id) && ($vmmfgItem->id == $bomContentForm->bomItem->vmmfg_item_id) ? 'selected' : ''}}>
+                                ({{ $vmmfgItem->vmmfgTitle->sequence }}) - ({{ $vmmfgItem->sequence }}) {{ $vmmfgItem->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('bomContentForm.vmmfg_item_id')
+                        <span style="color: red;">
+                            <small>
+                                {{ $message }}
+                            </small>
+                        </span>
+                    @enderror
+                </div>
+                <div class="form-group">
+                    <label>
+                        Category2
+                    </label>
+                    <select class="select form-control" wire:model.defer="bomContentForm.bom_sub_category_id">
+                        <option value="">Select..</option>
+                        @foreach($bomSubCategories as $bomSubCategory)
+                            <option value="{{$bomSubCategory->id}}" {{isset($bomContentForm->bom_sub_category_id) && ($bomSubCategory->id == $bomContentForm->bom_sub_category_id) ? 'selected' : ''}}>
+                                {{$bomSubCategory->name}}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('bomContentForm.bom_sub_category_id')
+                        <span style="color: red;">
+                            <small>
+                                {{ $message }}
+                            </small>
+                        </span>
+                    @enderror
+                </div>
+                <x-input type="text" model="bomContentForm.qty">
+                    Qty
+                </x-input>
+        </x-slot>
+        <x-slot name="footer">
+            @if($bomContentForm->is_edit)
+                <button type="submit" class="btn btn-danger btn-xs-block" onclick="return confirm('Are you sure you want to Delete the Unbind this?') || event.stopImmediatePropagation()" wire:click.prevent="deletePart">
+                    <i class="fas fa-trash"></i>
+                    Delete
                 </button>
-            </x-slot>
-        </x-modal>
+            @endif
+            <button type="submit" class="btn btn-success btn-xs-block" wire:click.prevent="savePart">
+                <i class="fas fa-save"></i>
+                Save
+            </button>
+        </x-slot>
+    </x-modal>
+
+    <x-modal id="attachment-modal">
+        <x-slot name="title">
+            Attachments
+        </x-slot>
+        <x-slot name="content">
+            <div class="form-group">
+                @if(isset($attachments))
+                    @foreach($attachments as $attachmentIndex => $attachment)
+                    <div class="card" style="max-width:600px;width:100%;" wire:key="attachment-{{$attachmentIndex}}">
+                            @php
+                                $ext = pathinfo($attachment->full_url, PATHINFO_EXTENSION);
+                            @endphp
+                            @if($ext === 'pdf')
+                                <embed src="{{$attachment->full_url}}" type="application/pdf" class="card-img-top" style="min-height: 500px;">
+                            @elseif($ext === 'mov' or $ext === 'mp4')
+                                <div class="embed-responsive embed-responsive-16by9">
+                                    <video class=" embed-responsive-item video-js" controls>
+                                        <source src="{{$attachment->full_url}}">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                            @else
+                                <img class="card-img-top" src="{{$attachment->full_url}}" alt="">
+                            @endif
+                            <div class="card-body">
+                                <div class="btn-group d-none d-sm-block">
+                                    <button type="button" class="btn btn-warning" wire:click="downloadAttachment({{$attachment}})">
+                                        <i class="fas fa-cloud-download-alt"></i>
+                                        Download
+                                    </button>
+                                    <button type="button" class="btn btn-danger" wire:click="deleteAttachment({{$attachment}})">
+                                        <i class="fas fa-trash"></i>
+                                        Delete
+                                    </button>
+                                </div>
+                                <div class="d-block d-sm-none">
+                                    <button type="button" class="btn btn-block btn-warning" wire:click="downloadAttachment({{$attachment}})">
+                                        <i class="fas fa-cloud-download-alt"></i>
+                                        Download
+                                    </button>
+                                    <button type="button" class="btn btn-block btn-danger" wire:click="deleteAttachment({{$attachment}})">
+                                        <i class="fas fa-trash"></i>
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                @endif
+            </div>
+        </x-slot>
+        <x-slot name="footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </x-slot>
+    </x-modal>
+
     </div>
 </div>
