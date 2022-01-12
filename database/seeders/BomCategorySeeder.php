@@ -16,14 +16,18 @@ class BomCategorySeeder extends Seeder
     public function run()
     {
         $bomCategory1 = BomCategory::create([
-            'name' => 'DVM Unit'
+            'name' => 'MACHINE UNIT'
         ]);
         BomSubCategory::create([
             'name' => 'Freezer',
             'bom_category_id' => $bomCategory1->id,
         ]);
         BomSubCategory::create([
-            'name' => 'Exit Hole',
+            'name' => 'Door Lock',
+            'bom_category_id' => $bomCategory1->id,
+        ]);
+        BomSubCategory::create([
+            'name' => 'Product Exit Hole',
             'bom_category_id' => $bomCategory1->id,
         ]);
         BomSubCategory::create([
@@ -34,30 +38,23 @@ class BomCategorySeeder extends Seeder
             'name' => 'Freezer Fan',
             'bom_category_id' => $bomCategory1->id,
         ]);
-        BomSubCategory::create([
-            'name' => 'Sticker',
-            'bom_category_id' => $bomCategory1->id,
-        ]);
 
 
         $bomCategory2 = BomCategory::create([
-            'name' => 'Exit Door & Foam Door Asm'
+            'name' => 'EXIT BOX & DISPENSING ASM'
         ]);
         BomSubCategory::create([
             'name' => 'Exit Box',
             'bom_category_id' => $bomCategory2->id,
         ]);
         BomSubCategory::create([
-            'name' => 'Drop Sensor',
-            'bom_category_id' => $bomCategory2->id,
-        ]);
-        BomSubCategory::create([
-            'name' => 'Actuator Door',
+            'name' => 'Foam Door Syst',
             'bom_category_id' => $bomCategory2->id,
         ]);
 
+
         $bomCategory3 = BomCategory::create([
-            'name' => 'Metal Door & Boards'
+            'name' => 'METAL DOOR & BOARDS'
         ]);
         BomSubCategory::create([
             'name' => 'Metal Door & Screen Door',
@@ -77,30 +74,27 @@ class BomCategorySeeder extends Seeder
         ]);
 
         $bomCategory4 = BomCategory::create([
-            'name' => 'S/S Rack Asm'
+            'name' => 'RACKING SYSTEM'
         ]);
         BomSubCategory::create([
-            'name' => 'Top Racks & Side Plates',
+            'name' => 'Top Rack Syst',
             'bom_category_id' => $bomCategory4->id,
         ]);
         BomSubCategory::create([
-            'name' => 'Ice Gel',
-            'bom_category_id' => $bomCategory4->id,
-        ]);
-        BomSubCategory::create([
-            'name' => 'Ice Gel Rack',
-            'bom_category_id' => $bomCategory4->id,
-        ]);
-        BomSubCategory::create([
-            'name' => 'S/S Frame',
+            'name' => 'Racking',
             'bom_category_id' => $bomCategory4->id,
         ]);
 
+
         $bomCategory5 = BomCategory::create([
-            'name' => 'Drive Motor Asm'
+            'name' => 'DRIVE MOTOR ASM'
         ]);
         BomSubCategory::create([
-            'name' => 'Assembly',
+            'name' => 'Batch Cable',
+            'bom_category_id' => $bomCategory5->id,
+        ]);
+        BomSubCategory::create([
+            'name' => 'Freezer Fan',
             'bom_category_id' => $bomCategory5->id,
         ]);
         BomSubCategory::create([
@@ -113,7 +107,7 @@ class BomCategorySeeder extends Seeder
         ]);
 
         $bomCategory6 = BomCategory::create([
-            'name' => 'Spring'
+            'name' => 'SPRING'
         ]);
         BomSubCategory::create([
             'name' => 'Spring',

@@ -116,8 +116,11 @@
         <li class="header-menu">
           <span>VM Mfg Inventory</span>
         </li>
-        <li class="{{ $name == 'vmmfg-inventory-bom' ? 'active' : '' }}">
-          <a href="{{ route('vmmfg-inventory-bom') }}"><i class="fas fa-clipboard-list"></i>BOM</a>
+        <li class="{{ $name == 'vmmfg-bom' ? 'active' : '' }}">
+          <a href="{{ route('vmmfg-bom') }}"><i class="fas fa-clipboard-list"></i>BOM</a>
+        </li>
+        <li class="{{ $name == 'vmmfg-bom-inventory' ? 'active' : '' }}">
+          <a href="{{ route('vmmfg-bom-inventory') }}"><i class="fas fa-clipboard-list"></i>Inventory</a>
         </li>
         @endcan
 {{--

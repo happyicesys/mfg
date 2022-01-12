@@ -3,6 +3,7 @@
 use App\Http\Controllers\ExportExcelController;
 use App\Http\Livewire\Admin;
 use App\Http\Livewire\AppSetting;
+use App\Http\Livewire\BomInventory;
 use App\Http\Livewire\Customer;
 use App\Http\Livewire\Home;
 use App\Http\Livewire\Product;
@@ -57,7 +58,8 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::group(['middleware' => ['permission:vmmfg-inventory-access']], function() {
-        Route::get('/vmmfg-inventory-bom', VmmfgInventoryBom::class)->name('vmmfg-inventory-bom');
+        Route::get('/vmmfg-bom', VmmfgInventoryBom::class)->name('vmmfg-bom');
+        Route::get('/vmmfg-bom-inventory', BomInventory::class)->name('vmmfg-bom-inventory');
     });
 });
 

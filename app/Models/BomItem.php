@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\HasSearch;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class BomItem extends Model
 {
-    use HasFactory;
+    use HasFactory, HasSearch;
 
     protected $fillable = [
         'code',
@@ -20,6 +21,8 @@ class BomItem extends Model
         'is_header',
         'is_sub_header',
         'is_part',
+        'order_by',
+        'supplier_id',
     ];
 
     // relationships
@@ -28,9 +31,9 @@ class BomItem extends Model
         return $this->morphMany(Attachment::class, 'modelable');
     }
 
-    public function bomCategory()
+    public function baseCurrency()
     {
-        return $this->belongsTo(BomCategory::class);
+        return $this->belongsTo(Country::class, 'base_currency');
     }
 
     public function bomContents()
@@ -43,15 +46,26 @@ class BomItem extends Model
         return $this->hasMany(BomHeader::class);
     }
 
-    public function bomSubCategory()
-    {
-        return $this->belongsTo(BomSubCategory::class);
-    }
-
     public function bomItemType()
     {
         return $this->belongsTo(BomItemType::class);
     }
+
+    public function orderBy()
+    {
+        return $this->belongsTo(User::class, 'order_by');
+    }
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
+    }
+
+    // setter
+    // public function setUnitPriceAttribute($value)
+    // {
+    //     $this->attributes['unit_price'] = $value * 100;
+    // }
 
     // getter
     public function getCodeAttribute($value)
@@ -60,6 +74,11 @@ class BomItem extends Model
             return $value;
         }
     }
+
+    // public function getUnitPriceAttribute($value)
+    // {
+    //     return round($value/ 100, 2);
+    // }
 
     // setter
     // public function setIsInventoryAttribute($value)

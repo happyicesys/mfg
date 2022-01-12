@@ -17,9 +17,15 @@ class BomContent extends Model
         'bom_sub_category_id',
         'is_group',
         'vmmfg_item_id',
+        'assemble_location',
     ];
 
     // relationships
+    public function assembleLocation()
+    {
+        return $this->belongsTo(Profile::class, 'assemble_location');
+    }
+
     public function bomItem()
     {
         return $this->belongsTo(BomItem::class);
@@ -38,5 +44,11 @@ class BomContent extends Model
     public function vmmfgItem()
     {
         return $this->belongsTo(VmmfgItem::class);
+    }
+
+    // getter
+    public function getQtyAttribute($value)
+    {
+        return $value + 0;
     }
 }

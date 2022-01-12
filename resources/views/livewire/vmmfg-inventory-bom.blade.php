@@ -271,7 +271,7 @@
                                     {{$bomHeader->bomItem ? $bomHeader->bomItem->name : null}}
                                 </th>
                                 <th class="col-md-1 bg-info text-dark text-center">
-                                    {{$bomHeader->qty }}
+                                    {{-- {{$bomHeader->qty }} --}}
                                 </th>
                                 <td class="col-md-2 bg-info text-center">
                                     <div class="btn-group">
@@ -324,7 +324,12 @@
                                             {{$bomContent->bomItem->name}}
                                         </th>
                                         <th class="col-md-1 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-dark text-center">
-                                            {{$bomContent->qty}}
+                                            @if($bomContent->is_group)
+                                                {{$bomContent->qty ? $bomContent->qty : ''}}
+                                            @else
+                                                {{$bomContent->qty}}
+                                            @endif
+
                                         </th>
                                         <td class="col-md-2 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-center">
                                             <div class="btn-group">

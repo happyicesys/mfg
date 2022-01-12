@@ -25,9 +25,13 @@ class DatabaseSeeder extends Seeder
         // StaffPermission::class,
         // VmmfgTitleCategorySeeder::class,
             // ProfileSettingSeeder::class,
+            // BomCategorySeeder::class,
+            // BomItemTypeSeeder::class,
+            // VmmfgInventoryAccessSeeder::class,
+            ChinaUSCountrySeeder::class,
             BomCategorySeeder::class,
             BomItemTypeSeeder::class,
-            // VmmfgInventoryAccessSeeder::class,
+            BomSeeder::class,
        ]);
     //    \App\Models\User::factory(150)->create();
     }

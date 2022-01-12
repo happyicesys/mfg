@@ -43,4 +43,10 @@ class BomHeader extends Model
     {
         return $this->belongsTo(VmmfgItem::class);
     }
+
+    // getter
+    public function getQtyAttribute($value)
+    {
+        return $value + 0;
+    }
 }
