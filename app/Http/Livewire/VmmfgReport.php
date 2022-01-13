@@ -122,6 +122,8 @@ class VmmfgReport extends Component
 
                 },
             'vmmfgUnits.vmmfgTasks',
+            'vmmfgUnits.vmmfgTasks.doneBy',
+            'vmmfgUnits.vmmfgTasks.cancelledBy',
             'vmmfgUnits.vmmfgJob'
         ]);
 

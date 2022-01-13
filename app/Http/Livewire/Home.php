@@ -16,6 +16,10 @@ class Home extends Component
     public function render()
     {
         $thisYear = Carbon::now()->year;
+        $years = [
+            Carbon::now()->year,
+            Carbon::now()->subYear()->year,
+        ];
         $months = [
             1 => 'Jan',
             2 => 'Feb',
@@ -32,50 +36,41 @@ class Home extends Component
         ];
         $dataArr = [];
 
-        $jobs = VmmfgUnit::leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')
-                    ->select(DB::raw('COUNT(vmmfg_units.id) AS count'), DB::raw('MONTH(vmmfg_units.order_date) AS order_month'), DB::raw('MONTH(vmmfg_units.completion_date) AS completion_month'))
-                    ->where(function($query) use ($thisYear) {
-                        $query->whereYear('vmmfg_units.order_date', '=', $thisYear)->orWhereYear('vmmfg_units.completion_date', '=', $thisYear);
-                    })
-                    ->groupBy(DB::raw('MONTH(vmmfg_units.order_date)'))
-                    ->groupBy(DB::raw('MONTH(vmmfg_units.completion_date)'))
-                    ->get();
+        foreach($years as $year) {
+            $jobs = VmmfgUnit::select(
+                            DB::raw('MONTH(order_date) AS order_month'),
+                            DB::raw('MONTH(completion_date) AS completion_month'),
+                            DB::raw('YEAR(order_date) AS order_year'),
+                            DB::raw('YEAR(completion_date) AS completion_year'),
+                        )
+                        ->where(function($query) use ($year) {
+                            $query->whereYear('order_date', '=', $year)->orWhereYear('completion_date', '=', $year);
+                        })
+                        ->get();
 
-        foreach($months as $index => $month) {
-            $dataArr[$index] = [
-                'name' => $month,
-                'order' => 0,
-                'completion' => 0,
-            ];
-            foreach($jobs as $job) {
-                if($job->order_month === $index) {
-                    $dataArr[$index]['order'] = $job->count;
-                }
-                if($job->completion_month === $index) {
-                    $dataArr[$index]['completion'] = $job->count;
+            foreach($months as $index => $month) {
+                $dataArr[$year][$index] = [
+                    'year' => $year,
+                    'name' => $month,
+                    'order' => 0,
+                    'completion' => 0,
+                ];
+                foreach($jobs as $job) {
+                    if($job->order_month === $index and $job->order_year === $year) {
+                        $dataArr[$year][$index]['order'] += 1;
+                    }
+                    if($job->completion_month === $index and $job->completion_year === $year) {
+                        $dataArr[$year][$index]['completion'] += 1;
+                    }
                 }
             }
         }
 
-        $multiLineChartModel = LivewireCharts::multiLineChartModel()
-                //->setTitle('Expenses by Type')
-                ->setAnimated($this->firstLoadingChart)
-                ->multiLine()
-                ->setDataLabelsEnabled(true)
-                ->sparklined()
-                ->withDataLabels()
-                ->withLegend()
-                ->setXAxisCategories($months);
-                // ->setColors(['#b01a1b', '#d41b2c', '#ec3c3b', '#f66665']);
-                foreach($dataArr as $data) {
-                    $multiLineChartModel = $multiLineChartModel->addSeriesPoint('Start', $data['name'], $data['order']);
-                    $multiLineChartModel = $multiLineChartModel->addSeriesPoint('Completion', $data['name'], $data['completion']);
-                }
+
 
         return view('livewire.home', [
-            'year' => $thisYear,
+            'years' => $years,
             'dataArr' => $dataArr,
-            'multiLineChartModel' => $multiLineChartModel
         ]);
     }
 }

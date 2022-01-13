@@ -33,10 +33,22 @@
                         @if($unit->vmmfgJob)
                             {{ $unit->vmmfgJob->batch_no }}
                         @endif
-                        @if($unit->vend_id)
-                            ({{ $unit->vend_id }})
-                        @endif
                         #{{ $unit->unit_no }}
+                    </b>
+                </th>
+            @endforeach
+        @endif
+    </tr>
+    <tr>
+        <th></th>
+        <th></th>
+        @if($units)
+            @foreach($units as $unit)
+                <th>
+                    <b>
+                        @if($unit->vend_id)
+                            {{ $unit->vend_id }}
+                        @endif
                     </b>
                 </th>
             @endforeach
@@ -81,6 +93,17 @@
                 @foreach($units as $unit)
                     <td>
                         @if($task = $unit->vmmfgTasks()->where('vmmfg_item_id', $item->id)->first())
+                            @if($task->status === \App\Models\VmmfgTask::STATUS_DONE)
+                                Done: {{$task->doneBy->name}}
+                                <br>
+                                {{\Carbon\Carbon::parse($task->done_time)->format('Y-m-d H:ia')}}
+                                <br>
+                            @elseif($task->status === \App\Models\VmmfgTask::STATUS_CANCELLED)
+                                Cancelled: {{$task->cancelledBy->name}}
+                                <br>
+                                {{\Carbon\Carbon::parse($task->cancelled_time)->format('Y-m-d H:ia')}}
+                                <br>
+                            @endif
                             {{ $task->remarks }}
                         @endif
                     </td>
