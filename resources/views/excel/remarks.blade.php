@@ -93,7 +93,7 @@
                 @foreach($units as $unit)
                     <td>
                         @if($task = $unit->vmmfgTasks()->where('vmmfg_item_id', $item->id)->first())
-                            @if($task->status === \App\Models\VmmfgTask::STATUS_DONE)
+                            @if($task->status === \App\Models\VmmfgTask::STATUS_DONE or $task->status === \App\Models\VmmfgTask::STATUS_CHECKED)
                                 Done: {{$task->doneBy->name}}
                                 <br>
                                 {{\Carbon\Carbon::parse($task->done_time)->format('Y-m-d H:ia')}}
