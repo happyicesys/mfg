@@ -32,7 +32,6 @@ class BomInventory extends Component
         'code' => '',
         'name' => '',
         'bom_item_type_id' => '',
-        'is_consumable' => '',
         'is_inventory' => '',
     ];
     public $bomItemTypes;
@@ -43,7 +42,6 @@ class BomInventory extends Component
             'bomItemForm.code' => 'required',
             'bomItemForm.name' => 'required',
             'bomItemForm.bom_item_type_id' => 'sometimes',
-            'bomItemForm.is_consumable' => 'sometimes',
             'bomItemForm.is_inventory' => 'sometimes',
         ];
     }
@@ -79,7 +77,7 @@ class BomInventory extends Component
                 if($isConsumable) {
                     $query->search('name', 'C');
                 }else {
-                    $query->where('name', '<>', 'C');
+                    $query->where('name', '!=', 'C');
                 }
             });
         }

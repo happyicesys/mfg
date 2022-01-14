@@ -40,7 +40,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="form-group col-md-4 col-xs-12">
+                            {{-- <div class="form-group col-md-4 col-xs-12">
                                 <label>
                                     Is Consumable?
                                 </label>
@@ -49,7 +49,7 @@
                                     <option value="1">Yes</option>
                                     <option value="0">No</option>
                                 </select>
-                            </div>
+                            </div> --}}
                         </div>
                         <div class="form-row d-flex justify-content-end">
                             <div class="btn-group">
@@ -114,10 +114,10 @@
                             <td class="text-center">
                                 {{ $index + $from}}
                             </td>
-                            <td class="text-center">
+                            <td class="text-left">
                                 {{ $bomItem->code }}
                             </td>
-                            <td class="text-center">
+                            <td class="text-left">
                                 {{ $bomItem->name }}
                             </td>
                             <td class="text-center">

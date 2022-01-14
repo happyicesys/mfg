@@ -16,7 +16,6 @@ class BomItem extends Model
         'remarks',
         'bom_item_type_id',
         'is_inventory',
-        'is_consumable',
         'available_qty',
         'is_header',
         'is_sub_header',
@@ -73,6 +72,11 @@ class BomItem extends Model
         if($value) {
             return $value;
         }
+    }
+
+    public function getAvailableQtyAttribute($value)
+    {
+        return $value + 0;
     }
 
     // public function getUnitPriceAttribute($value)
