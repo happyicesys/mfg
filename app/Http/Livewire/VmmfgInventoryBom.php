@@ -279,7 +279,8 @@ class VmmfgInventoryBom extends Component
         }
 
         if($currentBomHeader->bomItem and $this->file) {
-            $url = $this->file->storePublicly('bom', 'digitaloceanspaces');
+            $oriFileName = $this->file->getClientOriginalName();
+            $url = $this->file->storePubliclyAs('bom', $oriFileName, 'digitaloceanspaces');
             $fullUrl = Storage::url($url);
             $currentBomHeader->bomItem->attachments()->create([
                 'url' => $url,
@@ -414,7 +415,8 @@ class VmmfgInventoryBom extends Component
         }
 
         if($currentBomContent->bomItem and $this->file) {
-            $url = $this->file->storePublicly('bom', 'digitaloceanspaces');
+            $oriFileName = $this->file->getClientOriginalName();
+            $url = $this->file->storePubliclyAs('bom', $oriFileName, 'digitaloceanspaces');
             $fullUrl = Storage::url($url);
             $currentBomContent->bomItem->attachments()->create([
                 'url' => $url,
