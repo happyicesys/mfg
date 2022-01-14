@@ -38,7 +38,7 @@ class BomItem extends Model
 
     public function bomContents()
     {
-        return $this->hasMany(bomContent::class);
+        return $this->hasMany(BomContent::class);
     }
 
     public function bomHeaders()
