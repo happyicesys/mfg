@@ -250,9 +250,9 @@
                         <table class="table table-borderless table-sm" wire:key="header-table-{{$bomHeaderIndex}}">
                             <tr class="d-flex border border-secondary">
                                 <th class="col-md-2 bg-info text-dark">
-                                    {{$bomHeader->sequence}}.
+                                    {{$bomHeader->sequence}}
                                     @if($bomHeader->bomCategory)
-                                        <span class="badge badge-dark">
+                                        <span class="badge badge-dark pl-1">
                                             {{$bomHeader->bomCategory->name}}
                                         </span>
                                     @endif
@@ -296,11 +296,28 @@
                             </tr>
                             @if($bomHeader->bomContents()->exists())
                                 @foreach($bomHeader->bomContents->sortBy('sequence', SORT_NATURAL) as $bomContent)
+                                    @php
+                                        $sequenceStyle = '';
+                                        $dotCount = substr_count($bomContent->sequence, '.');
+                                        switch($dotCount) {
+                                            case 1:
+                                                $sequenceStyle = 'text-dark';
+                                                break;
+                                            case 2:
+                                                $sequenceStyle = 'pl-3 text-dark';
+                                                break;
+                                            case 3:
+                                                $sequenceStyle = 'pl-5 text-secondary';
+                                                break;
+                                            default:
+                                                $sequenceStyle = 'text-dark';
+                                        }
+                                    @endphp
                                     <tr class="d-flex border border-secondary ml-3">
                                         <th class="col-md-2 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-dark">
-                                            {{$bomContent->sequence}}.
+                                            {{$bomContent->sequence}}
                                             @if($bomContent->bomSubCategory)
-                                                <span class="badge badge-dark">
+                                                <span class="badge badge-dark pl-1">
                                                     {{$bomContent->bomSubCategory->name}}
                                                 </span>
                                             @endif
@@ -320,8 +337,10 @@
                                                 </small>
                                             @endif
                                         </th>
-                                        <th class="col-md-4 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-dark">
-                                            {{$bomContent->bomItem->name}}
+                                        <th class="col-md-4 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} {{$sequenceStyle}}">
+                                            <span class="">
+                                                {{$bomContent->bomItem->name}}
+                                            </span>
                                         </th>
                                         <th class="col-md-1 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-dark text-center">
                                             @if($bomContent->is_group)
