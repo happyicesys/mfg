@@ -28,10 +28,13 @@ class DatabaseSeeder extends Seeder
             // BomCategorySeeder::class,
             // BomItemTypeSeeder::class,
             // VmmfgInventoryAccessSeeder::class,
-            ChinaUSCountrySeeder::class,
-            BomCategorySeeder::class,
-            BomItemTypeSeeder::class,
-            BomSeeder::class,
+            // ChinaUSCountrySeeder::class,
+            // BomCategorySeeder::class,
+            // BomItemTypeSeeder::class,
+            // BomSeeder::class,
+            PaymentTermSeeder::class,
+            // SupplierAccessSeeder::class,
+            CurrencyRateSeeder::class,
        ]);
     //    \App\Models\User::factory(150)->create();
     }

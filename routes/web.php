@@ -4,6 +4,9 @@ use App\Http\Controllers\ExportExcelController;
 use App\Http\Livewire\Admin;
 use App\Http\Livewire\AppSetting;
 use App\Http\Livewire\BomInventory;
+use App\Http\Livewire\BomMovement;
+use App\Http\Livewire\BomSupplier;
+use App\Http\Livewire\Currency;
 use App\Http\Livewire\Customer;
 use App\Http\Livewire\Home;
 use App\Http\Livewire\Product;
@@ -60,7 +63,14 @@ Route::middleware(['auth'])->group(function () {
     Route::group(['middleware' => ['permission:vmmfg-inventory-access']], function() {
         Route::get('/vmmfg-bom', VmmfgInventoryBom::class)->name('vmmfg-bom');
         Route::get('/vmmfg-bom-inventory', BomInventory::class)->name('vmmfg-bom-inventory');
+        Route::get('/bom-movement', BomMovement::class)->name('bom-movement');
+        Route::get('/bom-supplier', BomSupplier::class)->name('bom-supplier');
+        Route::get('/currency', Currency::class)->name('currency');
     });
+
+    // Route::group(['middleware' => ['permission:bom-supplier-access']], function() {
+
+    // });
 });
 
 

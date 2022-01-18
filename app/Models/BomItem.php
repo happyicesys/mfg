@@ -22,6 +22,7 @@ class BomItem extends Model
         'is_part',
         'order_by',
         'supplier_id',
+        'base_avg_price',
     ];
 
     // relationships
@@ -60,13 +61,23 @@ class BomItem extends Model
         return $this->belongsTo(Supplier::class);
     }
 
+    public function supplierQuotePrices()
+    {
+        return $this->hasMany(SupplierQuotePrice::class);
+    }
+
     // setter
-    // public function setUnitPriceAttribute($value)
-    // {
-    //     $this->attributes['unit_price'] = $value * 100;
-    // }
+    public function setBaseAvgPriceAttribute($value)
+    {
+        $this->attributes['base_avg_price'] = $value * 100;
+    }
 
     // getter
+    public function getBaseAvgPriceAttribute($value)
+    {
+        return round($value/ 100, 2);
+    }
+
     public function getCodeAttribute($value)
     {
         if($value) {

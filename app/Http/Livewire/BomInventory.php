@@ -6,13 +6,18 @@ use App\Models\Bom;
 use App\Models\BomContent;
 use App\Models\BomItem;
 use App\Models\BomItemType;
+use App\Models\Profile;
+use App\Models\Supplier;
+use App\Models\SupplierQuotePrice;
 use DB;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Livewire\WithPagination;
+use Storage;
 
 class BomInventory extends Component
 {
-    use WithPagination;
+    use WithFileUploads, WithPagination;
 
     protected $paginationTheme = 'bootstrap';
     public $itemPerPage = 100;
@@ -25,8 +30,8 @@ class BomInventory extends Component
         'code' => '',
         'name' => '',
         'bom_item_type_id' => '',
-        'is_consumable' => '',
         'is_inventory' => '',
+        'is_consumable' => '',
     ];
     public $bomItemForm = [
         'code' => '',
@@ -34,7 +39,18 @@ class BomInventory extends Component
         'bom_item_type_id' => '',
         'is_inventory' => '',
     ];
+    public $supplierQuotePriceForm = [
+        'supplier_id' => '',
+        'unit_price' => '',
+    ];
     public $bomItemTypes;
+    public $suppliers;
+    public $supplier;
+    public $realTimeConversionPrice = 0;
+    public $supplierCurrencyName;
+    public $supplierQuotePrices = [];
+    public $attachments;
+    public $file;
 
     public function rules()
     {
@@ -43,12 +59,15 @@ class BomInventory extends Component
             'bomItemForm.name' => 'required',
             'bomItemForm.bom_item_type_id' => 'sometimes',
             'bomItemForm.is_inventory' => 'sometimes',
+            'supplierQuotePriceForm.supplier_id' => 'sometimes',
+            'supplierQuotePriceForm.unit_price' => 'sometimes',
         ];
     }
 
     public function mount()
     {
         $this->bomItemTypes = BomItemType::orderBy('name')->get();
+        $this->suppliers = Supplier::orderBy('company_name')->get();
     }
 
     public function render()
@@ -58,6 +77,9 @@ class BomInventory extends Component
             'bomItemType',
             'bomHeaders',
             'bomContents',
+            'supplierQuotePrices',
+            'supplierQuotePrices.country',
+            'supplierQuotePrices.supplier'
         ])
         ->where('is_part', true);
 
@@ -107,12 +129,25 @@ class BomInventory extends Component
     public function edit(BomItem $bomItem)
     {
         $this->bomItemForm = $bomItem;
+        $this->supplierQuotePrices = $bomItem->supplierQuotePrices()->latest()->get();
+        $this->attachments = $bomItem->attachments;
     }
 
     public function save()
     {
         $this->validate();
         $this->bomItemForm->save();
+
+        if($this->file) {
+            $oriFileName = $this->file->getClientOriginalName();
+            $url = $this->file->storePubliclyAs('bom', $oriFileName, 'digitaloceanspaces');
+            $fullUrl = Storage::url($url);
+            $this->bomItemForm->attachments()->create([
+                'url' => $url,
+                'full_url' => $fullUrl,
+            ]);
+        }
+
         $this->emit('updated');
         session()->flash('success', 'Your entry has been updated');
     }
@@ -125,5 +160,48 @@ class BomInventory extends Component
     public function updatedFilters()
     {
         $this->resetPage();
+    }
+
+    public function createSupplierQuotePrice()
+    {
+        $this->reset('supplierQuotePriceForm');
+        $this->realTimeConversionPrice = 0;
+    }
+
+    public function calculateConvertion()
+    {
+        // dd($this->supplierQuotePriceForm);
+        if($this->supplierQuotePriceForm['supplier_id']) {
+            $supplier = Supplier::find($this->supplierQuotePriceForm['supplier_id']);
+            $this->supplier = $supplier;
+            $this->supplierCurrencyName = $supplier->country->currency_name;
+
+            if(is_numeric($this->supplierQuotePriceForm['unit_price'])) {
+                $baseCurrency = Profile::where('is_primary', 1)->first()->country->currencyRates()->latest()->first();
+                $quotePrice = $this->supplierQuotePriceForm['unit_price'];
+                $supplierCurrency = $supplier->country->currencyRates()->latest()->first();
+                $this->realTimeConversionPrice = round($quotePrice/$supplierCurrency->rate, 2);
+            }
+        }
+    }
+
+    public function saveSupplierQuotePrice()
+    {
+        $this->validate([
+            'supplierQuotePriceForm.supplier_id' => 'required',
+            'supplierQuotePriceForm.unit_price' => 'required|numeric',
+        ]);
+
+        SupplierQuotePrice::create([
+            'bom_item_id' => $this->bomItemForm->id,
+            'country_id' => $this->supplier->country->id,
+            'currency_rate_id' => $this->supplier->country->currencyRates()->latest()->first()->id,
+            'supplier_id' => $this->supplierQuotePriceForm['supplier_id'],
+            'unit_price' => $this->supplierQuotePriceForm['unit_price'],
+            'base_price' => $this->realTimeConversionPrice,
+        ]);
+
+        $this->emit('updated');
+        session()->flash('success', 'Your entry has been updated');
     }
 }

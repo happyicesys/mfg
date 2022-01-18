@@ -103,6 +103,15 @@
                             Available Qty
                         </x-th-data>
                         <th class="text-center text-dark">
+                            Quote Price
+                        </th>
+                        <th class="text-center text-dark">
+                            Base Price
+                        </th>
+                        <th class="text-center text-dark">
+                            Supplier
+                        </th>
+                        <th class="text-center text-dark">
                             Action
                         </th>
                     </tr>
@@ -128,6 +137,15 @@
                             </td>
                             <td class="text-center">
                                 {{ $bomItem->available_qty }}
+                            </td>
+                            <td class="text-center">
+                                {{ $bomItem->supplierQuotePrices()->latest()->first() ? $bomItem->supplierQuotePrices()->latest()->first()->unit_price : null }} @if($bomItem->supplierQuotePrices()->latest()->first()) ({{ $bomItem->supplierQuotePrices()->latest()->first()->country->currency_name }}) @endif
+                            </td>
+                            <td class="text-center">
+                                {{ $bomItem->supplierQuotePrices()->latest()->first() ? $bomItem->supplierQuotePrices()->latest()->first()->base_price : null }} @if($bomItem->supplierQuotePrices()->latest()->first() and $profile->country) ({{$profile->country->currency_name}}) @endif
+                            </td>
+                            <td class="text-center">
+                                {{ $bomItem->supplierQuotePrices()->latest()->first() ? $bomItem->supplierQuotePrices()->latest()->first()->supplier->company_name : null }}
                             </td>
                             <td class="text-center">
                                 <div class="btn-group">
@@ -179,6 +197,114 @@
                                 <input class="form-check-input ml-2" type="checkbox" name="is_inventory" wire:model="bomItemForm.is_inventory">
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label for="file">
+                                Upload File(s)
+                            </label>
+                            <input type="file" class="form-control-file" wire:model.defer="file">
+                        </div>
+
+                        @if(isset($attachments))
+                            @foreach($attachments as $attachmentIndex => $attachment)
+                            <div class="card" style="max-width:600px;width:100%;" wire:key="attachment-{{$attachmentIndex}}">
+                                    @php
+                                        $ext = pathinfo($attachment->full_url, PATHINFO_EXTENSION);
+                                    @endphp
+                                    @if($ext === 'pdf')
+                                        <embed src="{{$attachment->full_url}}" type="application/pdf" class="card-img-top" style="min-height: 500px;">
+                                    @elseif($ext === 'mov' or $ext === 'mp4')
+                                        <div class="embed-responsive embed-responsive-16by9">
+                                            <video class=" embed-responsive-item video-js" controls>
+                                                <source src="{{$attachment->full_url}}">
+                                                Your browser does not support the video tag.
+                                            </video>
+                                        </div>
+                                    @else
+                                        <img class="card-img-top" src="{{$attachment->full_url}}" alt="">
+                                    @endif
+                                    <div class="card-body">
+                                        <div class="btn-group d-none d-sm-block">
+                                            <button type="button" class="btn btn-warning" wire:click="downloadAttachment({{$attachment}})">
+                                                <i class="fas fa-cloud-download-alt"></i>
+                                                Download
+                                            </button>
+                                            <button type="button" class="btn btn-danger" wire:click="deleteAttachment({{$attachment}})">
+                                                <i class="fas fa-trash"></i>
+                                                Delete
+                                            </button>
+                                        </div>
+                                        <div class="d-block d-sm-none">
+                                            <button type="button" class="btn btn-block btn-warning" wire:click="downloadAttachment({{$attachment}})">
+                                                <i class="fas fa-cloud-download-alt"></i>
+                                                Download
+                                            </button>
+                                            <button type="button" class="btn btn-block btn-danger" wire:click="deleteAttachment({{$attachment}})">
+                                                <i class="fas fa-trash"></i>
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @endif
+                        <hr>
+                        <div class="mr-auto pl-1">
+                            <button class="btn btn-success" wire:click="createSupplierQuotePrice()" data-toggle="modal" data-target="#create-supplier-quote-price-modal">
+                                <i class="fas fa-plus-circle"></i>
+                                Create Pricing
+                            </button>
+                        </div>
+
+                        <div class="table-responsive pt-2">
+                            <table class="table table-bordered table-hover">
+                                <tr class="table-primary">
+                                    <th class="text-center text-dark" colspan="18">
+                                        Pricing History
+                                    </th>
+                                </tr>
+                                <tr class="table-primary">
+                                    <th class="text-center text-dark">
+                                        #
+                                    </th>
+                                    <th class="text-center text-dark">
+                                        Supplier Company
+                                    </th>
+                                    <th class="text-center text-dark">
+                                        Unit Price
+                                    </th>
+                                    <th class="text-center text-dark">
+                                        Base Price
+                                    </th>
+                                    <th class="text-center text-dark">
+                                        Created At
+                                    </th>
+                                </tr>
+                                @forelse($supplierQuotePrices as $supplierQuotePriceIndex => $supplierQuotePrice)
+                                <tr>
+                                    <td class="text-center">
+                                        {{ $supplierQuotePriceIndex + 1 }}
+                                    </td>
+                                    <td class="text-left">
+                                        {{ $supplierQuotePrice->supplier->company_name }}
+                                    </td>
+                                    <td class="text-right">
+                                        {{ $supplierQuotePrice->unit_price }} @if($supplierQuotePrice->country) ({{ $supplierQuotePrice->country->currency_name }}) @endif
+                                    </td>
+                                    <td class="text-right">
+                                        {{ $supplierQuotePrice->base_price }} @if($profile->country) ({{$profile->country->currency_name}}) @endif
+                                    </td>
+                                    <td class="text-center">
+                                        {{ \Carbon\Carbon::parse($supplierQuotePrice->created_at)->format('Y-m-d H:ia') }}
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="18" class="text-center"> No Results Found </td>
+                                </tr>
+                                @endforelse
+                            </table>
+                        </div>
+
                     </x-slot>
                     <x-slot name="footer">
                         <button type="submit" class="btn btn-success d-none d-sm-block" wire:click.prevent="save">
@@ -190,6 +316,53 @@
                     </x-slot>
                 </x-modal>
             {{-- </form> --}}
+
+            <x-modal id="create-supplier-quote-price-modal">
+                <x-slot name="title">
+                    Create Pricing
+                </x-slot>
+                <x-slot name="content">
+                    <div class="form-group">
+                        <label for="supplier_id">
+                            Supplier
+                        </label>
+                        <select class="select form-control"
+                            wire:model="supplierQuotePriceForm.supplier_id"
+                            wire:change="calculateConvertion()"
+                        >
+                            <option value="">Select..</option>
+                            @foreach($suppliers as $supplier)
+                                <option value="{{$supplier->id}}">
+                                    {{ $supplier->company_name }}
+                                    @if($supplier->attn_name)
+                                        ({{ $supplier->attn_name }})
+                                    @endif
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @if($supplierQuotePriceForm['supplier_id'])
+                        <div class="form-group">
+                            <label for="unit_price">
+                                Unit Price
+                                @if($supplierCurrencyName) ({{ $supplierCurrencyName }}) @endif
+                            </label>
+                            <input type="text" wire:model="supplierQuotePriceForm.unit_price" class="form-control" wire:change="calculateConvertion()" placeholder="Unit Price">
+                            <small>
+                                Convert to &#x2248; {{$realTimeConversionPrice}} {{$profile->country->currency_name}}
+                            </small>
+                        </div>
+                    @endif
+                </x-slot>
+                <x-slot name="footer">
+                    <button type="submit" class="btn btn-success d-none d-sm-block" wire:click.prevent="saveSupplierQuotePrice">
+                        Submit
+                    </button>
+                    <button type="submit" class="btn btn-success btn-block d-block d-sm-none" wire:click.prevent="saveSupplierQuotePrice">
+                        Submit
+                    </button>
+                </x-slot>
+            </x-modal>
         </div>
     </div>
 </div>

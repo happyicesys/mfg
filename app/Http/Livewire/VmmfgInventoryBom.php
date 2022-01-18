@@ -212,6 +212,8 @@ class VmmfgInventoryBom extends Component
         $this->bomHeaderForm->sequence = BomHeader::where('bom_id', $this->bom->id)->max('sequence') + 1;
         $this->reset('file');
         $this->reset('attachments');
+        $this->resetErrorBag();
+        $this->resetValidation();
     }
 
     public function editHeader(BomHeader $bomHeader)
@@ -224,6 +226,8 @@ class VmmfgInventoryBom extends Component
         $this->bomHeaderForm->name = $bomHeader->bomItem->name;
         $this->bomHeaderForm->bom_item_type_id = $bomHeader->bomItem->bomItemType->id;
         $this->bomHeaderForm->is_edit = true;
+        $this->resetErrorBag();
+        $this->resetValidation();
     }
 
     public function saveHeader()
@@ -329,6 +333,8 @@ class VmmfgInventoryBom extends Component
                                         );
         $this->reset('file');
         $this->reset('attachments');
+        $this->resetErrorBag();
+        $this->resetValidation();
     }
 
     public function createContent(BomHeader $bomHeader)
@@ -354,6 +360,8 @@ class VmmfgInventoryBom extends Component
                                         );
         $this->reset('file');
         $this->reset('attachments');
+        $this->resetErrorBag();
+        $this->resetValidation();
     }
 
     public function savePart()
@@ -374,6 +382,13 @@ class VmmfgInventoryBom extends Component
             ]);
         }
         if($this->bomContentForm->is_edit) {
+
+            $this->validate([
+                'bomContentForm.code' => 'unique:bom_items,code,'.$this->bomContentForm->bomItem->id,
+            ], [
+                'bomContentForm.code.unique' => 'This Code is already been used',
+            ]);
+
             $this->bomContent->update([
                 'sequence' => $this->bomContentForm->sequence,
                 'bom_sub_category_id' => $this->bomContentForm->bom_sub_category_id,
@@ -393,6 +408,11 @@ class VmmfgInventoryBom extends Component
             if($this->bomContentForm->is_existing) {
                 $bomItemId = $this->bomContentForm->bom_item_id;
             }else {
+                $this->validate([
+                    'bomContentForm.code' => 'unique:bom_items,code',
+                ], [
+                    'bomContentForm.code.unique' => 'This Code is already been used',
+                ]);
                 $bomContentItem = BomItem::create([
                     'code' => $this->bomContentForm->code,
                     'name' => $this->bomContentForm->name,
@@ -457,6 +477,8 @@ class VmmfgInventoryBom extends Component
                                     })
                                     ->orderBy('name')
                                     ->get();
+        $this->resetErrorBag();
+        $this->resetValidation();
     }
 
     public function deletePart()

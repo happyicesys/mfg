@@ -673,6 +673,11 @@
                 Part:
                 @endif
                 {{$bomContentForm->bomItem->sequence}}. {{$bomContentForm->bomItem->name}}
+                @if($bomContentForm->bomItem->bomContents()->count() > 1)
+                    <small>
+                        <span class="badge badge-pill badge-danger">&nbsp;</span>
+                    </small>
+                @endif
             @else
                 Create
                 @if($bomContentForm->is_group)
@@ -869,9 +874,9 @@
         </x-slot>
         <x-slot name="footer">
             @if($bomContentForm->is_edit)
-                <button type="submit" class="btn btn-danger btn-xs-block" onclick="return confirm('Are you sure you want to Delete the Unbind this?') || event.stopImmediatePropagation()" wire:click.prevent="deletePart">
+                <button type="submit" class="btn btn-danger btn-xs-block" onclick="return confirm('Are you sure you want to Unbind this?') || event.stopImmediatePropagation()" wire:click.prevent="deletePart">
                     <i class="fas fa-trash"></i>
-                    Delete
+                    Unbind
                 </button>
             @endif
             <button type="submit" class="btn btn-success btn-xs-block" wire:click.prevent="savePart">
