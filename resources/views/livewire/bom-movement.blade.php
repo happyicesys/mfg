@@ -379,9 +379,11 @@
                                         <th class="text-center text-dark">
                                             Amount
                                         </th>
+                                        @if($inventoryMovementForm->id)
                                         <th class="text-center text-dark">
                                             Status
                                         </th>
+                                        @endif
 {{--
                                         @if($inventoryMovementForm->status > 1)
                                         <th class="text-center text-dark">
@@ -412,10 +414,12 @@
                                         <td class="text-right">
                                             {{ number_format($inventoryMovementItem['amount'], 2, '.', ',') }}
                                         </td>
+                                        @if($inventoryMovementForm->id)
                                         <td class="text-center">
                                             {{-- {{ $inventoryMovementItem['status'] }} --}}
-                                            {{ \App\Models\InventoryMovementItem::STATUSES[$inventoryMovementItem['status']] }}
+                                            {{ $inventoryMovementItem['status'] ? \App\Models\InventoryMovementItem::STATUSES[$inventoryMovementItem['status']] : null }}
                                         </td>
+                                        @endif
 {{--
                                         @if($inventoryMovementForm->status > 1)
                                         <td class="text-left">

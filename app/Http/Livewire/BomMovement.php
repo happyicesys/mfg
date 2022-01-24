@@ -248,6 +248,7 @@ class BomMovement extends Component
             'amount' => $this->inventoryMovementItemForm->amount,
             'qty' => $this->inventoryMovementItemForm->qty,
             'supplier_quote_price_id' => $this->inventoryMovementItemForm->supplier_quote_price_id,
+            'status' => null,
         ];
         // dd($this->inventoryMovementItems);
         array_push($this->inventoryMovementItems, $data);
