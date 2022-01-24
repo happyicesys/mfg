@@ -459,7 +459,7 @@ class VmmfgInventoryBom extends Component
         $this->bomContentForm->code = $bomContent->bomItem->code;
         $this->bomContentForm->name = $bomContent->bomItem->name;
         $this->bomContentForm->is_inventory = $bomContent->bomItem->is_inventory;
-        $this->bomContentForm->bom_item_type_id = $bomContent->bomItem->bomItemType->id;
+        $this->bomContentForm->bom_item_type_id = $bomContent->bomItem->bomItemType ? $bomContent->bomItem->bomItemType->id : null;
         $this->bomContentForm->is_edit = true;
 
         if($this->bomContentForm->is_group) {

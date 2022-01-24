@@ -13,8 +13,7 @@ class InventoryMovementItem extends Model
     const STATUSES = [
         1 => 'Pending',
         2 => 'Confirmed',
-        3 => 'Received',
-        99 => 'Cancelled',
+        99 => 'Void',
     ];
 
     protected $fillable = [
@@ -25,17 +24,18 @@ class InventoryMovementItem extends Model
         'status',
         'qty',
         'amount',
+        'unit_price',
         'created_by',
         'updated_by',
     ];
 
     // getter
-    public function getQtyAttribute($value)
+    public function getAmountAttribute($value)
     {
-        return $value + 0;
+        return round($value/ 100, 2);
     }
 
-    public function getAmountAttribute($value)
+    public function getUnitPriceAttribute($value)
     {
         return round($value/ 100, 2);
     }
@@ -44,6 +44,18 @@ class InventoryMovementItem extends Model
     public function setAmountAttribute($value)
     {
         $this->attributes['amount'] = $value * 100;
+    }
+
+    public function setUnitPriceAttribute($value)
+    {
+        $this->attributes['unit_price'] = $value * 100;
+    }
+
+    public function setSupplierQuotePriceIdAttribute($value)
+    {
+        if($value) {
+            $this->attributes['supplier_quote_price_id'] = $value;
+        }
     }
 
     // relationships

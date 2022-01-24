@@ -13,15 +13,13 @@ class InventoryMovement extends Model
     const ACTIONS = [
         1 => 'Receiving',
         2 => 'Outgoing',
-        3 => 'Adjustement',
-        99 => 'Void',
     ];
 
     const STATUSES = [
         1 => 'Pending',
         2 => 'Confirmed',
-        3 => 'Partially Received',
-        4 => 'All Received',
+        3 => 'Partially',
+        4 => 'Completed',
         99 => 'Cancelled',
     ];
 
@@ -35,6 +33,7 @@ class InventoryMovement extends Model
         'bom_id',
         'created_by',
         'updated_by',
+        'country_id',
     ];
 
     // getter
@@ -58,6 +57,16 @@ class InventoryMovement extends Model
     public function bom()
     {
         return $this->belongsTo(Bom::class);
+    }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
+    }
+
+    public function inventoryMovementItems()
+    {
+        return $this->hasMany(InventoryMovementItem::class);
     }
 
     public function createdBy()

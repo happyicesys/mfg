@@ -3,7 +3,6 @@
     x-data
     x-init="
         @this.set('fileRefId', {{ $attributes['id'] }})
-        FilePond.registerPlugin(FilePondPluginImagePreview);
         FilePond.setOptions({
             allowMultiple: {{ isset($attributes['multiple']) ? 'true' : 'false' }},
             allowRevert: false,

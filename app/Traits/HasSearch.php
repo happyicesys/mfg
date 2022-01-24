@@ -43,4 +43,9 @@ trait HasSearch
     {
         return $query->orWhereDate($columnName, '<=', $value);
     }
+
+    public function scopeSearchDate($query, $columnName, $value)
+    {
+        return $query->whereDate($columnName, '=', $value);
+    }
 }
