@@ -6,9 +6,11 @@ use App\Models\Bom;
 use App\Models\BomContent;
 use App\Models\BomItem;
 use App\Models\Country;
+use App\Models\CurrencyRate;
 use App\Models\InventoryMovement;
 use App\Models\InventoryMovementItem;
 use App\Models\Supplier;
+use App\Models\SupplierQuotePrice;
 use DB;
 use Carbon\Carbon;
 use Livewire\Component;
@@ -38,6 +40,7 @@ class BomMovement extends Component
     public $bomItems;
     public $selectBomItemId;
     public $supplierQuotedPrice;
+    public $supplierQuotedPriceCountry;
     public $supplierQuotedPriceStr;
     public $inventoryMovementItems = [];
     public $totalAmount = 0.00;
@@ -68,6 +71,8 @@ class BomMovement extends Component
             'inventoryMovementItemForm.supplier_quote_price_id' => 'sometimes',
             'inventoryMovementItemForm.remarks' => 'sometimes',
             'inventoryMovementItemForm.bom_qty' => 'sometimes',
+            'inventoryMovementItemForm.supplier_unit_price' => 'sometimes',
+            'inventoryMovementItemForm.rate' => 'sometimes',
         ];
     }
 
@@ -219,11 +224,16 @@ class BomMovement extends Component
             $this->supplierQuotedPrice = $this->supplier->id ?
                                             $this->selectedBomItem->supplierQuotePrices()->latest()->first()->unit_price :
                                             null;
+            $this->supplierQuotedPriceCountry = $this->supplier->id ?
+                                            $this->selectedBomItem->supplierQuotePrices()->latest()->first()->country :
+                                            null;
             $this->supplierQuotedPriceStr = $this->supplier->id ?
-                                            $this->selectedBomItem->supplierQuotePrices()->latest()->first()->unit_price.' ('.$this->selectedBomItem->supplierQuotePrices()->latest()->first()->country->currency_name.')' :
+                                            $this->supplierQuotedPrice.' ('.$this->supplierQuotedPriceCountry->currency_name.')' :
                                             null;
                                             // dd($this->supplierQuotedPriceStr);
             $this->inventoryMovementItemForm->unit_price = $this->supplierQuotedPrice;
+            $this->inventoryMovementItemForm->supplier_unit_price = $this->supplierQuotedPrice;
+            $this->inventoryMovementItemForm->rate = $this->supplier->transactedCurrency->currencyRates()->latest()->first()->rate;
         }
     }
 
@@ -250,8 +260,23 @@ class BomMovement extends Component
             'supplier_quote_price_id' => $this->inventoryMovementItemForm->supplier_quote_price_id,
             'status' => null,
         ];
-        // dd($this->inventoryMovementItems);
+
+        if($this->inventoryMovementItemForm->supplier_unit_price) {
+            if($this->supplierQuotedPrice != $this->inventoryMovementItemForm->supplier_unit_price) {
+                $data['supplier_unit_price'] = $this->inventoryMovementItemForm->supplier_unit_price;
+                $data['supplier_quote_price_id'] = null;
+            }
+        }
+
+        if($this->inventoryMovementItemForm->rate) {
+            if($this->supplier->transactedCurrency->currencyRates()->latest()->first()->rate != $this->inventoryMovementItemForm->rate) {
+                $data['country_id'] = $this->supplier->transactedCurrency->id;
+                $data['rate'] = $this->inventoryMovementItemForm->rate;
+            }
+        }
+
         array_push($this->inventoryMovementItems, $data);
+        // dd($this->inventoryMovementItems);
 
         $this->inventoryMovementForm->total_amount = $this->calculateTotalAmount($this->inventoryMovementItems);
     }
@@ -324,6 +349,27 @@ class BomMovement extends Component
                 $previousInventoryMovementItems = InventoryMovementItem::where('inventory_movement_id', $inventoryMovement->id)->delete();
                 foreach($this->inventoryMovementItems as $inventoryMovementItem) {
                     $bomItem = BomItem::findOrFail($inventoryMovementItem['bom_item_id']);
+
+                    if(isset($inventoryMovementItem['rate'])) {
+                        $currencyRate = CurrencyRate::create([
+                            'rate' => $inventoryMovementItem['rate'],
+                            'country_id' => $inventoryMovementItem['country_id'],
+                        ]);
+                    }else {
+                        $currencyRate = CurrencyRate::where('country_id', $inventoryMovementItem['country_id'])->latest()->first();
+                    }
+
+                    if(isset($inventoryMovementItem['supplier_unit_price'])) {
+                        $supplierQuotePrice = SupplierQuotePrice::create([
+                            'bom_item_id' => $bomItem->id,
+                            'country_id' => $currencyRate->country_id,
+                            'currency_rate_id' => $currencyRate->id,
+                            'supplier_id' => $this->supplier->id,
+                            'unit_price' => $inventoryMovementItem['supplier_unit_price'],
+                            'base_price' => $inventoryMovementItem['supplier_unit_price']/ ($currencyRate->rate ? $currencyRate->rate : 1),
+                        ]);
+                        $inventoryMovementItem['supplier_quote_price_id'] = $supplierQuotePrice->id;
+                    }
                     InventoryMovementItem::create([
                         'bom_item_id' => $bomItem->id,
                         'inventory_movement_id' => $inventoryMovement->id,
@@ -484,6 +530,11 @@ class BomMovement extends Component
         }
         $this->inventoryMovementItems = $inventoryMovementItemArr;
         $this->showGenerateByBomArea = false;
+    }
+
+    public function updatedInventoryMovementItemFormSupplierUnitPrice($value)
+    {
+        $this->inventoryMovementItemForm->unit_price = is_numeric($value) ? $value : 0;
     }
 
     private function calculateTotalAmount($inventoryMovementItemArr)

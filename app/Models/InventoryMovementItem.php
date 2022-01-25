@@ -16,8 +16,21 @@ class InventoryMovementItem extends Model
         99 => 'Void',
     ];
 
+    const RECEIVING_STATUSES = [
+        1 => 'Ordered',
+        2 => 'Received',
+        99 => 'Void',
+    ];
+
+    const OUTGOING_STATUSES = [
+        1 => 'Planned',
+        2 => 'Sent',
+        99 => 'Void',
+    ];
+
     protected $fillable = [
         'bom_item_id',
+        'date',
         'inventory_movement_id',
         'supplier_quote_price_id',
         'remarks',

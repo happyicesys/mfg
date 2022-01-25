@@ -318,15 +318,22 @@
                                         </select>
                                     </div>
                                     @if($this->inventoryMovementItemForm->bom_item_id and $supplier->id)
-                                        <div class="form-group">
-                                            <label for="supplier_unit_price">
-                                                Quoted Unit Price ({{$supplier->company_name}})
-                                            </label>
-                                            <label class="d-none" for="supplier_unit_price_value">
-                                                {{ $supplierQuotedPriceStr }}
-                                            </label>
-                                            <input type="text" class="form-control" value="{{ $supplierQuotedPriceStr }}" disabled>
+                                        <hr>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6 col-xs-12">
+                                                <label for="supplier_unit_price">
+                                                    Quoted Unit Price <br>({{$supplier->company_name}})
+                                                </label>
+                                                <input type="text" wire:model="inventoryMovementItemForm.supplier_unit_price" wire:change="calculateAmount()" class="form-control">
+                                            </div>
+                                            <div class="form-group col-md-6 col-xs-12">
+                                                <label for="supplier_unit_price">
+                                                    Latest Currency Rate <br> ({{$supplier->transactedCurrency->currency_name}})
+                                                </label>
+                                                <input type="text" wire:model="inventoryMovementItemForm.rate" class="form-control">
+                                            </div>
                                         </div>
+                                        <hr>
                                     @endif
                                         <div class="form-row">
                                             <div class="form-group @if($this->inventoryMovementItemForm->bom_item_id and $supplier->id) col-md-4 col-xs-12 @else col-md-12 col-xs-12 @endif ">
@@ -417,7 +424,7 @@
                                         @if($inventoryMovementForm->id)
                                         <td class="text-center">
                                             {{-- {{ $inventoryMovementItem['status'] }} --}}
-                                            {{ $inventoryMovementItem['status'] ? \App\Models\InventoryMovementItem::STATUSES[$inventoryMovementItem['status']] : null }}
+                                            {{ $inventoryMovementItem['status'] ? \App\Models\InventoryMovementItem::RECEIVING_STATUSES[$inventoryMovementItem['status']] : null }}
                                         </td>
                                         @endif
 {{--

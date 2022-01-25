@@ -1,37 +1,22 @@
-<div
-    wire:ignore
-    x-data
-    x-init="
-        $(this.$refs.select)
-        .select2({
-            data: this.options,
-            placeholder: 'Select..',
-            allowClear: true
-        })
-        .on('change', function (ev, args) {
-            if (!(args && 'ignore' in args)) {
-                $dispatch('input', $(this).val())
-            }
-        });
-
-        $nextTick(() => {
-        $(this.$refs.select)
-            .val(this.value)
-            .trigger('change', { ignore: true })
-        });
-
-        $watch(
-            value: function (value, oldValue) {
-            $(this.$refs.select)
-                .val(this.value)
-                .trigger('change', { ignore: true });
-          },
-          options: function (options) {
-            $(this.$refs.select).select2({ data: options })
-          }
-        )
-">
-    <select class="form-control" x-ref="input" {{$attributes}}>
+<div wire:ignore class="w-full">
+    <select class="form-select select2" data-minimum-results-for-search="Infinity" data-placeholder="{{__('Select your option')}}" {{ $attributes }}>
+        <option></option>
         {{$slot}}
     </select>
 </div>
+
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            $('.select2').select2({
+                placeholder: '{{__('Select your option')}}',
+                allowClear: true
+            });
+            $('.select2').on('change', function (e) {
+                let elementName = $(this).attr('id');
+                var data = $(this).select2("val");
+                @this.set(elementName, data);
+            });
+        });
+    </script>
+@endpush

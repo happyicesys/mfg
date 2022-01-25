@@ -26,9 +26,9 @@ class Supplier extends Model
         return $this->hasMany(BomItem::class);
     }
 
-    public function country()
+    public function transactedCurrency()
     {
-        return $this->belongsTo(Country::class);
+        return $this->belongsTo(Country::class, 'country_id');
     }
 
     public function paymentTerm()

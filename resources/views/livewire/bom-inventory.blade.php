@@ -40,7 +40,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            {{-- <div class="form-group col-md-4 col-xs-12">
+                            <div class="form-group col-md-4 col-xs-12">
                                 <label>
                                     Is Consumable?
                                 </label>
@@ -49,7 +49,7 @@
                                     <option value="1">Yes</option>
                                     <option value="0">No</option>
                                 </select>
-                            </div> --}}
+                            </div>
                         </div>
                         <div class="form-row d-flex justify-content-end">
                             <div class="btn-group">
@@ -96,20 +96,17 @@
                         <x-th-data model="bom_item_type_id" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Type
                         </x-th-data>
-                        <th class="text-center text-dark">
-                            Is Consumable
-                        </th>
+                        <x-th-data model="ordered_qty">
+                            Ordered Qty
+                        </x-th-data>
                         <x-th-data model="available_qty" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Available Qty
                         </x-th-data>
+                        <x-th-data model="planned_qty">
+                            Planned Qty
+                        </x-th-data>
                         <th class="text-center text-dark">
-                            Quote Price
-                        </th>
-                        <th class="text-center text-dark">
-                            Base Price
-                        </th>
-                        <th class="text-center text-dark">
-                            Supplier
+                            Base Price @if($profile->country) ({{$profile->country->currency_name}}) @endif
                         </th>
                         <th class="text-center text-dark">
                             Action
@@ -133,19 +130,10 @@
                                 {{ $bomItem->bomItemType ? $bomItem->bomItemType->name : '' }}
                             </td>
                             <td class="text-center">
-                                {{ $bomItem->bomItemType && $bomItem->bomItemType->name === 'C' ? 'Yes' : 'No' }}
-                            </td>
-                            <td class="text-center">
                                 {{ $bomItem->available_qty }}
                             </td>
-                            <td class="text-center">
-                                {{ $bomItem->supplierQuotePrices()->latest()->first() ? $bomItem->supplierQuotePrices()->latest()->first()->unit_price : null }} @if($bomItem->supplierQuotePrices()->latest()->first()) ({{ $bomItem->supplierQuotePrices()->latest()->first()->country->currency_name }}) @endif
-                            </td>
-                            <td class="text-center">
-                                {{ $bomItem->supplierQuotePrices()->latest()->first() ? $bomItem->supplierQuotePrices()->latest()->first()->base_price : null }} @if($bomItem->supplierQuotePrices()->latest()->first() and $profile->country) ({{$profile->country->currency_name}}) @endif
-                            </td>
-                            <td class="text-center">
-                                {{ $bomItem->supplierQuotePrices()->latest()->first() ? $bomItem->supplierQuotePrices()->latest()->first()->supplier->company_name : null }}
+                            <td class="text-right">
+                                {{ $bomItem->supplierQuotePrices()->latest()->first() ? $bomItem->supplierQuotePrices()->latest()->first()->base_price : null }}
                             </td>
                             <td class="text-center">
                                 <div class="btn-group">
@@ -273,7 +261,7 @@
                                         Unit Price
                                     </th>
                                     <th class="text-center text-dark">
-                                        Base Price
+                                        Base Price @if($profile->country) ({{$profile->country->currency_name}}) @endif
                                     </th>
                                     <th class="text-center text-dark">
                                         Created At
@@ -291,7 +279,7 @@
                                         {{ $supplierQuotePrice->unit_price }} @if($supplierQuotePrice->country) ({{ $supplierQuotePrice->country->currency_name }}) @endif
                                     </td>
                                     <td class="text-right">
-                                        {{ $supplierQuotePrice->base_price }} @if($profile->country) ({{$profile->country->currency_name}}) @endif
+                                        {{ $supplierQuotePrice->base_price }}
                                     </td>
                                     <td class="text-center">
                                         {{ \Carbon\Carbon::parse($supplierQuotePrice->created_at)->format('Y-m-d H:ia') }}
