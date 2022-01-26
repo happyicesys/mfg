@@ -614,6 +614,15 @@
                         </li>
                     @endforelse
                 </ul>
+                <div class="form-group pt-3">
+                    <label for="completion_date">
+                        Completion Date
+                    </label>
+                    <input type="date" wire:model.defer="form.completion_date" class="form-control">
+                </div>
+                <button type="button" class="btn btn-success btn-xs-block" wire:click.prevent="saveCompletionDate({{$vmmfgUnit}})">
+                    Save Completion Date
+                </button>
             @else
                 @if($vmmfgUnit)
                     <ul class="list-group">
@@ -623,15 +632,6 @@
                     </ul>
                 @endif
             @endif
-            <div class="form-group pt-3">
-                <label for="completion_date">
-                    Completion Date
-                </label>
-                <input type="date" wire:model.defer="form.completion_date" class="form-control">
-            </div>
-            <button type="button" class="btn btn-success btn-xs-block" wire:click.prevent="saveCompletionDate({{$vmmfgUnit}})">
-                Save Completion Date
-            </button>
             <x-zoom-modal id="zoom-picture-modal">
                 <x-slot name="content">
                     <img class="img-fluid border border-dark" src="{{$zoomPictureUrl}}" alt="">

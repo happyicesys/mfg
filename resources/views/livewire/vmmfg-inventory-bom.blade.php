@@ -304,9 +304,12 @@
                                                 $sequenceStyle = 'text-dark';
                                                 break;
                                             case 2:
-                                                $sequenceStyle = 'pl-3 text-dark';
+                                                $sequenceStyle = 'pl-2 text-dark';
                                                 break;
                                             case 3:
+                                                $sequenceStyle = 'pl-4 text-secondary';
+                                                break;
+                                            case 4:
                                                 $sequenceStyle = 'pl-5 text-secondary';
                                                 break;
                                             default:
