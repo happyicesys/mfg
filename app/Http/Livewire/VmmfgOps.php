@@ -40,6 +40,7 @@ class VmmfgOps extends Component
         'user_id' => '',
         'is_incomplete' => '',
         'remarks' => [],
+        'completion_date' => '',
     ];
     public $editArea = [0];
     public $file;
@@ -102,6 +103,7 @@ class VmmfgOps extends Component
             'form.job_id' => 'sometimes',
             'form.unit_id' => 'sometimes',
             'form.remarks.*' => 'sometimes',
+            'form.completion_date' => 'sometimes',
         ];
     }
 
@@ -116,6 +118,7 @@ class VmmfgOps extends Component
                     $this->form['remarks'][$task->vmmfgItem->id] = $task->remarks;
                 }
             }
+            $this->form['completion_date'] = $vmmfgUnit->first()->completion_date;
         }
 
         return view('livewire.vmmfg-ops', ['vmmfgUnit' => $vmmfgUnit]);
@@ -125,6 +128,7 @@ class VmmfgOps extends Component
     {
         $this->form = $job;
         $this->units = $job->vmmfgUnits;
+        // $this->form->completion_date
     }
 
     public function create()
@@ -322,6 +326,13 @@ class VmmfgOps extends Component
         ];
 
         return $filtersData;
+    }
+
+    public function saveCompletionDate(VmmfgUnit $vmmfgUnit)
+    {
+        $vmmfgUnit->completion_date = $this->form['completion_date'];
+        $vmmfgUnit->save();
+        session()->flash('success', 'Your entry has been updated');
     }
 
     private function mainCollections($filters, $unitId)

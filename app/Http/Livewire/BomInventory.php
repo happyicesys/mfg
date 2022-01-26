@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\Attachment;
 use App\Models\Bom;
 use App\Models\BomContent;
 use App\Models\BomItem;
@@ -31,7 +32,7 @@ class BomInventory extends Component
         'name' => '',
         'bom_item_type_id' => '',
         'is_inventory' => '',
-        'is_consumable' => '',
+        'is_consumable' => '0',
     ];
     public $bomItemForm = [
         'code' => '',
@@ -94,12 +95,13 @@ class BomInventory extends Component
             });
         }
 
-        if($isConsumable = $this->filters['is_consumable']) {
+        if($this->filters['is_consumable'] != '') {
+            $isConsumable = $this->filters['is_consumable'];
             $bomItems = $bomItems->whereHas('bomItemType', function($query) use ($isConsumable) {
                 if($isConsumable) {
                     $query->search('name', 'C');
                 }else {
-                    $query->where('name', '!=', 'C');
+                    $query->whereNotIn('name', ['C']);
                 }
             });
         }
@@ -203,5 +205,20 @@ class BomInventory extends Component
 
         $this->emit('updated');
         session()->flash('success', 'Your entry has been updated');
+    }
+
+    public function deleteAttachment(Attachment $attachment)
+    {
+        $deleteFile = Storage::disk('digitaloceanspaces')->delete($attachment->url);
+        if($deleteFile){
+            $attachment->delete();
+        }
+        $this->emit('updated');
+        session()->flash('success', 'Entry has been removed');
+    }
+
+    public function downloadAttachment(Attachment $attachment)
+    {
+        return Storage::disk('digitaloceanspaces')->download($attachment->url);
     }
 }

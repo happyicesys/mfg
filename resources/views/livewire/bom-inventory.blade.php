@@ -96,13 +96,13 @@
                         <x-th-data model="bom_item_type_id" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Type
                         </x-th-data>
-                        <x-th-data model="ordered_qty">
+                        <x-th-data model="ordered_qty" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Ordered Qty
                         </x-th-data>
                         <x-th-data model="available_qty" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Available Qty
                         </x-th-data>
-                        <x-th-data model="planned_qty">
+                        <x-th-data model="planned_qty" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Planned Qty
                         </x-th-data>
                         <th class="text-center text-dark">
@@ -113,6 +113,25 @@
                         </th>
                     </tr>
                     @forelse($bomItems as $index => $bomItem)
+
+                        @php
+                            $orderedQty = $bomItem
+                                            ->inventoryMovementItems()
+                                            ->where('status', array_search('Ordered', \App\Models\InventoryMovementItem::RECEIVING_STATUSES))
+                                            ->whereHas('inventoryMovement', function($query) {
+                                                $query->where('action', array_search('Receiving', \App\Models\InventoryMovement::ACTIONS));
+                                            })->latest()
+                                            ->get();
+
+                            $plannedQty = $bomItem
+                                            ->inventoryMovementItems()
+                                            ->where('status', array_search('Planned', \App\Models\InventoryMovementItem::OUTGOING_STATUSES))
+                                            ->whereHas('inventoryMovement', function($query) {
+                                                $query->where('action', array_search('Outgoing', \App\Models\InventoryMovement::ACTIONS));
+                                            })->latest()
+                                            ->get();
+                        @endphp
+
                         <tr class="row_edit" wire:loading.class.delay="opacity-2" wire:key="row-{{$index}}">
                             {{-- <th class="text-center">
                                 <input type="checkbox" wire:model="selected" value="{{$admin->id}}">
@@ -130,7 +149,23 @@
                                 {{ $bomItem->bomItemType ? $bomItem->bomItemType->name : '' }}
                             </td>
                             <td class="text-center">
-                                {{ $bomItem->available_qty }}
+                                <b>{{ $bomItem->ordered_qty }}</b>
+                                @foreach($orderedQty as $ordered)
+                                    @if($ordered->date)
+                                        <br> <small>{{ $ordered->date }}</small>
+                                    @endif
+                                @endforeach
+                            </td>
+                            <td class="text-center">
+                                <b>{{ $bomItem->available_qty }}</b>
+                            </td>
+                            <td class="text-center">
+                                <b>{{ $bomItem->planned_qty }}</b>
+                                @foreach($plannedQty as $planned)
+                                    @if($planned->date)
+                                        <br> <small>{{ $planned->date }}</small>
+                                    @endif
+                                @endforeach
                             </td>
                             <td class="text-right">
                                 {{ $bomItem->supplierQuotePrices()->latest()->first() ? $bomItem->supplierQuotePrices()->latest()->first()->base_price : null }}

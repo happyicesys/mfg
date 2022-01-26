@@ -34,6 +34,7 @@ class InventoryMovement extends Model
         'created_by',
         'updated_by',
         'country_id',
+        'order_date',
     ];
 
     // getter

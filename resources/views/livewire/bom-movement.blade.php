@@ -120,6 +120,9 @@
                         <x-th-data model="batch" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Batch
                         </x-th-data>
+                        <x-th-data model="order_date" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
+                            Order Date
+                        </x-th-data>
                         <x-th-data model="country_id" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Currency
                         </x-th-data>
@@ -164,6 +167,10 @@
                             {{ $inventoryMovement->batch }}
                         </td>
                         <td class="text-center">
+                            {{ $inventoryMovement->order_date ? \Carbon\Carbon::parse($inventoryMovement->order_date)->format('Y-m-d') : null }}
+                            {{-- {{ \Carbon\Carbon::parse($inventoryMovement->order_date)->toDateString() }} --}}
+                        </td>
+                        <td class="text-center">
                             {{ $inventoryMovement->country ? $inventoryMovement->country->currency_name : null }}
                         </td>
                         <td class="text-left">
@@ -182,13 +189,13 @@
                             {{ $inventoryMovement->createdBy ? $inventoryMovement->createdBy->name : null }}
                         </td>
                         <td class="text-center">
-                            {{ $inventoryMovement->created_at ? \Carbon\Carbon::parse($inventoryMovement->created_at)->format('Y-m-d H:ia') : null }}
+                            {{ $inventoryMovement->created_at ? \Carbon\Carbon::parse($inventoryMovement->created_at)->format('Y-m-d h:ia') : null }}
                         </td>
                         <td class="text-center">
                             {{ $inventoryMovement->updatedBy ? $inventoryMovement->updatedBy->name : null }}
                         </td>
                         <td class="text-center">
-                            {{ $inventoryMovement->updated_at ? \Carbon\Carbon::parse($inventoryMovement->updated_at)->format('Y-m-d H:ia') : null }}
+                            {{ $inventoryMovement->updated_at ? \Carbon\Carbon::parse($inventoryMovement->updated_at)->format('Y-m-d h:ia') : null }}
                         </td>
                         <td class="text-center">
                             <button type="button" wire:click="editInventoryMovement({{$inventoryMovement}})" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#inventory-movement-modal">
@@ -291,6 +298,22 @@
                             Batch
                         </x-input>
                         <div class="form-group">
+                            <label>
+                                Order Date
+                            </label>
+                            <div class="input-group">
+                                <input type="date" class="form-control" wire:model="inventoryMovementForm.order_date">
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateinventoryMovementFormClicked(-1, 'order_date')">
+                                        <i class="fas fa-caret-left"></i>
+                                    </button>
+                                    <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateinventoryMovementFormClicked(1, 'order_date')">
+                                        <i class="fas fa-caret-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
                             <label for="remarks">
                                 Remarks
                             </label>
@@ -308,6 +331,7 @@
                                         <label for="bom_item_id">
                                             Part
                                         </label>
+                                        <label for="*" class="text-danger">*</label>
                                         <select wire:model="inventoryMovementItemForm.bom_item_id" class="form-control select">
                                             <option value="">Select..</option>
                                             @foreach($bomItems as $bomItem)
@@ -317,7 +341,7 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                    @if($this->inventoryMovementItemForm->bom_item_id and $supplier->id)
+                                    @if($inventoryMovementItemForm->bom_item_id and $supplier->id)
                                         <hr>
                                         <div class="form-row">
                                             <div class="form-group col-md-6 col-xs-12">
@@ -340,6 +364,7 @@
                                                 <label>
                                                     Qty
                                                 </label>
+                                                <label for="*" class="text-danger">*</label>
                                                 <input wire:model="inventoryMovementItemForm.qty" wire:change="calculateAmount()" type="text" class="form-control" placeholder="Qty">
                                             </div>
                                             @if($this->inventoryMovementItemForm->bom_item_id and $supplier->id)
@@ -356,6 +381,28 @@
                                                 <input wire:model="inventoryMovementItemForm.amount" type="text" class="form-control" placeholder="Unit Price" disabled>
                                             </div>
                                             @endif
+                                        </div>
+                                        <div class="form-group">
+                                            <label>
+                                                ETA
+                                            </label>
+                                            <div class="input-group">
+                                                <input type="date" class="form-control" wire:model="inventoryMovementItemForm.date">
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateinventoryMovementItemFormClicked(-1, 'date')">
+                                                        <i class="fas fa-caret-left"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateinventoryMovementItemFormClicked(1, 'date')">
+                                                        <i class="fas fa-caret-right"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>
+                                                Remarks
+                                            </label>
+                                            <textarea wire:model="inventoryMovementItemForm.remarks" class="form-control" name="remarks" rows="3"></textarea>
                                         </div>
                                     <button class="btn btn-success" wire:click="addInventoryMovementItem()" {{$inventoryMovementItemForm->bom_item_id && $inventoryMovementItemForm->qty ? '' : 'disabled' }}>
                                         <i class="fas fa-plus-circle"></i>
@@ -376,6 +423,12 @@
                                         </th>
                                         <th class="text-center text-dark">
                                             Part Name
+                                        </th>
+                                        <th class="text-center text-dark">
+                                            ETA
+                                        </th>
+                                        <th class="text-center text-dark">
+                                            Remarks
                                         </th>
                                         <th class="text-center text-dark">
                                             Qty
@@ -402,7 +455,7 @@
                                         </th>
                                     </tr>
                                     @forelse($inventoryMovementItems as $inventoryMovementItemIndex => $inventoryMovementItem)
-                                    <tr wire:key="{{ $inventoryMovementItemIndex }}">
+                                    <tr wire:key="inventory-movement-item-{{ $inventoryMovementItemIndex }}">
                                         <td class="text-center">
                                             {{ $inventoryMovementItemIndex + 1 }}
                                         </td>
@@ -411,6 +464,12 @@
                                         </td>
                                         <td class="text-left">
                                             {{ $inventoryMovementItem['bom_item_name'] }}
+                                        </td>
+                                        <td class="text-center">
+                                            {{ \Carbon\Carbon::parse($inventoryMovementItem['date'])->format('Y-m-d') }}
+                                        </td>
+                                        <td class="text-left">
+                                            {{ $inventoryMovementItem['remarks'] }}
                                         </td>
                                         <td class="text-right">
                                             {{ $inventoryMovementItem['qty'] }}
@@ -434,24 +493,31 @@
                                         </td>
                                         @endif --}}
                                         <td class="text-center">
-                                            @if($inventoryMovementForm->status > 1)
-                                                <div class="btn-group">
-                                                    @if($inventoryMovementItem['status'] != array_search('Confirmed', \App\Models\InventoryMovement::STATUSES))
+                                            <div class="btn-group">
+                                                @if(isset($inventoryMovementItem['id']))
+                                                    <button class="btn btn-sm btn-outline-secondary" wire:click.prevent="editSingleInventoryMovementItem({{$inventoryMovementItem['id']}})" data-toggle="modal" data-target="#inventory-movement-item-modal">
+                                                        <i class="far fa-edit"></i>
+                                                    </button>
+                                                @endif
+                                                @if($inventoryMovementForm->status > 1)
+                                                    @role('admin|superadmin')
+                                                    @if($inventoryMovementItem['status'] != array_search('Received', \App\Models\InventoryMovementItem::RECEIVING_STATUSES))
                                                         <button class="btn btn-sm btn-success" wire:click.prevent="receivedSingleInventoryMovementItem({{$inventoryMovementItem['id']}})">
                                                             <i class="fas fa-check-square"></i>
                                                         </button>
                                                     @endif
-                                                    @if($inventoryMovementItem['status'] != array_search('Cancelled', \App\Models\InventoryMovement::STATUSES))
+                                                    @endrole
+                                                    @if($inventoryMovementItem['status'] != array_search('Void', \App\Models\InventoryMovementItem::RECEIVING_STATUSES))
                                                         <button class="btn btn-sm btn-danger" wire:click.prevent="voidSingleInventoryMovementItem({{$inventoryMovementItem['id']}})">
                                                             <i class="fas fa-minus-circle"></i>
                                                         </button>
                                                     @endif
-                                                </div>
-                                            @else
-                                                <button class="btn btn-sm btn-danger" wire:click.prevent="deleteSingleInventoryMovementItem({{$inventoryMovementItemIndex}})">
-                                                    <i class="fas fa-times-circle"></i>
-                                                </button>
-                                            @endif
+                                                @else
+                                                    <button class="btn btn-sm btn-danger" wire:click.prevent="deleteSingleInventoryMovementItem({{$inventoryMovementItemIndex}})">
+                                                        <i class="fas fa-times-circle"></i>
+                                                    </button>
+                                                @endif
+                                            </div>
                                         </td>
                                     </tr>
                                     @empty
@@ -460,7 +526,7 @@
                                     </tr>
                                     @endforelse
                                     @if(count($inventoryMovementItems) > 0)
-                                        <td colspan="5" class="text-center">
+                                        <td colspan="7" class="text-center">
                                             Total
                                         </td>
                                         <td class="text-right">
@@ -759,6 +825,14 @@
                                 >
                                     Confirm
                                 </button>
+                            @else
+                                <button
+                                    type="submit"
+                                    class="btn btn-outline-secondary"
+                                    wire:click.prevent="saveInventoryMovementForm()"
+                                >
+                                    Save
+                                </button>
                             @endif
                         </div>
                     </x-slot>
@@ -816,6 +890,104 @@
                     </x-slot>
                     <x-slot name="footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </x-slot>
+                </x-modal>
+
+                <x-modal id="inventory-movement-item-modal">
+                    <x-slot name="title">
+                        Edit Movement Item
+                        @if($editInventoryMovementItemForm)
+                            ({{\App\Models\InventoryMovementItem::RECEIVING_STATUSES[$editInventoryMovementItemForm->status]}})
+                        @endif
+                    </x-slot>
+                    <x-slot name="content">
+                        <div class="form-group">
+                            <label>
+                                ETA
+                            </label>
+                            <div class="input-group">
+                                <input type="date" class="form-control" wire:model="editInventoryMovementItemForm.date">
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateEditInventoryMovementItemFormClicked(-1, 'date')">
+                                        <i class="fas fa-caret-left"></i>
+                                    </button>
+                                    <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateEditInventoryMovementItemFormClicked(1, 'date')">
+                                        <i class="fas fa-caret-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                Remarks
+                            </label>
+                            <textarea wire:model="editInventoryMovementItemForm.remarks" class="form-control" name="remarks" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="file">
+                                Upload File(s)
+                            </label>
+                            <input type="file" class="form-control-file" wire:model.defer="file">
+                        </div>
+
+                        @if(isset($attachments))
+                            @foreach($attachments as $attachmentIndex => $attachment)
+                            <div class="card" style="max-width:600px;width:100%;" wire:key="attachment-{{$attachmentIndex}}">
+                                    @php
+                                        $ext = pathinfo($attachment->full_url, PATHINFO_EXTENSION);
+                                    @endphp
+                                    @if($ext === 'pdf')
+                                        <embed src="{{$attachment->full_url}}" type="application/pdf" class="card-img-top" style="min-height: 500px;">
+                                    @elseif($ext === 'mov' or $ext === 'mp4')
+                                        <div class="embed-responsive embed-responsive-16by9">
+                                            <video class=" embed-responsive-item video-js" controls>
+                                                <source src="{{$attachment->full_url}}">
+                                                Your browser does not support the video tag.
+                                            </video>
+                                        </div>
+                                    @else
+                                        <img class="card-img-top" src="{{$attachment->full_url}}" alt="">
+                                    @endif
+                                    <div class="card-body">
+                                        <div class="btn-group d-none d-sm-block">
+                                            <button type="button" class="btn btn-warning" wire:click="downloadAttachment({{$attachment}})">
+                                                <i class="fas fa-cloud-download-alt"></i>
+                                                Download
+                                            </button>
+                                            <button type="button" class="btn btn-danger" wire:click="deleteAttachment({{$attachment}})">
+                                                <i class="fas fa-trash"></i>
+                                                Delete
+                                            </button>
+                                        </div>
+                                        <div class="d-block d-sm-none">
+                                            <button type="button" class="btn btn-block btn-warning" wire:click="downloadAttachment({{$attachment}})">
+                                                <i class="fas fa-cloud-download-alt"></i>
+                                                Download
+                                            </button>
+                                            <button type="button" class="btn btn-block btn-danger" wire:click="deleteAttachment({{$attachment}})">
+                                                <i class="fas fa-trash"></i>
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @endif
+                    </x-slot>
+                    <x-slot name="footer">
+                        <div class="btn-group">
+                            @if($editInventoryMovementItemForm and $editInventoryMovementItemForm->status != array_search('Received', \App\Models\InventoryMovementItem::RECEIVING_STATUSES))
+                                <button wire:click.prevent="receivedSingleInventoryMovementItem({{$editInventoryMovementItemForm->id}})" class="btn btn-success" {{ isset($attachments) && count($attachments) > 0 ? '' : 'disabled'}}>
+                                    <i class="fas fa-check-square"></i>
+                                    Received
+                                </button>
+                            @endif
+                            <button wire:click.prevent="saveEditInventoryMovementItemForm()" class="btn btn-outline-success">
+                                <i class="far fa-save"></i>
+                                Save
+                            </button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
                     </x-slot>
                 </x-modal>
         </div>

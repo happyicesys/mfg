@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\HasSearch;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -17,8 +18,9 @@ class InventoryMovementItem extends Model
     ];
 
     const RECEIVING_STATUSES = [
-        1 => 'Ordered',
-        2 => 'Received',
+        1 => 'Pending',
+        2 => 'Ordered',
+        4 => 'Received',
         99 => 'Void',
     ];
 
@@ -40,12 +42,20 @@ class InventoryMovementItem extends Model
         'unit_price',
         'created_by',
         'updated_by',
+        'previous_status',
     ];
 
     // getter
     public function getAmountAttribute($value)
     {
         return round($value/ 100, 2);
+    }
+
+    public function getDateAttribute($value)
+    {
+        if($value) {
+            return Carbon::parse($value)->toDateString();
+        }
     }
 
     public function getUnitPriceAttribute($value)
@@ -72,6 +82,11 @@ class InventoryMovementItem extends Model
     }
 
     // relationships
+    public function attachments()
+    {
+        return $this->morphMany(Attachment::class, 'modelable');
+    }
+
     public function bomItem()
     {
         return $this->belongsTo(BomItem::class);

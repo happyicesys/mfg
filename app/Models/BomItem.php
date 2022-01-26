@@ -23,6 +23,8 @@ class BomItem extends Model
         'order_by',
         'supplier_id',
         'base_avg_price',
+        'ordered_qty',
+        'planned_qty',
     ];
 
     // relationships
@@ -49,6 +51,11 @@ class BomItem extends Model
     public function bomItemType()
     {
         return $this->belongsTo(BomItemType::class);
+    }
+
+    public function inventoryMovementItems()
+    {
+        return $this->hasMany(InventoryMovementItem::class);
     }
 
     public function orderBy()
@@ -86,6 +93,16 @@ class BomItem extends Model
     }
 
     public function getAvailableQtyAttribute($value)
+    {
+        return $value + 0;
+    }
+
+    public function getOrderedQtyAttribute($value)
+    {
+        return $value + 0;
+    }
+
+    public function getPlannedQtyAttribute($value)
     {
         return $value + 0;
     }
