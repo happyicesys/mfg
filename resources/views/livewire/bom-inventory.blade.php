@@ -246,6 +246,9 @@
                                         <img class="card-img-top" src="{{$attachment->full_url}}" alt="">
                                     @endif
                                     <div class="card-body">
+                                        <label for="">
+                                            {{$attachment->url}}
+                                        </label>
                                         <div class="btn-group d-none d-sm-block">
                                             <button type="button" class="btn btn-warning" wire:click="downloadAttachment({{$attachment}})">
                                                 <i class="fas fa-cloud-download-alt"></i>
