@@ -63,7 +63,7 @@ class BomSupplier extends Component
     {
         $suppliers = Supplier::with([
             'paymentTerm',
-            'country',
+            'transactedCurrency',
         ]);
 
         // advance search

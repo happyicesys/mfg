@@ -26,6 +26,7 @@
         "@fortawesome/fontawesome-free": "^5.15.3",
         "alpinejs": "^3.5.1",
         "apexcharts": "^3.32.0",
+        "bootstrap-select": "^1.13.18",
         "filepond": "^4.30.3",
         "filepond-plugin-image-preview": "^4.6.10",
         "moment": "^2.29.1",

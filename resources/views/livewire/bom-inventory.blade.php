@@ -6,8 +6,8 @@
             <hr>
             @php
                 $bomItemsArr = $bomItems->toArray();
-                $from = $bomItemsArr['from'];
-                $total = $bomItemsArr['total'];
+                $from = isset($bomItemsArr['from']) ? $bomItemsArr['from'] : 1;
+                $total = isset($bomItemsArr['total']) ? $bomItemsArr['total'] : count($bomItems);
 
                 $profile = \App\Models\Profile::where('is_primary', 1)->first();
             @endphp
@@ -66,6 +66,7 @@
                                 <option value="100">100</option>
                                 <option value="200">200</option>
                                 <option value="500">500</option>
+                                <option value="All">All</option>
                             </select>
                             <label for="display_num2" style="padding-right: 20px"> per Page</label>
                         </div>
@@ -185,9 +186,11 @@
                     @endforelse
                 </table>
             </div>
-            <div>
-                {{ $bomItems->links() }}
-            </div>
+            @if($itemPerPage != 'All')
+                <div>
+                    {{ $bomItems->links() }}
+                </div>
+            @endif
 
             {{-- <form wire:submit.prevent="save"> --}}
                 <x-modal id="edit-bom-item">

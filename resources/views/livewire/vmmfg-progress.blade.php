@@ -182,10 +182,7 @@
                                             $itemCount += $title->vmmfgItems()->count();
                                         }
                                     }
-//
-                                    // if($itemCount === 0) {
-                                    //     $itemCount = 1;
-                                    // }
+
                                     $eachProgressPercent = round($taskCount/($itemCount ? $itemCount : 1) * 100);
 
                                     if($eachProgressPercent == 100) {

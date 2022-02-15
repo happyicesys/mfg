@@ -21,7 +21,7 @@ class BomInventory extends Component
     use WithFileUploads, WithPagination;
 
     protected $paginationTheme = 'bootstrap';
-    public $itemPerPage = 100;
+    public $itemPerPage = 'All';
     public $sortKey = '';
     public $sortAscending = true;
     public $showEditModal = false;
@@ -106,13 +106,19 @@ class BomInventory extends Component
             });
         }
 
+        $bomItems = $bomItems->where('is_inventory', 1);
+
         if($sortKey = $this->sortKey) {
             $bomItems = $bomItems->orderBy($sortKey, $this->sortAscending ? 'asc' : 'desc');
         }else {
             $bomItems = $bomItems->orderBy('code');
         }
 
-        $bomItems = $bomItems->paginate($this->itemPerPage);
+        if($this->itemPerPage == 'All') {
+            $bomItems = $bomItems->get();
+        }else {
+            $bomItems = $bomItems->paginate($this->itemPerPage);
+        }
 
         return view('livewire.bom-inventory', ['bomItems' => $bomItems]);
     }

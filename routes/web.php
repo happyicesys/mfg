@@ -5,6 +5,7 @@ use App\Http\Livewire\Admin;
 use App\Http\Livewire\AppSetting;
 use App\Http\Livewire\BomInventory;
 use App\Http\Livewire\BomMovement;
+use App\Http\Livewire\BomReceiving;
 use App\Http\Livewire\BomSupplier;
 use App\Http\Livewire\Currency;
 use App\Http\Livewire\Customer;
@@ -64,6 +65,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/vmmfg-bom', VmmfgInventoryBom::class)->name('vmmfg-bom');
         Route::get('/vmmfg-bom-inventory', BomInventory::class)->name('vmmfg-bom-inventory');
         Route::get('/bom-movement', BomMovement::class)->name('bom-movement');
+        Route::get('/bom-receiving', BomReceiving::class)->name('bom-receiving');
         Route::get('/bom-supplier', BomSupplier::class)->name('bom-supplier');
         Route::get('/currency', Currency::class)->name('currency');
     });

@@ -2,6 +2,7 @@ require('./bootstrap');
 
 //select2
 window.select2 = require('select2');
+window.selectpicker = require('bootstrap-select');
 
 // videojs
 require('video.js');

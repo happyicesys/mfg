@@ -815,7 +815,7 @@
                                     class="btn btn-outline-secondary"
                                     wire:click.prevent="saveInventoryMovementForm('Pending')"
                                 >
-                                    Save Draft
+                                    Pending
                                 </button>
                                 <button
                                     type="submit"

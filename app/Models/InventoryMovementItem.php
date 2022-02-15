@@ -18,7 +18,7 @@ class InventoryMovementItem extends Model
     ];
 
     const RECEIVING_STATUSES = [
-        1 => 'Pending',
+        1 => 'New',
         2 => 'Ordered',
         4 => 'Received',
         99 => 'Void',
@@ -55,6 +55,13 @@ class InventoryMovementItem extends Model
     {
         if($value) {
             return Carbon::parse($value)->toDateString();
+        }
+    }
+
+    public function getQtyAttribute($value)
+    {
+        if(is_numeric($value)) {
+            return $value + 0;
         }
     }
 
@@ -95,6 +102,11 @@ class InventoryMovementItem extends Model
     public function inventoryMovement()
     {
         return $this->belongsTo(InventoryMovement::class);
+    }
+
+    public function inventoryMovementItemQuantities()
+    {
+        return $this->hasMany(InventoryMovementItemQuantity::class);
     }
 
     public function supplierQuotePrice()
