@@ -182,6 +182,7 @@ class BomInventory extends Component
         if($this->supplierQuotePriceForm['supplier_id']) {
             $supplier = Supplier::find($this->supplierQuotePriceForm['supplier_id']);
             $this->supplier = $supplier;
+            // dd($supplier->toArray());
             $this->supplierCurrencyName = $supplier->country->currency_name;
 
             if(is_numeric($this->supplierQuotePriceForm['unit_price'])) {

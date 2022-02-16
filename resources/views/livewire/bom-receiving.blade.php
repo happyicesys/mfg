@@ -574,7 +574,7 @@
                                                             <i class="fas fa-times-circle"></i>
                                                         </button>
                                                     @else
-                                                        <button class="btn btn-sm btn-danger" wire:click.prevent="deleteSingleInventoryMovementItem({{$inventoryMovementItemIndex}})">
+                                                        <button class="btn btn-sm btn-danger" wire:click.prevent="deleteSingleInventoryMovementItemIndex({{$inventoryMovementItemIndex}})">
                                                             <i class="fas fa-times-circle"></i>
                                                         </button>
                                                     @endif

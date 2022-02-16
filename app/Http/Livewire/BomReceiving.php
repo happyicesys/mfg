@@ -255,6 +255,10 @@ class BomReceiving extends Component
         $this->inventoryMovementItemQuantity = new InventoryMovementItemQuantity();
         $this->inventoryMovementItem = new InventoryMovementItem();
         $this->inventoryMovementForm = new InventoryMovement();
+
+        $inventoryMovementItemQuantity = new InventoryMovementItemQuantity();
+        $inventoryMovementItem = new InventoryMovementItem();
+
         $this->bomItemId = null;
         $this->emit('refresh');
         $this->emit('updated');
@@ -434,6 +438,8 @@ class BomReceiving extends Component
                 }
             }
         }
+        $this->syncTotalAmount($inventoryMovement->id);
+
         $this->emit('refresh');
         $this->emit('updated');
         session()->flash('success', 'Your entry has been added');
@@ -446,9 +452,17 @@ class BomReceiving extends Component
         $this->inventoryMovementItemQuantityForm->date = Carbon::today()->toDateString();
     }
 
+    public function deleteSingleInventoryMovementItemIndex($index)
+    {
+        unset($this->inventoryMovementItems[$index]);
+
+        $this->inventoryMovementForm->total_amount = $this->calculateTotalAmount($this->inventoryMovementItems);
+    }
+
     public function deleteSingleInventoryMovementItem($inventoryMovementItemId)
     {
         $inventoryMovementItem = InventoryMovementItem::findOrFail($inventoryMovementItemId);
+        $inventoryMovement = $inventoryMovementItem->inventoryMovement;
         $bomItemId = $inventoryMovementItem->bomItem->id;
         if($inventoryMovementItem->inventoryMovementItemQuantities()->exists()) {
             foreach($inventoryMovementItem->inventoryMovementItemQuantities as $inventoryMovementItemQuantity) {
@@ -463,7 +477,9 @@ class BomReceiving extends Component
         }
         $inventoryMovementItem->delete();
         $this->syncBomItemQty($bomItemId);
+        $this->syncTotalAmount($inventoryMovement->id);
         $this->reloadInventoryItems($inventoryMovementItem->inventoryMovement);
+        $this->inventoryMovement = new InventoryMovement();
         $this->inventoryMovementItem = new InventoryMovementItem();
         $this->inventoryMovementItemQuantity = new InventoryMovementItemQuantity();
         $this->emit('refresh');
@@ -551,6 +567,7 @@ class BomReceiving extends Component
         if($deleteFile){
             $attachment->delete();
         }
+        $this->attachment = new Attachment();
         $this->deleteFile = null;
         $this->emit('updated');
         session()->flash('success', 'Entry has been removed');
@@ -564,6 +581,7 @@ class BomReceiving extends Component
     public function createInventoryMovement()
     {
         $this->inventoryMovementForm = new InventoryMovement();
+        $this->reset('inventoryMovementItemFormFilters');
     }
 
     public function onPrevNextDateClicked($direction, $model)
@@ -709,6 +727,19 @@ class BomReceiving extends Component
         }
 
         return $totalAmount;
+    }
+
+    private function syncTotalAmount($inventoryMovementId)
+    {
+        $totalAmount = 0.00;
+        $inventoryMovement = InventoryMovement::findOrFail($inventoryMovementId);
+        if($inventoryMovement->inventoryMovementItems()->exists()) {
+            foreach($inventoryMovement->inventoryMovementItems as $inventoryMovementItem) {
+                $totalAmount += $inventoryMovementItem->amount;
+            }
+        }
+        $inventoryMovement->total_amount = $totalAmount;
+        $inventoryMovement->save();
     }
 
 
