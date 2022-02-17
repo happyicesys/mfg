@@ -107,6 +107,9 @@
                             Planned Qty
                         </x-th-data>
                         <th class="text-center text-dark">
+                            Unit Price
+                        </th>
+                        <th class="text-center text-dark">
                             Base Price @if($profile->country) ({{$profile->country->currency_name}}) @endif
                         </th>
                         <th class="text-center text-dark">
@@ -168,8 +171,14 @@
                                     @endif
                                 @endforeach
                             </td>
+                            @php
+                                $supplierQuotePrice = $bomItem->supplierQuotePrices()->latest()->first();
+                            @endphp
                             <td class="text-right">
-                                {{ $bomItem->supplierQuotePrices()->latest()->first() ? $bomItem->supplierQuotePrices()->latest()->first()->base_price : null }}
+                                {{ $supplierQuotePrice ? $supplierQuotePrice->unit_price : '' }} @if(isset($supplierQuotePrice->country)) ({{ $supplierQuotePrice->country->currency_name }}) @endif
+                            </td>
+                            <td class="text-right">
+                                {{ $supplierQuotePrice ? $supplierQuotePrice->base_price : null }}
                             </td>
                             <td class="text-center">
                                 <div class="btn-group">

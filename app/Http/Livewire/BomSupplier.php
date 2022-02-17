@@ -30,6 +30,7 @@ class BomSupplier extends Component
         'attn_name' => '',
         'attn_contact' => '',
         'url' => '',
+        'email' => '',
         'payment_term_id' => '',
         'country_id' => '',
     ];
@@ -45,6 +46,7 @@ class BomSupplier extends Component
             'supplierForm.attn_name' => 'sometimes',
             'supplierForm.attn_contact' => 'sometimes',
             'supplierForm.url' => 'sometimes',
+            'supplierForm.email' => 'sometimes',
             'supplierForm.payment_term_id' => 'sometimes',
             'supplierForm.country_id' => 'sometimes',
         ];

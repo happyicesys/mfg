@@ -138,6 +138,9 @@
                         <x-input type="text" model="supplierForm.url">
                             URL
                         </x-input>
+                        <x-input type="text" model="supplierForm.email">
+                            Email
+                        </x-input>
                         <div class="form-group">
                             <label>
                                 Payment Term

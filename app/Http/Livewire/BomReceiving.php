@@ -146,7 +146,7 @@ class BomReceiving extends Component
     public function edit(InventoryMovement $inventoryMovement)
     {
         $this->inventoryMovementForm = $inventoryMovement;
-
+        $this->reset('file');
     }
 
     public function updated($name, $value)
@@ -244,6 +244,11 @@ class BomReceiving extends Component
                         $inventoryMovementItemQuantity->delete();
                     }
                 }
+                if($inventoryMovementItem->attachments()->exists()) {
+                    foreach($inventoryMovementItem->attachments as $attachment) {
+                        $this->deleteAttachment($attachment);
+                    }
+                }
                 $inventoryMovementItem->delete();
                 $this->syncBomItemQty($bomItemId);
             }
@@ -306,6 +311,8 @@ class BomReceiving extends Component
                     'date' => $inventoryMovementItem->date,
                     'inventoryMovementItemQuantities' => $inventoryMovementItem->inventoryMovementItemQuantities()->with(['attachments', 'inventoryMovementItem', 'inventoryMovementItem.inventoryMovement'])->get(),
                     'inventoryMovement' => $inventoryMovement,
+                    'attachment_url' => $inventoryMovementItem->attachments()->first() ? $inventoryMovementItem->attachments()->first()->full_url : '',
+                    'attachment' => $inventoryMovementItem->attachments()->first()
                 ];
                 // dd($this->inventoryMovementItems);
                 array_push($this->inventoryMovementItems, $data);
@@ -420,7 +427,7 @@ class BomReceiving extends Component
                             'remarks' => $inventoryMovementItem['remarks'],
                         ]);
                     }else {
-                        InventoryMovementItem::create([
+                        $createdItem = InventoryMovementItem::create([
                             'bom_item_id' => $bomItem->id,
                             'inventory_movement_id' => $inventoryMovement->id,
                             'supplier_quote_price_id' => $inventoryMovementItem['supplier_quote_price_id'],
@@ -432,6 +439,15 @@ class BomReceiving extends Component
                             'date' => $inventoryMovementItem['date'],
                             'remarks' => $inventoryMovementItem['remarks'],
                         ]);
+                        if(isset($inventoryMovementItem['attachment'])) {
+                            $file = $inventoryMovementItem['attachment'];
+                            $url = $file->storePublicly('receiving', 'digitaloceanspaces');
+                            $fullUrl = Storage::url($url);
+                            $createdItem->attachments()->create([
+                                'url' => $url,
+                                'full_url' => $fullUrl,
+                            ]);
+                        }
                     }
 
                     $this->syncBomItemQty($bomItem->id);
@@ -450,6 +466,7 @@ class BomReceiving extends Component
         $this->inventoryMovementItemForm = $inventoryMovementItem;
         $this->inventoryMovementItemQuantityForm = new InventoryMovementItemQuantity();
         $this->inventoryMovementItemQuantityForm->date = Carbon::today()->toDateString();
+        $this->reset('file');
     }
 
     public function deleteSingleInventoryMovementItemIndex($index)
@@ -473,6 +490,11 @@ class BomReceiving extends Component
                     }
                 }
                 $inventoryMovementItemQuantity->delete();
+            }
+        }
+        if($inventoryMovementItem->attachments()->exists()) {
+            foreach($inventoryMovementItem->attachments as $attachment) {
+                $this->deleteAttachment($attachment);
             }
         }
         $inventoryMovementItem->delete();
@@ -543,6 +565,12 @@ class BomReceiving extends Component
     {
         $this->reset('attachments');
         $this->attachments = $bomItem->attachments;
+    }
+
+    public function viewInventoryItemAttachments(InventoryMovementItem $inventoryMovementItem)
+    {
+        $this->reset('attachments');
+        $this->attachments = $inventoryMovementItem->attachments;
     }
 
     public function viewQuantityAttachments(InventoryMovementItemQuantity $inventoryMovementItemQuantity)
@@ -626,6 +654,14 @@ class BomReceiving extends Component
                 'date' => $this->inventoryMovementItemForm->date,
                 'remarks' => $this->inventoryMovementItemForm->remarks,
             ]);
+            if($this->file) {
+                $url = $this->file->storePublicly('receiving', 'digitaloceanspaces');
+                $fullUrl = Storage::url($url);
+                $inventoryMovementItem->attachments()->create([
+                    'url' => $url,
+                    'full_url' => $fullUrl,
+                ]);
+            }
 
             $this->syncBomItemQty($bomItem->id);
 
@@ -642,6 +678,7 @@ class BomReceiving extends Component
                 'date' => $inventoryMovementItem->date,
                 'remarks' => $inventoryMovementItem->remarks,
                 'inventoryMovement' => $inventoryMovementItem->inventoryMovement,
+                'attachment_url' => $inventoryMovementItem->attachments()->first() ? $inventoryMovementItem->attachments()->first()->full_url : '',
             ];
         }else {
             $data = [
@@ -655,6 +692,8 @@ class BomReceiving extends Component
                 'status' => null,
                 'date' => $this->inventoryMovementItemForm->date,
                 'remarks' => $this->inventoryMovementItemForm->remarks,
+                'attachment_url' => $this->file ? $this->file->temporaryUrl() : '',
+                'attachment' => $this->file,
             ];
         }
 

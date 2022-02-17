@@ -107,9 +107,6 @@
                         <x-th-data model="order_date" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Order Date
                         </x-th-data>
-                        <x-th-data model="remarks" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
-                            Remarks
-                        </x-th-data>
                         <x-th-data model="total_amount" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Total Amount
                         </x-th-data>
@@ -127,25 +124,6 @@
                         </x-th-data>
                         <th></th>
                     </tr>
-                    <tr class="table-secondary">
-                        <th colspan="2"></th>
-                        <th class="text-center text-dark" colspan="2">
-                            Code
-                        </th>
-                        <th class="text-center text-dark" colspan="2">
-                            Name
-                        </th>
-                        <th class="text-center text-dark">
-                            ETA
-                        </th>
-                        <th class="text-center text-dark">
-                            Qty
-                        </th>
-                        <th class="text-center text-dark">
-                            Status
-                        </th>
-                        <th></th>
-                    </tr>
                     @forelse($inventoryMovements as $index => $inventoryMovement)
                     <tr class="row_edit m-b-3" wire:loading.class.delay="opacity-2" wire:key="row-{{$inventoryMovement->id}}" style="background-color: #adcfe6;">
                         {{-- <th class="text-center">
@@ -161,9 +139,6 @@
                         </td>
                         <td class="text-center">
                             {{ $inventoryMovement->order_date ? \Carbon\Carbon::parse($inventoryMovement->order_date)->format('Y-m-d') : null }}
-                        </td>
-                        <td class="text-left">
-                            {{ $inventoryMovement->remarks }}
                         </td>
                         <td class="text-right">
                             {{ number_format($inventoryMovement->total_amount, '2', '.', ',') }}
@@ -192,6 +167,28 @@
                         </td>
                     </tr>
                     @if(count($inventoryMovement->inventoryMovementItems) > 0)
+                        <tr class="table-secondary">
+                            <th colspan="2"></th>
+                            <th class="text-center text-dark">
+                                Code
+                            </th>
+                            <th class="text-center text-dark">
+                                Name
+                            </th>
+                            <th class="text-center text-dark">
+                                Remarks
+                            </th>
+                            <th class="text-center text-dark">
+                                ETA
+                            </th>
+                            <th class="text-center text-dark">
+                                Qty
+                            </th>
+                            <th class="text-center text-dark">
+                                Status
+                            </th>
+                            <th></th>
+                        </tr>
                         @foreach($inventoryMovement->inventoryMovementItems as $inventoryMovementItemIndex => $inventoryMovementItem)
                             <tr class="ml-3">
                                 <td class="text-center" colspan="2">
@@ -202,11 +199,14 @@
                                         </button>
                                     @endif
                                 </td>
-                                <td class="text-left" colspan="2">
+                                <td class="text-left">
                                     {{ $inventoryMovementItem->bomItem->code }}
                                 </td>
-                                <td class="text-left" colspan="2">
+                                <td class="text-left">
                                     {{ $inventoryMovementItem->bomItem->name }}
+                                </td>
+                                <td class="text-left">
+                                    {{ $inventoryMovementItem->remarks }}
                                 </td>
                                 <td class="text-center">
                                     {{ $inventoryMovementItem->date }}
@@ -230,6 +230,11 @@
                                             <button class="btn btn-sm btn-danger" wire:click.prevent="deleteSingleInventoryMovementItem({{$inventoryMovementItem->id}})" {{$inventoryMovementItem['inventoryMovement']['status'] == array_search('Completed', \App\Models\InventoryMovement::STATUSES) ? 'disabled' : '' }}>
                                                 <i class="fas fa-times-circle"></i>
                                             </button>
+                                            @if($inventoryMovementItem->attachments()->exists())
+                                                <button type="button" class="btn btn-outline-dark btn-sm" wire:click="viewInventoryItemAttachments({{$inventoryMovementItem}})" wire:key="inventory-movement-item-quantity-attachment-{{$inventoryMovementItem->id}}" data-toggle="modal" data-target="#attachment-modal">
+                                                    <i class="far fa-images"></i>
+                                                </button>
+                                            @endif
                                         @else
                                             <button class="btn btn-sm btn-danger" wire:click.prevent="deleteSingleInventoryMovementItem({{$inventoryMovementItemIndex}})">
                                                 <i class="fas fa-times-circle"></i>
@@ -489,6 +494,12 @@
                                             </label>
                                             <textarea wire:model.defer="inventoryMovementItemForm.remarks" class="form-control" name="remarks" rows="3"></textarea>
                                         </div>
+                                        <div class="form-group">
+                                            <label for="file">
+                                                Upload File
+                                            </label>
+                                            <input type="file" class="form-control-file" wire:model.defer="file">
+                                        </div>
                                     <button class="btn btn-success" wire:click="addInventoryMovementItem()" {{$inventoryMovementItemForm->bom_item_id && $inventoryMovementItemForm->qty ? '' : 'disabled' }}>
                                         <i class="fas fa-plus-circle"></i>
                                         Add
@@ -529,6 +540,9 @@
                                         </th>
                                         @endif
                                         <th class="text-center text-dark">
+                                            Attachment
+                                        </th>
+                                        <th class="text-center text-dark">
                                             Action
                                         </th>
                                     </tr>
@@ -563,6 +577,23 @@
                                                 {{ $inventoryMovementItem['status'] ? \App\Models\InventoryMovementItem::RECEIVING_STATUSES[$inventoryMovementItem['status']] : null }}
                                             </td>
                                             @endif
+                                            <td class="text-center">
+                                                @php
+                                                    $ext = pathinfo($inventoryMovementItem['attachment_url'], PATHINFO_EXTENSION);
+                                                @endphp
+                                                @if($ext === 'pdf')
+                                                    <embed src="{{$inventoryMovementItem['attachment_url']}}" type="application/pdf" class="card-img-top" style="min-height: 500px;">
+                                                @elseif($ext === 'mov' or $ext === 'mp4')
+                                                    <div class="embed-responsive embed-responsive-16by9">
+                                                        <video class=" embed-responsive-item video-js" controls>
+                                                            <source src="{{$inventoryMovementItem['attachment_url']}}">
+                                                            Your browser does not support the video tag.
+                                                        </video>
+                                                    </div>
+                                                @else
+                                                    <img class="card-img-top" src="{{$inventoryMovementItem['attachment_url']}}" alt="">
+                                                @endif
+                                            </td>
                                             <td class="text-center">
                                                 <div class="btn-group">
                                                     @if(isset($inventoryMovementItem['id']))
