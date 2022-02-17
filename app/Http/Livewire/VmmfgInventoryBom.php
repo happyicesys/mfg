@@ -138,6 +138,7 @@ class VmmfgInventoryBom extends Component
                                     ->get();
         $this->bomHeaderForm = new BomHeader();
         $this->bomContentForm = new BomContent();
+        $this->bom = new Bom();
 
     }
 
@@ -184,7 +185,9 @@ class VmmfgInventoryBom extends Component
 
     public function edit(Bom $bom)
     {
+        $this->bom = new Bom();
         $this->bom = $bom;
+        // dd($bom->bomHeaders->toArray());
     }
 
     public function create()

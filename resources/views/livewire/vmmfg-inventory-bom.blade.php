@@ -158,7 +158,7 @@
                     Action
                 </th>
             </tr>
-            @forelse($boms as $index => $bom)
+            @forelse($boms as $index => $bomItem)
             <tr class="row_edit" wire:loading.class.delay="opacity-2" wire:key="row-{{$index}}">
                 {{-- <th class="text-center">
                     <input type="checkbox" wire:model="selected" value="{{$admin->id}}">
@@ -167,14 +167,14 @@
                     {{ $index + $from}}
                 </td>
                 <td class="text-left">
-                    {{ $bom->name }}
+                    {{ $bomItem->name }}
                 </td>
                 <td class="text-left">
-                    {{ $bom->remarks }}
+                    {{ $bomItem->remarks }}
                 </td>
                 <td class="text-center">
                     <div class="btn-group">
-                        <button type="button" wire:key="edit-bom-{{$bom->id}}" wire:click="edit({{$bom}})" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#edit-bom">
+                        <button type="button" wire:key="edit-bom-{{$bomItem->id}}" wire:click="edit({{$bomItem}})" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#edit-bom">
                             <i class="fas fa-edit"></i>
                         </button>
 {{--
