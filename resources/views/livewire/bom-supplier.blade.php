@@ -43,6 +43,12 @@
                     </div>
                 </div>
                 <div class="form-row">
+                    <div class="mr-auto pl-1">
+                        <button class="btn btn-success" wire:click="create()" data-toggle="modal" data-target="#edit-supplier">
+                            <i class="fas fa-plus-circle"></i>
+                            Create
+                        </button>
+                    </div>
                     <div class="ml-auto">
                         <div class="form-inline">
                             <label for="display_num">Display </label>

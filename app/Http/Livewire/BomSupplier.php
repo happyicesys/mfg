@@ -97,6 +97,11 @@ class BomSupplier extends Component
         $this->sortKey = $key;
     }
 
+    public function create()
+    {
+        $this->supplierForm = new Supplier;
+    }
+
     public function edit(Supplier $supplier)
     {
         $this->supplierForm = $supplier;
