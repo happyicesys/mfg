@@ -316,6 +316,7 @@
                                     <th class="text-center text-dark">
                                         Created At
                                     </th>
+                                    <th></th>
                                 </tr>
                                 @forelse($supplierQuotePrices as $supplierQuotePriceIndex => $supplierQuotePrice)
                                 <tr>
@@ -333,6 +334,14 @@
                                     </td>
                                     <td class="text-center">
                                         {{ \Carbon\Carbon::parse($supplierQuotePrice->created_at)->format('Y-m-d H:ia') }}
+                                    </td>
+                                    <td class="text-center">
+                                        <button class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete the price?') || event.stopImmediatePropagation()" wire:click.prevent="deleteSingleSupplierQuotePrice({{$supplierQuotePrice}})" {{$supplierQuotePrice->inventoryMovementItems()->exists() ? 'disabled' : ''}}>
+                                            <i class="fas fa-times-circle"></i>
+                                            @if($supplierQuotePrice->inventoryMovementItems()->exists())
+                                                This Pricing is in Used in Receiving
+                                            @endif
+                                        </button>
                                     </td>
                                 </tr>
                                 @empty

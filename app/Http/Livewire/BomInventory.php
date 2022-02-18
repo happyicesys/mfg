@@ -53,6 +53,10 @@ class BomInventory extends Component
     public $attachments;
     public $file;
 
+    protected $listeners = [
+        'refresh' => '$refresh',
+    ];
+
     public function rules()
     {
         return [
@@ -212,6 +216,14 @@ class BomInventory extends Component
 
         $this->emit('updated');
         session()->flash('success', 'Your entry has been updated');
+    }
+
+    public function deleteSingleSupplierQuotePrice(SupplierQuotePrice $supplierQuotePrice)
+    {
+        $supplierQuotePrice->delete();
+        $this->emit('refresh');
+        $this->emit('updated');
+        session()->flash('success', 'Your entry has been deleted');
     }
 
     public function deleteAttachment(Attachment $attachment)

@@ -36,6 +36,11 @@ class SupplierQuotePrice extends Model
         return $this->belongsTo(CurrencyRate::class);
     }
 
+    public function inventoryMovementItems()
+    {
+        return $this->hasMany(InventoryMovementItem::class);
+    }
+
     public function supplier()
     {
         return $this->belongsTo(Supplier::class);
