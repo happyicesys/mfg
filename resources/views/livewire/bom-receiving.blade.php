@@ -675,10 +675,9 @@
                     <x-slot name="footer" >
                         <div class="btn-group">
                             @if(isset($inventoryMovementForm->id))
-                                <button class="btn btn-danger" onclick="confirm('Are you sure you want to delete this receiving?') || event.stopImmediatePropagation()" wire:click.prevent="deleteInventoryMovement()">
-                                    <i class="fas fa-trash"></i>
+                                <a href="#" class="btn btn-xs-block btn-danger" onclick="return confirm('Are you sure you want to delete this receiving?') || event.stopImmediatePropagation()" wire:click.prevent="deleteInventoryMovement()" >
                                     Delete
-                                </button>
+                                </a>
                             @endif
                             @if(!isset($inventoryMovementForm->id))
                                 <button

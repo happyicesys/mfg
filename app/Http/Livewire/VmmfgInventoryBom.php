@@ -386,26 +386,37 @@ class VmmfgInventoryBom extends Component
         }
         if($this->bomContentForm->is_edit) {
 
-            $this->validate([
-                'bomContentForm.code' => 'unique:bom_items,code,'.$this->bomContentForm->bomItem->id,
-            ], [
-                'bomContentForm.code.unique' => 'This Code is already been used',
-            ]);
+            if($this->bomContentForm->is_existing) {
+                $this->bomContent->update([
+                    'bom_item_id' => $this->bomContentForm->bom_item_id,
+                ]);
+                $this->bomContent->bomItem()->update([
+                    'bom_item_type_id' => $this->bomContentForm->bom_item_type_id,
+                ]);
+            }else {
+                $this->validate([
+                    'bomContentForm.code' => 'unique:bom_items,code,'.$this->bomContentForm->bomItem->id,
+                ], [
+                    'bomContentForm.code.unique' => 'This Code is already been used',
+                ]);
 
-            $this->bomContent->update([
-                'sequence' => $this->bomContentForm->sequence,
-                'bom_sub_category_id' => $this->bomContentForm->bom_sub_category_id,
-                'bom_header_id' => $this->bomHeader->id,
-                'is_group' => $this->bomContentForm->is_group,
-                'vmmfg_item_id' => $this->bomContentForm->vmmfg_item_id,
-                'qty' => $this->bomContentForm->qty,
-            ]);
-            $bomContentItem = $this->bomContent->bomItem()->update([
-                'code' => $this->bomContentForm->code,
-                'name' => $this->bomContentForm->name,
-                'bom_item_type_id' => $this->bomContentForm->bom_item_type_id,
-                'is_inventory' => $this->bomContentForm->is_inventory ? $this->bomContentForm->is_inventory : false,
-            ]);
+                $this->bomContent->update([
+                    'sequence' => $this->bomContentForm->sequence,
+                    'bom_sub_category_id' => $this->bomContentForm->bom_sub_category_id,
+                    'bom_header_id' => $this->bomHeader->id,
+                    'is_group' => $this->bomContentForm->is_group,
+                    'vmmfg_item_id' => $this->bomContentForm->vmmfg_item_id,
+                    'qty' => $this->bomContentForm->qty,
+                ]);
+                $this->bomContent->bomItem()->update([
+                    'code' => $this->bomContentForm->code,
+                    'name' => $this->bomContentForm->name,
+                    'bom_item_type_id' => $this->bomContentForm->bom_item_type_id,
+                    'is_inventory' => $this->bomContentForm->is_inventory ? $this->bomContentForm->is_inventory : false,
+                ]);
+            }
+
+
             $currentBomContent = $this->bomContent;
         }else {
             if($this->bomContentForm->is_existing) {
@@ -449,6 +460,7 @@ class VmmfgInventoryBom extends Component
 
         $this->reset('file');
         $this->emit('refresh');
+        $this->emit('updated');
         session()->flash('success', 'Entry has been created');
     }
 
