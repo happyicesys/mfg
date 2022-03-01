@@ -7,6 +7,8 @@
         $bomsArr = $boms->toArray();
         $from = $bomsArr['from'];
         $total = $bomsArr['total'];
+        $profile = \App\Models\Profile::where('is_primary', 1)->first();
+        $amountTotal = 0;
     @endphp
     <div class="d-none d-sm-block">
         <div class="form-group form-inline">
@@ -218,6 +220,12 @@
                     </button>
                 </div>
                 @if($bom->bomHeaders()->exists())
+                    {{-- <div class="form-group">
+                        <label>
+                            Est Total Cost: {{$amountTotal}}
+                        </label>
+                    </div> --}}
+
                     <div class="table-responsive pt-3">
                         <table class="table table-bordered table-sm">
                             <tr class="d-flex">
@@ -235,6 +243,9 @@
                                 </th>
                                 <th class="col-md-1 bg-secondary text-white text-center">
                                     Qty
+                                </th>
+                                <th class="col-md-1 bg-secondary text-white text-center">
+                                    Amount ({{$profile->country->currency_name}})
                                 </th>
                                 <th class="col-md-2 bg-secondary text-white text-center">
                                     Action
@@ -267,7 +278,7 @@
                                 <th class="col-md-2 bg-info text-dark">
                                     {{$bomHeader->bomItem ? $bomHeader->bomItem->code : null}}
                                 </th>
-                                <th class="col-md-4 bg-info text-dark">
+                                <th class="col-md-5 bg-info text-dark">
                                     {{$bomHeader->bomItem ? $bomHeader->bomItem->name : null}}
                                 </th>
                                 <th class="col-md-1 bg-info text-dark text-center">
@@ -352,6 +363,21 @@
                                                 {{$bomContent->qty}}
                                             @endif
 
+                                        </th>
+                                        @php
+                                            $unitPrice = 0;
+                                            $amount = 0;
+
+                                            if($bomContent->bomItem->supplierQuotePrices()->exists()) {
+                                                $unitPrice = $bomContent->bomItem->supplierQuotePrices()->latest()->first()->base_price;
+                                            }
+                                            if($unitPrice and $bomContent->qty) {
+                                                $amount = $unitPrice * $bomContent->qty;
+                                                $amountTotal += $amount;
+                                            }
+                                        @endphp
+                                        <th class="col-md-1 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-dark text-right">
+                                            {{$amount}}
                                         </th>
                                         <td class="col-md-2 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-center">
                                             <div class="btn-group">

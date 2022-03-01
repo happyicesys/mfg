@@ -86,7 +86,7 @@ class BomInventory extends Component
             'supplierQuotePrices.country',
             'supplierQuotePrices.supplier'
         ])
-        ->where('is_part', true);
+        ->where('is_inventory', true);
 
         // advance search
         $bomItems = $bomItems

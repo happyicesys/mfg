@@ -197,20 +197,20 @@ class VmmfgDailyreport extends Component
         if($userId = $filters['user_id']) {
             $tasks = $tasks->where(function($query) use ($userId) {
                 // $query->search('done_by', $userId)->orSearch('checked_by', $userId)->orSearch('undo_done_by', $userId);
-                $query->search('done_by', $userId);
+                $query->search('done_by', $userId)->orSearch('checked_by', $userId);
             });
         }
         // dd($filters['date_from'], $filters['date_to']);
         if($dateFrom = $filters['date_from']) {
             $tasks = $tasks->where(function($query) use ($dateFrom) {
                 // $query->searchFromDate('done_time', $dateFrom)->orSearchFromDate('checked_time', $dateFrom)->orSearchFromDate('undo_done_time', $dateFrom);
-                $query->searchFromDate('done_time', $dateFrom);
+                $query->searchFromDate('done_time', $dateFrom)->orSearchFromDate('checked_time', $dateFrom);
             });
         }
         if($dateTo = $filters['date_to']) {
             $tasks = $tasks->where(function($query) use ($dateTo) {
                 // $query->searchToDate('done_time', $dateTo)->orSearchToDate('checked_time', $dateTo)->orSearchToDate('undo_done_time', $dateTo);
-                $query->searchToDate('done_time', $dateTo);
+                $query->searchToDate('done_time', $dateTo)->orSearchToDate('checked_time', $dateTo);
             });
         }
 

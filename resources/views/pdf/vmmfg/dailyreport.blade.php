@@ -131,7 +131,7 @@
                     <td align="left">
                         {{ $item->vmmfgItem ? $item->vmmfgItem->sequence : '' }}
                     </td>
-                    <td align="left" style="font-family: 'founder-type'; font-weight: bold;  max-width: 150px; word-wrap: break-word;">
+                    <td align="left" style="font-family: 'founder-type'; font-weight: bold;  max-width: 130px; word-wrap: break-word;">
                         {{ $item->vmmfgItem ? $item->vmmfgItem->name : '' }}
                     </td>
                     <td align="center">
@@ -152,7 +152,7 @@
                     <td align="center">
                         {{  $item->undo_done_time ? \Carbon\Carbon::parse($item->undo_done_time)->format('Y-m-d h:ia') : null }}
                     </td>
-                    <td align="left">
+                    <td align="left" style="font-family: 'founder-type'; font-weight: bold;  max-width: 150px; word-wrap: break-word;">
                         {{$item->remarks}}
                     </td>
                 </tr>
