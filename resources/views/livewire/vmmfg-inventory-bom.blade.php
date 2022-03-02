@@ -219,43 +219,33 @@
                         Group
                     </button>
                 </div>
-                @if($bom->bomHeaders()->exists())
-                    {{-- <div class="form-group">
-                        <label>
-                            Est Total Cost: {{$amountTotal}}
-                        </label>
-                    </div> --}}
 
-                    <div class="table-responsive pt-3">
-                        <table class="table table-bordered table-sm">
-                            <tr class="d-flex">
-                                <th class="col-md-2 bg-secondary text-white text-center">
-                                    Cat1/Cat2
-                                </th>
-                                <th class="col-md-1 bg-secondary text-white text-center">
-                                    Type
-                                </th>
-                                <th class="col-md-2 bg-secondary text-white text-center">
-                                    Code
-                                </th>
-                                <th class="col-md-4 bg-secondary text-white text-center">
-                                    Name
-                                </th>
-                                <th class="col-md-1 bg-secondary text-white text-center">
-                                    Qty
-                                </th>
-                                <th class="col-md-1 bg-secondary text-white text-center">
-                                    Amount ({{$profile->country->currency_name}})
-                                </th>
-                                <th class="col-md-2 bg-secondary text-white text-center">
-                                    Action
-                                </th>
-                            </tr>
-                        </table>
-                    </div>
-                @endif
-
-                <div class="table-responsive">
+                <div class="table-responsive pt-3">
+                    <table class="table table-bordered table-sm">
+                        <tr class="d-flex">
+                            <th class="col-md-2 bg-secondary text-white text-center">
+                                Cat1/Cat2
+                            </th>
+                            <th class="col-md-1 bg-secondary text-white text-center">
+                                Type
+                            </th>
+                            <th class="col-md-2 bg-secondary text-white text-center">
+                                Code
+                            </th>
+                            <th class="col-md-4 bg-secondary text-white text-center">
+                                Name
+                            </th>
+                            <th class="col-md-1 bg-secondary text-white text-center">
+                                Qty
+                            </th>
+                            <th class="col-md-1 bg-secondary text-white text-center">
+                                Amount ({{$profile->country->currency_name}})
+                            </th>
+                            <th class="col-md-2 bg-secondary text-white text-center">
+                                Action
+                            </th>
+                        </tr>
+                    </table>
                     @if($bom->bomHeaders()->exists())
                         @foreach($bom->bomHeaders as $bomHeaderIndex => $bomHeader)
                         <table class="table table-borderless table-sm" wire:key="header-table-{{$bomHeaderIndex}}">

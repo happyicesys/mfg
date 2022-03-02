@@ -73,7 +73,7 @@ class LoginController extends Controller
             $login_type => $request->input('login')
         ]);
 
-        if (Auth::attempt($request->only($login_type, 'password'))) {
+        if (Auth::attempt([$login_type => $request->input('login'), 'password' => $request->input('password'), 'is_active' => 1])) {
             return redirect()->intended($this->redirectPath());
         }
 

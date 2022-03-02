@@ -17,7 +17,7 @@ class User extends Authenticatable
 
     const STATUSES = [
         1 => 'Active',
-        2 => 'Inactive'
+        99 => 'Inactive'
     ];
 
     /**

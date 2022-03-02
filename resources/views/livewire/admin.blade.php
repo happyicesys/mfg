@@ -198,9 +198,9 @@
                     <x-th-data model="email" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                         Email
                     </x-th-data>
-                    <th class="text-center">
+                    <x-th-data model="is_active" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                         Status
-                    </th>
+                    </x-th-data>
                     <x-th-data model="created_at" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                         Created At
                     </x-th-data>
@@ -226,7 +226,7 @@
                         {{ $admin->email }}
                     </td>
                     <td class="text-center">
-                        Active
+                        {{ $admin->is_active ? 'Active' : 'Inactive' }}
                     </td>
                     <td class="text-center">
                         {{ $admin->created_at }}
@@ -284,12 +284,23 @@
                     </div>
                 </x-slot>
                 <x-slot name="footer">
-                    <button type="submit" class="btn btn-success d-none d-sm-block" wire:click.prevent="save">
-                        Submit
-                    </button>
-                    <button type="submit" class="btn btn-success btn-block d-block d-sm-none" wire:click.prevent="save">
-                        Submit
-                    </button>
+                    <div class="btn-group">
+                        @if($form->is_active)
+                            <button type="submit" class="btn btn-danger btn-xs-block" wire:click.prevent="toggleIsActiveUser">
+                                Deactivate
+                            </button>
+                        @else
+                            <button type="submit" class="btn btn-success btn-xs-block" wire:click.prevent="toggleIsActiveUser">
+                                Activate
+                            </button>
+                        @endif
+                        <button type="submit" class="btn btn-success d-none d-sm-block" wire:click.prevent="save">
+                            Save
+                        </button>
+                        <button type="submit" class="btn btn-success btn-block d-block d-sm-none" wire:click.prevent="save">
+                            Save
+                        </button>
+                    </div>
                 </x-slot>
             </x-modal>
         {{-- </form> --}}

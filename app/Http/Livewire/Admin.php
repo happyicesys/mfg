@@ -120,4 +120,13 @@ class Admin extends Component
     {
         $this->resetPage();
     }
+
+    public function toggleIsActiveUser()
+    {
+        $this->form->is_active = !$this->form->is_active;
+        $this->form->save();
+
+        $this->emit('updated');
+        session()->flash('success', 'Your entry has been updated');
+    }
 }

@@ -125,7 +125,10 @@
         <li class="{{ $name == 'bom-receiving' ? 'active' : '' }}">
           <a href="{{ route('bom-receiving') }}"><i class="fas fa-truck-loading"></i>Receiving</a>
         </li>
-        {{-- <li class="{{ $name == 'bom-movement' ? 'active' : '' }}">
+        {{-- <li class="{{ $name == 'bom-outgoing' ? 'active' : '' }}">
+          <a href="{{ route('bom-outgoing') }}"><i class="fas fa-box-open"></i>Outgoing</a>
+        </li>
+        <li class="{{ $name == 'bom-movement' ? 'active' : '' }}">
           <a href="{{ route('bom-movement') }}"><i class="fas fa-truck-loading"></i>Movement</a>
         </li> --}}
         <li class="{{ $name == 'bom-supplier' ? 'active' : '' }}">
