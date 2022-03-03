@@ -14,7 +14,7 @@
                 <label for="name">
                     Quick Search
                 </label>
-                <input type="text" wire:model="filters.search" class="form-control mx-2" placeholder="Quick Search" @if($showFilters) disabled @endif>
+                <input type="text" wire:model="filters.search" class="form-control mx-2" placeholder="Quick Search" @if($showFilters) disabled @endif autocomplete="off">
                 <button wire:click="$toggle('showFilters')" class="btn btn-outline-secondary">
                     Advance Search
                     @if($showFilters)
@@ -79,6 +79,12 @@
                         Search
                     </button>
                 </div> --}}
+                <div class="mr-auto pl-1">
+                    <button class="btn btn-success" wire:click="createAdmin()" data-toggle="modal" data-target="#edit-admin">
+                        <i class="fas fa-plus-circle"></i>
+                        Create
+                    </button>
+                </div>
 
                 <div class="ml-auto">
                     <div class="form-inline">
@@ -142,19 +148,19 @@
                                 <label>
                                     Name
                                 </label>
-                                <input wire:model="filters.name" type="text" class="form-control" placeholder="Name">
+                                <input wire:model="filters.name" type="text" class="form-control" placeholder="Name" autocomplete="off">
                             </div>
                             <div class="form-group">
                                 <label>
                                     Phone Number
                                 </label>
-                                <input wire:model="filters.phone_number" type="text" class="form-control" placeholder="Phone Number">
+                                <input wire:model="filters.phone_number" type="text" class="form-control" placeholder="Phone Number" autocomplete="off">
                             </div>
                             <div class="form-group">
                                 <label>
                                     Email
                                 </label>
-                                <input wire:model="filters.email" type="text" class="form-control" placeholder="Email">
+                                <input wire:model="filters.email" type="text" class="form-control" placeholder="Email" autocomplete="off">
                             </div>
                         {{-- </div> --}}
                         <div class="form-group">
@@ -201,6 +207,9 @@
                     <x-th-data model="is_active" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                         Status
                     </x-th-data>
+                    <th class="text-center text-dark">
+                        Role
+                    </th>
                     <x-th-data model="created_at" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                         Created At
                     </x-th-data>
@@ -229,6 +238,9 @@
                         {{ $admin->is_active ? 'Active' : 'Inactive' }}
                     </td>
                     <td class="text-center">
+                        {{ $admin->roles()->exists() ? $admin->roles()->first()->name : '' }}
+                    </td>
+                    <td class="text-center">
                         {{ $admin->created_at }}
                     </td>
                     <td class="text-center">
@@ -251,7 +263,12 @@
         {{-- <form wire:submit.prevent="save"> --}}
             <x-modal id="edit-admin">
                 <x-slot name="title">
-                    Edit User
+                    @if($form->id)
+                    Edit
+                    @else
+                    Create
+                    @endif
+                    User
                 </x-slot>
                 <x-slot name="content">
                     <x-input type="text" model="form.name">
@@ -266,8 +283,8 @@
                     <x-input type="text" model="form.email">
                         Email
                     </x-input>
-                    <x-input type="password" model="form.password">
-                        Password (Overwrite, Leave Blank to use the same)
+                    <x-input type="password" model="form.password" autocomplete="off">
+                        Password @if($form->id) (Overwrite, Leave Blank to use the same) @endif
                     </x-input>
                     <div class="form-group">
                         <label>
@@ -285,19 +302,43 @@
                 </x-slot>
                 <x-slot name="footer">
                     <div class="btn-group">
-                        @if($form->is_active)
-                            <button type="submit" class="btn btn-danger btn-xs-block" wire:click.prevent="toggleIsActiveUser">
-                                Deactivate
+                        @php
+                            $isDisabled = false;
+                            if(
+                                $form->inventoryMovementItemCreatedBy()->exists() or
+                                $form->inventoryMovementItemUpdatedBy()->exists() or
+                                $form->vmmfgTaskDoneBy()->exists() or
+                                $form->vmmfgTaskCheckedBy()->exists() or
+                                $form->vmmfgTaskUndoDoneBy()->exists() or
+                                $form->vmmfgTaskCancelledBy()->exists()
+                            ) {
+                                $isDisabled = true;
+                            }
+                        @endphp
+                        @if($form->id)
+                            <button type="submit" class="btn btn-danger btn-xs-block" onclick="confirm('Are you sure you want to delete this user?') || event.stopImmediatePropagation()" wire:click.prevent="deleteUser" {{$isDisabled ? 'disabled' : ''}}>
+                                <i class="fas fa-trash"></i>
+                                Delete
+                                @if($isDisabled)
+                                    (Record(s) found under this user)
+                                @endif
                             </button>
-                        @else
-                            <button type="submit" class="btn btn-success btn-xs-block" wire:click.prevent="toggleIsActiveUser">
-                                Activate
-                            </button>
+
+                            @if($form->is_active)
+                                <button type="submit" class="btn btn-danger btn-xs-block" wire:click.prevent="toggleIsActiveUser">
+                                    <i class="fas fa-ban"></i>
+                                    Deactivate
+                                </button>
+                            @else
+                                <button type="submit" class="btn btn-success btn-xs-block" wire:click.prevent="toggleIsActiveUser">
+                                    <i class="fas fa-universal-access"></i>
+                                    Activate
+                                </button>
+                            @endif
                         @endif
-                        <button type="submit" class="btn btn-success d-none d-sm-block" wire:click.prevent="save">
-                            Save
-                        </button>
-                        <button type="submit" class="btn btn-success btn-block d-block d-sm-none" wire:click.prevent="save">
+
+                        <button type="submit" class="btn btn-success btn-xs-block" wire:click.prevent="save">
+                            <i class="fas fa-check-circle"></i>
                             Save
                         </button>
                     </div>

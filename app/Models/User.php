@@ -80,4 +80,34 @@ class User extends Authenticatable
         return $this->hasMany(Profile::class);
     }
 
+    public function inventoryMovementItemCreatedBy()
+    {
+        return $this->hasMany(InventoryMovementItem::class, 'created_by');
+    }
+
+    public function inventoryMovementItemUpdatedBy()
+    {
+        return $this->hasMany(InventoryMovementItem::class, 'updated_by');
+    }
+
+    public function vmmfgTaskDoneBy()
+    {
+        return $this->hasMany(VmmfgTask::class, 'done_by');
+    }
+
+    public function vmmfgTaskCheckedBy()
+    {
+        return $this->hasMany(VmmfgTask::class, 'checked_by');
+    }
+
+    public function vmmfgTaskUndoDoneBy()
+    {
+        return $this->hasMany(VmmfgTask::class, 'undo_done_by');
+    }
+
+    public function vmmfgTaskCancelledBy()
+    {
+        return $this->hasMany(VmmfgTask::class, 'cancelled_by');
+    }
+
 }

@@ -83,6 +83,12 @@ class Admin extends Component
         $this->sortKey = $key;
     }
 
+    public function createAdmin()
+    {
+        $this->form = new User();
+        $this->role_id = '';
+    }
+
     public function edit(User $admin)
     {
         $this->form = $admin;
@@ -125,6 +131,14 @@ class Admin extends Component
     {
         $this->form->is_active = !$this->form->is_active;
         $this->form->save();
+
+        $this->emit('updated');
+        session()->flash('success', 'Your entry has been updated');
+    }
+
+    public function deleteUser()
+    {
+        $this->form->delete();
 
         $this->emit('updated');
         session()->flash('success', 'Your entry has been updated');
