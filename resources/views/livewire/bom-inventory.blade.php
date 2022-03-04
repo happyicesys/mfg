@@ -42,7 +42,7 @@
                             </div>
                             <div class="form-group col-md-4 col-xs-12">
                                 <label>
-                                    Is Consumable?
+                                    Is Consumable(C) or Cable(CB)?
                                 </label>
                                 <select name="is_consumable" wire:model="filters.is_consumable" class="select form-control">
                                     <option value="">All</option>
@@ -117,10 +117,10 @@
                             Planned Qty
                         </x-th-data>
                         <th class="text-center text-dark">
-                            Unit Price
+                            Supplier
                         </th>
                         <th class="text-center text-dark">
-                            Supplier
+                            Unit Price
                         </th>
                         <th class="text-center text-dark">
                             Base Price @if($profile->country) ({{$profile->country->currency_name}}) @endif
@@ -187,11 +187,11 @@
                             @php
                                 $supplierQuotePrice = $bomItem->supplierQuotePrices()->latest()->first();
                             @endphp
-                            <td class="text-right">
-                                {{ $supplierQuotePrice ? $supplierQuotePrice->unit_price : '' }} @if(isset($supplierQuotePrice->country)) ({{ $supplierQuotePrice->country->currency_name }}) @endif
-                            </td>
                             <td class="text-left">
                                 {{ $supplierQuotePrice ? $supplierQuotePrice->supplier->company_name : '' }}
+                            </td>
+                            <td class="text-right">
+                                {{ $supplierQuotePrice ? $supplierQuotePrice->unit_price : '' }} @if(isset($supplierQuotePrice->country)) ({{ $supplierQuotePrice->country->currency_name }}) @endif
                             </td>
                             <td class="text-right">
                                 {{ $supplierQuotePrice ? $supplierQuotePrice->base_price : null }}

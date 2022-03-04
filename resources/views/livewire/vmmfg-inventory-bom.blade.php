@@ -239,10 +239,10 @@
                                 Qty
                             </th>
                             <th class="col-md-1 bg-secondary text-white text-center">
-                                Amount ({{$profile->country->currency_name}})
+                                Amt ({{$profile->country->currency_name}})
                             </th>
                             <th class="col-md-1 bg-secondary text-white text-center">
-                                Inventory?
+                                Inv?
                             </th>
                             <th class="col-md-2 bg-secondary text-white text-center">
                                 Action
@@ -371,7 +371,7 @@
                                         <th class="col-md-1 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-dark text-right">
                                             {{$amount}}
                                         </th>
-                                        <th class="col-md-1 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-dark text-right">
+                                        <th class="col-md-1 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-dark text-center">
                                             @if($bomContent->bomItem->is_part)
                                                 @if($bomContent->bomItem->is_inventory)
                                                     <i class="far fa-check-circle text-success"></i>

@@ -105,9 +105,9 @@ class BomInventory extends Component
             $isConsumable = $this->filters['is_consumable'];
             $bomItems = $bomItems->whereHas('bomItemType', function($query) use ($isConsumable) {
                 if($isConsumable) {
-                    $query->search('name', 'C');
+                    $query->whereIn('name', ['C', 'CB']);
                 }else {
-                    $query->whereNotIn('name', ['C']);
+                    $query->whereNotIn('name', ['C', 'CB']);
                 }
             });
         }

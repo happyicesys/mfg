@@ -3,6 +3,7 @@ require('./bootstrap');
 //select2
 window.select2 = require('select2');
 window.selectpicker = require('bootstrap-select');
+window.doubleScroll = require('jqdoublescroll');
 
 // videojs
 require('video.js');
@@ -57,6 +58,7 @@ $(document).ready(function () {
             $(".alert").slideUp(500);
         });
     });
+    $('.table-responsive').doubleScroll();
 });
 
 

@@ -110,8 +110,8 @@
                         <x-th-data model="total_amount" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Total Amount
                         </x-th-data>
-                        <x-th-data model="country_id" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
-                            Currency
+                        <x-th-data model="supplier_id" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
+                            Supplier
                         </x-th-data>
                         <x-th-data model="created_at" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Created At
@@ -144,7 +144,7 @@
                             {{ number_format($inventoryMovement->total_amount, '2', '.', ',') }}
                         </td>
                         <td class="text-center">
-                            {{ $inventoryMovement->country ? $inventoryMovement->country->currency_name : null }}
+                            {{ $inventoryMovement->supplier ? $inventoryMovement->supplier->company_name : null }} @if($inventoryMovement->supplier) ({{$inventoryMovement->supplier->country->currency_name}}) @endif
                         </td>
                         <td class="text-center">
                             <b>{{ $inventoryMovement->createdBy ? $inventoryMovement->createdBy->name : null }}</b> <br>
@@ -320,12 +320,26 @@
                                         break;
                                 }
                             @endphp
-                            <span class="{{$statusClass}}">{{ $statusStr }}</span>  Edit {{\App\Models\InventoryMovement::ACTIONS[$inventoryMovementForm->action]}} - {{ $inventoryMovementForm->batch }} @if($inventoryMovementForm->country) ({{ $inventoryMovementForm->country->currency_name }}) @endif
+                            <span class="{{$statusClass}}">{{ $statusStr }}</span>  Edit {{\App\Models\InventoryMovement::ACTIONS[$inventoryMovementForm->action]}} - {{ $inventoryMovementForm->batch }} @if($inventoryMovementForm->country) ({{$supplierForm->company_name}}) ({{ $inventoryMovementForm->country->currency_name }}) @endif
                         @endif
                     </x-slot>
                     <x-slot name="content">
                         @if(!$inventoryMovementForm->id)
                             <div class="form-group">
+                                <label for="supplier_id">
+                                    Supplier
+                                </label>
+                                <select name="supplier_id" wire:model="inventoryMovementForm.supplier_id" class="select form-control">
+                                    <option value="">Select..</option>
+                                    @foreach($suppliers as $supplier)
+                                        <option value="{{ $supplier->id }}">
+                                            {{ $supplier->company_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @if($errors->has("inventoryMovementForm.supplier_id"))<span style="color:red;"><small>{{ $errors->first("inventoryMovementForm.supplier_id") }}</small></span>@endif
+                            </div>
+                            {{-- <div class="form-group">
                                 <label for="country_id">
                                     Currency
                                 </label>
@@ -338,7 +352,7 @@
                                     @endforeach
                                 </select>
                                 @if($errors->has("inventoryMovementForm.country_id"))<span style="color:red;"><small>{{ $errors->first("inventoryMovementForm.country_id") }}</small></span>@endif
-                            </div>
+                            </div> --}}
                         @endif
                         @if($inventoryMovementForm->action == array_search('Outgoing', \App\Models\InventoryMovement::ACTIONS))
                             <div class="form-group">
@@ -430,19 +444,20 @@
                                                 </option>
                                             @endforeach
                                         </select>
+                                        {{-- {{$selectedBomItem->supplierQuotePrices()->latest()->with('supplier')->first()}} --}}
                                     </div>
-                                    @if($inventoryMovementItemForm->bom_item_id and isset($supplier) and $supplier->id)
+                                    @if($inventoryMovementItemForm->bom_item_id and isset($supplierForm) and $supplierForm->id)
                                         <hr>
                                         <div class="form-row">
                                             <div class="form-group col-md-6 col-xs-12">
                                                 <label for="supplier_unit_price">
-                                                    Quoted Unit Price <br>({{$supplier->company_name}})
+                                                    Quoted Unit Price <br>({{$supplierForm->company_name}})
                                                 </label>
                                                 <input type="text" wire:model="inventoryMovementItemForm.supplier_unit_price" wire:change="calculateAmount()" class="form-control">
                                             </div>
                                             <div class="form-group col-md-6 col-xs-12">
                                                 <label for="supplier_unit_price">
-                                                    Latest Currency Rate <br> ({{$supplier->transactedCurrency->currency_name}})
+                                                    Latest Currency Rate <br> ({{$supplierForm->transactedCurrency->currency_name}})
                                                 </label>
                                                 <input type="text" wire:model="inventoryMovementItemForm.rate" class="form-control">
                                             </div>
@@ -450,14 +465,14 @@
                                         <hr>
                                     @endif
                                         <div class="form-row">
-                                            <div class="form-group @if($this->inventoryMovementItemForm->bom_item_id and isset($supplier) and $supplier->id) col-md-4 col-xs-12 @else col-md-12 col-xs-12 @endif ">
+                                            <div class="form-group @if($this->inventoryMovementItemForm->bom_item_id and isset($supplierForm) and $supplierForm->id) col-md-4 col-xs-12 @else col-md-12 col-xs-12 @endif ">
                                                 <label>
                                                     Qty
                                                 </label>
                                                 <label for="*" class="text-danger">*</label>
                                                 <input wire:model="inventoryMovementItemForm.qty" wire:change="calculateAmount()" type="text" class="form-control" placeholder="Qty">
                                             </div>
-                                            @if($this->inventoryMovementItemForm->bom_item_id and isset($supplier) and $supplier->id)
+                                            @if($this->inventoryMovementItemForm->bom_item_id and isset($supplierForm) and $supplierForm->id)
                                             <div class="form-group col-md-4 col-xs-12">
                                                 <label>
                                                     Unit Price

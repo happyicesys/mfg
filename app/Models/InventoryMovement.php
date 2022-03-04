@@ -35,6 +35,7 @@ class InventoryMovement extends Model
         'updated_by',
         'country_id',
         'order_date',
+        'supplier_id',
     ];
 
     // getter
@@ -68,6 +69,11 @@ class InventoryMovement extends Model
     public function inventoryMovementItems()
     {
         return $this->hasMany(InventoryMovementItem::class);
+    }
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
     }
 
     public function createdBy()

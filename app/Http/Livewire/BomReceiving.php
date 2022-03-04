@@ -47,12 +47,14 @@ class BomReceiving extends Component
     public $attachments;
     public $bomItems;
     public $bomItemTypes;
+    public $suppliers;
     public $file;
     public InventoryMovement $inventoryMovementForm;
     public InventoryMovementItem $inventoryMovementItemForm;
     public InventoryMovementItem $editInventoryMovementItemForm;
     public InventoryMovementItemQuantity $inventoryMovementItemQuantityForm;
     public InventoryMovementItemQuantity $inventoryMovementItemQuantity;
+    public Supplier $supplierForm;
 
     protected $listeners = [
         'refresh' => '$refresh',
@@ -70,6 +72,7 @@ class BomReceiving extends Component
             'inventoryMovementForm.country_id' => 'sometimes',
             'inventoryMovementForm.bom_id' => 'sometimes',
             'inventoryMovementForm.order_date' => 'sometimes',
+            'inventoryMovementForm.supplier_id' => 'sometimes',
             'inventoryMovementItemForm.bom_item_id' => 'sometimes',
             'inventoryMovementItemForm.unit_price' => 'sometimes|numeric',
             'inventoryMovementItemForm.qty' => 'sometimes|numeric',
@@ -100,6 +103,7 @@ class BomReceiving extends Component
         $this->boms = Bom::latest()->get();
         $this->bomItems = BomItem::where('is_part', 1)->where('is_inventory', 1)->orderBy('code')->get();
         $this->bomItemTypes = BomItemType::orderBy('name')->get();
+        $this->suppliers = Supplier::orderBy('company_name')->get();
     }
 
     public function render()
@@ -156,27 +160,46 @@ class BomReceiving extends Component
                                     ->when($this->inventoryMovementItemFormFilters['name'], fn($query, $input) => $query->searchLike('name', $input))
                                     ->when($this->inventoryMovementItemFormFilters['bom_item_type_id'], fn($query, $input) => $query->whereHas('bomItemType', function($query) use ($input) { $query->search('id', $input); }));
 
-            // if($bomItemTypeId = $this->inventoryMovementItemFormFilters['bom_item_type_id']) {
-            //     $bomItems = $bomItems->whereHas('bomItemType', function($query) use ($bomItemTypeId) {
-            //         $query->search('id', $bomItemTypeId);
-            //     });
-            // }
+            if($supplierId = $this->inventoryMovementForm->supplier_id) {
+                $bomItems = $bomItems->where(function($query) use ($supplierId) {
+                    $query->whereHas('supplierQuotePrices', function($query) use ($supplierId) {
+                        $query->where('supplier_id', $supplierId);
+                    });
+                });
+            }
+
 
             $this->bomItems = $bomItems->where('is_part', 1)->where('is_inventory', 1)->orderBy('code')->get();
         }
     }
 
-    public function updatedInventoryMovementFormCountryId($value)
+    // public function updatedInventoryMovementFormCountryId($value)
+    // {
+    //     $this->inventoryMovementForm = new InventoryMovement();
+    //     $this->inventoryMovementItemForm = new InventoryMovementItem();
+    //     $this->inventoryMovementItems = [];
+    //     $this->inventoryMovementForm->country_id = $value;
+    //     $this->bomItems = BomItem::where(function($query) use ($value) {
+    //         $query->doesntHave('supplierQuotePrices')->orWhereHas('supplierQuotePrices', function($query) use ($value) {
+    //             $query->where('country_id', $value);
+    //         });
+    //     })->where('is_part', 1)->where('is_inventory', 1)->orderBy('code')->get();
+    // }
+
+    public function updatedInventoryMovementFormSupplierId($value)
     {
         $this->inventoryMovementForm = new InventoryMovement();
+        $this->inventoryMovementForm->order_date = Carbon::today()->toDateString();
         $this->inventoryMovementItemForm = new InventoryMovementItem();
         $this->inventoryMovementItems = [];
-        $this->inventoryMovementForm->country_id = $value;
+        $this->inventoryMovementForm->supplier_id = $value;
+        $this->supplierForm = Supplier::findOrFail($value);
         $this->bomItems = BomItem::where(function($query) use ($value) {
-            $query->doesntHave('supplierQuotePrices')->orWhereHas('supplierQuotePrices', function($query) use ($value) {
-                $query->where('country_id', $value);
+            $query->whereHas('supplierQuotePrices', function($query) use ($value) {
+                $query->where('supplier_id', $value);
             });
-        })->where('is_part', 1)->where('is_inventory', 1)->orderBy('code')->get();
+        })->where('is_part', 1)->orderBy('code')->get();
+        $this->inventoryMovementForm->country_id = $this->supplierForm->country->id;
     }
 
     public function updatedInventoryMovementItemFormSupplierUnitPrice($value)
@@ -191,23 +214,22 @@ class BomReceiving extends Component
             $this->inventoryMovementItemForm->amount = 0.00;
 
             $this->selectedBomItem = BomItem::findOrFail($value);
-            $this->supplier = $this->selectedBomItem->supplierQuotePrices()->latest()->first() ? $this->selectedBomItem->supplierQuotePrices()->latest()->first()->supplier : new Supplier();
 
-            $this->inventoryMovementItemForm->supplier_quote_price_id = $this->supplier->id ? $this->selectedBomItem->supplierQuotePrices()->latest()->first()->id : '';
+            $this->inventoryMovementItemForm->supplier_quote_price_id = $this->selectedBomItem->supplierQuotePrices()->latest()->first()->id;
 
-            $this->supplierQuotedPrice = $this->supplier->id ?
+            $this->supplierQuotedPrice = $this->supplierForm->id ?
                                             $this->selectedBomItem->supplierQuotePrices()->latest()->first()->unit_price :
                                             null;
-            $this->supplierQuotedPriceCountry = $this->supplier->id ?
+            $this->supplierQuotedPriceCountry = $this->supplierForm->id ?
                                             $this->selectedBomItem->supplierQuotePrices()->latest()->first()->country :
                                             null;
-            $this->supplierQuotedPriceStr = $this->supplier->id ?
+            $this->supplierQuotedPriceStr = $this->supplierForm->id ?
                                             $this->supplierQuotedPrice.' ('.$this->supplierQuotedPriceCountry->currency_name.')' :
                                             null;
                                             // dd($this->supplierQuotedPriceStr);
             $this->inventoryMovementItemForm->unit_price = $this->supplierQuotedPrice;
             $this->inventoryMovementItemForm->supplier_unit_price = $this->supplierQuotedPrice;
-            $this->inventoryMovementItemForm->rate = $this->supplier->transactedCurrency ? $this->supplier->transactedCurrency->currencyRates()->latest()->first()->rate : null;
+            $this->inventoryMovementItemForm->rate = $this->supplierForm->transactedCurrency ? $this->supplierForm->transactedCurrency->currencyRates()->latest()->first()->rate : null;
         }
     }
 
@@ -286,10 +308,11 @@ class BomReceiving extends Component
         $this->inventoryMovementItemForm = new InventoryMovementItem();
         $this->reloadInventoryItems($inventoryMovement);
         $this->bomItems = BomItem::where(function($query) use ($inventoryMovement) {
-            $query->doesntHave('supplierQuotePrices')->orWhereHas('supplierQuotePrices', function($query) use ($inventoryMovement) {
-                $query->where('country_id', $inventoryMovement->country_id);
+            $query->whereHas('supplierQuotePrices', function($query) use ($inventoryMovement) {
+                $query->where('supplier_id', $inventoryMovement->supplier_id);
             });
-        })->where('is_part', 1)->where('is_inventory', 1)->orderBy('code')->get();
+        })->where('is_part', 1)->orderBy('code')->get();
+        $this->supplierForm = $inventoryMovement->supplier;
     }
 
     public function reloadInventoryItems($inventoryMovement)
@@ -347,6 +370,7 @@ class BomReceiving extends Component
                 'total_amount' => $this->inventoryMovementForm->total_amount,
                 'created_by' => auth()->user()->id,
                 'order_date' => $this->inventoryMovementForm->order_date,
+                'supplier_id' => $this->inventoryMovementForm->supplier_id,
             ]);
         }else {
             // if($status) {
@@ -360,6 +384,7 @@ class BomReceiving extends Component
                     'total_amount' => $this->inventoryMovementForm->total_amount,
                     'updated_by' => auth()->user()->id,
                     'order_date' => $this->inventoryMovementForm->order_date,
+                    'supplier_id' => $this->inventoryMovementForm->supplier_id,
                 ]);
 
             $inventoryMovement = $this->inventoryMovementForm;
@@ -407,7 +432,7 @@ class BomReceiving extends Component
                             'bom_item_id' => $bomItem->id,
                             'country_id' => $currencyRate->country_id,
                             'currency_rate_id' => $currencyRate->id,
-                            'supplier_id' => $this->supplier->id,
+                            'supplier_id' => $this->supplierForm->id,
                             'unit_price' => $inventoryMovementItem['supplier_unit_price'],
                             'base_price' => $inventoryMovementItem['supplier_unit_price']/ ($currencyRate->rate ? $currencyRate->rate : 1),
                         ]);
@@ -427,6 +452,7 @@ class BomReceiving extends Component
                             'remarks' => $inventoryMovementItem['remarks'],
                         ]);
                     }else {
+                        // dd($inventoryMovementItem);
                         $createdItem = InventoryMovementItem::create([
                             'bom_item_id' => $bomItem->id,
                             'inventory_movement_id' => $inventoryMovement->id,
@@ -706,8 +732,8 @@ class BomReceiving extends Component
         }
 
         if($this->inventoryMovementItemForm->rate) {
-            if($this->supplier->transactedCurrency->currencyRates()->latest()->first()->rate != $this->inventoryMovementItemForm->rate) {
-                $data['country_id'] = $this->supplier->transactedCurrency->id;
+            if($this->supplierForm->transactedCurrency->currencyRates()->latest()->first()->rate != $this->inventoryMovementItemForm->rate) {
+                $data['country_id'] = $this->supplierForm->transactedCurrency->id;
                 $data['rate'] = $this->inventoryMovementItemForm->rate;
             }
         }
