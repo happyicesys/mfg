@@ -241,6 +241,9 @@
                             <th class="col-md-1 bg-secondary text-white text-center">
                                 Amount ({{$profile->country->currency_name}})
                             </th>
+                            <th class="col-md-1 bg-secondary text-white text-center">
+                                Inventory?
+                            </th>
                             <th class="col-md-2 bg-secondary text-white text-center">
                                 Action
                             </th>
@@ -268,7 +271,7 @@
                                 <th class="col-md-2 bg-info text-dark">
                                     {{$bomHeader->bomItem ? $bomHeader->bomItem->code : null}}
                                 </th>
-                                <th class="col-md-5 bg-info text-dark">
+                                <th class="col-md-6 bg-info text-dark">
                                     {{$bomHeader->bomItem ? $bomHeader->bomItem->name : null}}
                                 </th>
                                 <th class="col-md-1 bg-info text-dark text-center">
@@ -352,7 +355,6 @@
                                             @else
                                                 {{$bomContent->qty}}
                                             @endif
-
                                         </th>
                                         @php
                                             $unitPrice = 0;
@@ -368,6 +370,15 @@
                                         @endphp
                                         <th class="col-md-1 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-dark text-right">
                                             {{$amount}}
+                                        </th>
+                                        <th class="col-md-1 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-dark text-right">
+                                            @if($bomContent->bomItem->is_part)
+                                                @if($bomContent->bomItem->is_inventory)
+                                                    <i class="far fa-check-circle text-success"></i>
+                                                @else
+                                                    <i class="far fa-times-circle text-danger"></i>
+                                                @endif
+                                            @endif
                                         </th>
                                         <td class="col-md-2 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-center">
                                             <div class="btn-group">

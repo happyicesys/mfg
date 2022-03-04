@@ -33,6 +33,11 @@ class BomOutgoing extends Component
         'status' => '',
         'created_at' => '',
     ];
+    public $inventoryMovementItemFormFilters = [
+        'code' => '',
+        'name' => '',
+        'bom_item_type_id' => '',
+    ];
     public Bom $bom;
     public BomItem $selectedBomItem;
     public InventoryMovement $inventoryMovementForm;
@@ -89,6 +94,7 @@ class BomOutgoing extends Component
         $this->inventoryMovementItemForm = new InventoryMovementItem();
         $this->countries = Country::orderBy('currency_name')->get();
         $this->boms = Bom::latest()->get();
+        $this->bomItems = BomItem::where('is_part', 1)->where('is_inventory', 1)->orderBy('code')->get();
     }
 
     public function render()
@@ -136,5 +142,12 @@ class BomOutgoing extends Component
     {
         $this->inventoryMovementForm = $inventoryMovement;
         $this->reset('file');
+    }
+
+    public function createInventoryMovement()
+    {
+        $this->inventoryMovementForm = new InventoryMovement();
+        $this->inventoryMovementForm->order_date = Carbon::today()->toDateString();
+        $this->reset('inventoryMovementItemFormFilters');
     }
 }

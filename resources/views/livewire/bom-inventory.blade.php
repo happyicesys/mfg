@@ -50,6 +50,16 @@
                                     <option value="0">No</option>
                                 </select>
                             </div>
+                            <div class="form-group col-md-4 col-xs-12">
+                                <label>
+                                    Is Inventory?
+                                </label>
+                                <select name="is_inventory" wire:model="filters.is_inventory" class="select form-control">
+                                    <option value="">All</option>
+                                    <option value="1">Yes</option>
+                                    <option value="0">No</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="form-row d-flex justify-content-end">
                             <div class="btn-group">
@@ -108,6 +118,9 @@
                         </x-th-data>
                         <th class="text-center text-dark">
                             Unit Price
+                        </th>
+                        <th class="text-center text-dark">
+                            Supplier
                         </th>
                         <th class="text-center text-dark">
                             Base Price @if($profile->country) ({{$profile->country->currency_name}}) @endif
@@ -177,12 +190,15 @@
                             <td class="text-right">
                                 {{ $supplierQuotePrice ? $supplierQuotePrice->unit_price : '' }} @if(isset($supplierQuotePrice->country)) ({{ $supplierQuotePrice->country->currency_name }}) @endif
                             </td>
+                            <td class="text-left">
+                                {{ $supplierQuotePrice ? $supplierQuotePrice->supplier->company_name : '' }}
+                            </td>
                             <td class="text-right">
                                 {{ $supplierQuotePrice ? $supplierQuotePrice->base_price : null }}
                             </td>
                             <td class="text-center">
                                 <div class="btn-group">
-                                    <button type="button" wire:click="edit({{$bomItem->id}})" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#edit-bom-item">
+                                    <button type="button" wire:click="edit({{$bomItem}})" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#edit-bom-item">
                                         <i class="fas fa-edit"></i>
                                     </button>
                                 </div>
@@ -351,14 +367,19 @@
                                 @endforelse
                             </table>
                         </div>
-
                     </x-slot>
                     <x-slot name="footer">
-                        <button type="submit" class="btn btn-success d-none d-sm-block" wire:click.prevent="save">
-                            Submit
+
+                        <button type="submit" class="btn btn-danger btn-xs-block" onclick="return confirm('Are you sure you want to delete the part?') || event.stopImmediatePropagation()" wire:click.prevent="delete" {{$bomItemForm->id && $bomItemForm->bomContents()->exists() ? 'disabled' : ''}}>
+                            <i class="fas fa-trash"></i>
+                            Delete
+                            @if($bomItemForm->id && $bomItemForm->bomContents()->exists())
+                                (This Item is Used in BOM)
+                            @endif
                         </button>
-                        <button type="submit" class="btn btn-success btn-block d-block d-sm-none" wire:click.prevent="save">
-                            Submit
+                        <button type="submit" class="btn btn-success btn-xs-block" wire:click.prevent="save">
+                            <i class="fas fa-save"></i>
+                            Save
                         </button>
                     </x-slot>
                 </x-modal>
@@ -402,12 +423,11 @@
                     @endif
                 </x-slot>
                 <x-slot name="footer">
-                    <button type="submit" class="btn btn-success d-none d-sm-block" wire:click.prevent="saveSupplierQuotePrice">
-                        Submit
-                    </button>
-                    <button type="submit" class="btn btn-success btn-block d-block d-sm-none" wire:click.prevent="saveSupplierQuotePrice">
-                        Submit
-                    </button>
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-success btn-xs-block" wire:click.prevent="saveSupplierQuotePrice">
+                            Submit
+                        </button>
+                    </div>
                 </x-slot>
             </x-modal>
         </div>

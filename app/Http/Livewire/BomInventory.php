@@ -31,15 +31,15 @@ class BomInventory extends Component
         'code' => '',
         'name' => '',
         'bom_item_type_id' => '',
-        'is_inventory' => '',
+        'is_inventory' => '1',
         'is_consumable' => '0',
     ];
-    public $bomItemForm = [
-        'code' => '',
-        'name' => '',
-        'bom_item_type_id' => '',
-        'is_inventory' => '',
-    ];
+    // public $bomItemForm = [
+    //     'code' => '',
+    //     'name' => '',
+    //     'bom_item_type_id' => '',
+    //     'is_inventory' => '',
+    // ];
     public $supplierQuotePriceForm = [
         'supplier_id' => '',
         'unit_price' => '',
@@ -52,6 +52,8 @@ class BomInventory extends Component
     public $supplierQuotePrices = [];
     public $attachments;
     public $file;
+
+    public BomItem $bomItemForm;
 
     protected $listeners = [
         'refresh' => '$refresh',
@@ -71,6 +73,7 @@ class BomInventory extends Component
 
     public function mount()
     {
+        $this->bomItemForm = new BomItem();
         $this->bomItemTypes = BomItemType::orderBy('name')->get();
         $this->suppliers = Supplier::orderBy('company_name')->get();
     }
@@ -85,8 +88,7 @@ class BomInventory extends Component
             'supplierQuotePrices',
             'supplierQuotePrices.country',
             'supplierQuotePrices.supplier'
-        ])
-        ->where('is_inventory', true);
+        ]);
 
         // advance search
         $bomItems = $bomItems
@@ -110,7 +112,12 @@ class BomInventory extends Component
             });
         }
 
-        $bomItems = $bomItems->where('is_inventory', 1);
+        if($this->filters['is_inventory'] != '') {
+            $isInventory = $this->filters['is_inventory'];
+            $bomItems = $bomItems->where('is_inventory', $isInventory);
+        }
+
+        $bomItems = $bomItems->where('is_part', 1);
 
         if($sortKey = $this->sortKey) {
             $bomItems = $bomItems->orderBy($sortKey, $this->sortAscending ? 'asc' : 'desc');
@@ -159,6 +166,19 @@ class BomInventory extends Component
                 'full_url' => $fullUrl,
             ]);
         }
+
+        $this->emit('updated');
+        session()->flash('success', 'Your entry has been updated');
+    }
+
+    public function delete()
+    {
+        if($this->bomItemForm->attachments()->exists()) {
+            foreach($this->bomItemForm->attachments as $attachment) {
+                $this->deleteAttachment($attachment);
+            }
+        }
+        $this->bomItemForm->delete();
 
         $this->emit('updated');
         session()->flash('success', 'Your entry has been updated');

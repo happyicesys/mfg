@@ -609,6 +609,7 @@ class BomReceiving extends Component
     public function createInventoryMovement()
     {
         $this->inventoryMovementForm = new InventoryMovement();
+        $this->inventoryMovementForm->order_date = Carbon::today()->toDateString();
         $this->reset('inventoryMovementItemFormFilters');
     }
 
