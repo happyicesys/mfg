@@ -230,6 +230,7 @@ class BomReceiving extends Component
             $this->inventoryMovementItemForm->unit_price = $this->supplierQuotedPrice;
             $this->inventoryMovementItemForm->supplier_unit_price = $this->supplierQuotedPrice;
             $this->inventoryMovementItemForm->rate = $this->supplierForm->transactedCurrency ? $this->supplierForm->transactedCurrency->currencyRates()->latest()->first()->rate : null;
+            $this->calculateAmount();
         }
     }
 
