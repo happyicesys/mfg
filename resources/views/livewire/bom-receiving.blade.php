@@ -771,10 +771,16 @@
                     </x-slot>
                     <x-slot name="footer">
                         <div class="btn-group">
-                            <button wire:click.prevent="saveInventoryMovementItemQuantityForm()" class="btn btn-outline-success" {{$file ? '' : 'disabled'}}>
+                            <button wire:click.prevent="saveInventoryMovementItemQuantityForm()" class="btn btn-outline-success" {{$file && $inventoryMovementItemQuantityForm->qty ? '' : 'disabled'}}>
                                 <i class="far fa-save"></i>
                                 Received
                             </button>
+                            @role('admin|superadmin')
+                                <button wire:click.prevent="saveInventoryMovementItemQuantityForm()" class="btn btn-outline-success" {{$inventoryMovementItemQuantityForm->qty ? '' : 'disabled'}}>
+                                    <i class="far fa-save"></i>
+                                    Received wo attachment
+                                </button>
+                            @endrole
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">
                                 Close
                             </button>
