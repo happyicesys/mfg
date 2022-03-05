@@ -198,7 +198,7 @@ class BomReceiving extends Component
             $query->whereHas('supplierQuotePrices', function($query) use ($value) {
                 $query->where('supplier_id', $value);
             });
-        })->where('is_part', 1)->orderBy('code')->get();
+        })->where('is_part', 1)->where('is_inventory', 1)->orderBy('code')->get();
         $this->inventoryMovementForm->country_id = $this->supplierForm->country->id;
     }
 
@@ -311,7 +311,7 @@ class BomReceiving extends Component
             $query->whereHas('supplierQuotePrices', function($query) use ($inventoryMovement) {
                 $query->where('supplier_id', $inventoryMovement->supplier_id);
             });
-        })->where('is_part', 1)->orderBy('code')->get();
+        })->where('is_part', 1)->where('is_inventory', 1)->orderBy('code')->get();
         $this->supplierForm = $inventoryMovement->supplier;
     }
 
