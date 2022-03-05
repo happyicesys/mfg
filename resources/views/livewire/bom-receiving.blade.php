@@ -225,7 +225,7 @@
                                     <div class="btn-group">
                                         @if($inventoryMovement->status > array_search('Pending', \App\Models\InventoryMovement::STATUSES))
                                             <button class="btn btn-sm btn-success" wire:click.prevent="editReceiveInventoryMovementItem({{$inventoryMovementItem}})" data-toggle="modal" data-target="#inventory-movement-item-quantity-modal" title="Create Receiving">
-                                                <i class="fas fa-plus-circle"></i>
+                                                <i class="fas fa-check-circle"></i>
                                             </button>
                                             <button class="btn btn-sm btn-danger" wire:click.prevent="deleteSingleInventoryMovementItem({{$inventoryMovementItem->id}})" {{$inventoryMovementItem['inventoryMovement']['status'] == array_search('Completed', \App\Models\InventoryMovement::STATUSES) ? 'disabled' : '' }}>
                                                 <i class="fas fa-times-circle"></i>

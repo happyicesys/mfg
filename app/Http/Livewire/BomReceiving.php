@@ -313,7 +313,7 @@ class BomReceiving extends Component
                 $query->where('supplier_id', $inventoryMovement->supplier_id);
             });
         })->where('is_part', 1)->where('is_inventory', 1)->orderBy('code')->get();
-        $this->supplierForm = $inventoryMovement->supplier;
+        $this->supplierForm = $inventoryMovement->supplier ? $inventoryMovement->supplier : new Supplier();
     }
 
     public function reloadInventoryItems($inventoryMovement)
@@ -546,6 +546,7 @@ class BomReceiving extends Component
             ]);
         }
         $this->addBomItemQtyAvailable($this->inventoryMovementItemForm->bomItem->id, $inventoryMovementItemQuantity->qty);
+        $this->syncBomItemQty($this->inventoryMovementItemForm->bomItem->id);
         $this->emit('refresh');
         $this->emit('updated');
         session()->flash('success', 'Your entry has been updated');
@@ -564,6 +565,7 @@ class BomReceiving extends Component
         $this->reloadInventoryItems($inventoryMovement);
         $this->inventoryMovement = new InventoryMovement();
         $this->inventoryMovementItemQuantity = new InventoryMovementItemQuantity();
+        $inventoryMovementItemQuantity = new InventoryMovementItemQuantity();
         $this->emit('refresh');
         $this->emit('updated');
         session()->flash('success', 'Your entry has been removed');
