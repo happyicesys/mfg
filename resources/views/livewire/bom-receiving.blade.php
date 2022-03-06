@@ -749,9 +749,21 @@
                                 </div>
                             </div>
                         </div>
+                        @php
+                            $neededQty = 0;
+                            $totalReceivedQty = 0;
+
+                            $neededQty = $inventoryMovementItemForm->qty;
+                            if($inventoryMovementItemForm->inventoryMovementItemQuantities()->exists()) {
+                                foreach($inventoryMovementItemForm->inventoryMovementItemQuantities as $inventoryMovementItemQuantity) {
+                                    $totalReceivedQty += $inventoryMovementItemQuantity->qty;
+                                }
+                            }
+                        @endphp
                         <div class="form-group">
                             <label>
                                 Qty
+                                (Needed: {{$neededQty}} ; Received: {{$totalReceivedQty}})
                             </label>
                             <label for="*" class="text-danger">*</label>
                             <input wire:model.debounce.800ms="inventoryMovementItemQuantityForm.qty" type="text" class="form-control" placeholder="Qty">
