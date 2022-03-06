@@ -93,7 +93,7 @@
             </div>
 
             <div class="table-responsive pt-3" style="font-size: 14px;">
-                <table class="table table-bordered table-hover">
+                <table class="table table-bordered table-hover table-sm">
                     <tr class="table-secondary">
                         {{-- <th class="text-center">
                             <input type="checkbox" name="" id="">
