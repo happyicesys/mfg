@@ -104,11 +104,26 @@
                         <x-th-data model="batch" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Batch
                         </x-th-data>
+                        <th class="text-center text-dark">
+                            Code
+                        </th>
+                        <th class="text-center text-dark">
+                            Name
+                        </th>
+                        <th class="text-center text-dark">
+                            Remarks
+                        </th>
+                        <th class="text-center text-dark">
+                            ETA
+                        </th>
+                        <th class="text-center text-dark">
+                            Qty
+                        </th>
+                        <th class="text-center text-dark">
+                            Status
+                        </th>
                         <x-th-data model="order_date" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Order Date
-                        </x-th-data>
-                        <x-th-data model="total_amount" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
-                            Total Amount
                         </x-th-data>
                         <x-th-data model="supplier_id" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Supplier
@@ -116,12 +131,7 @@
                         <x-th-data model="created_at" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Created At
                         </x-th-data>
-                        <x-th-data model="updated_at" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
-                            Updated At
-                        </x-th-data>
-                        <x-th-data model="status" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
-                            Status
-                        </x-th-data>
+
                         <th></th>
                     </tr>
                     @forelse($inventoryMovements as $index => $inventoryMovement)
@@ -137,11 +147,14 @@
                         <td class="text-center">
                             {{ $inventoryMovement->batch }}
                         </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                         <td class="text-center">
                             {{ $inventoryMovement->order_date ? \Carbon\Carbon::parse($inventoryMovement->order_date)->format('Y-m-d') : null }}
-                        </td>
-                        <td class="text-right">
-                            {{ number_format($inventoryMovement->total_amount, '2', '.', ',') }}
                         </td>
                         <td class="text-center">
                             {{ $inventoryMovement->supplier ? $inventoryMovement->supplier->company_name : null }} @if($inventoryMovement->supplier) ({{$inventoryMovement->supplier->country->currency_name}}) @endif
@@ -151,44 +164,12 @@
                             {{ $inventoryMovement->created_at ? \Carbon\Carbon::parse($inventoryMovement->created_at)->format('Y-m-d h:ia') : null }}
                         </td>
                         <td class="text-center">
-                            <b>{{ $inventoryMovement->updatedBy ? $inventoryMovement->updatedBy->name : null }}</b> <br>
-                            {{ $inventoryMovement->updated_at ? \Carbon\Carbon::parse($inventoryMovement->updated_at)->format('Y-m-d h:ia') : null }}
-                        </td>
-                        <td class="text-center">
-                            {{ $inventoryMovement->status ?
-                                \App\Models\InventoryMovement::STATUSES[$inventoryMovement->status] :
-                                null
-                            }}
-                        </td>
-                        <td class="text-center">
                             <button type="button" wire:click="editInventoryMovement({{$inventoryMovement}})" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#inventory-movement-modal">
                                 <i class="fas fa-edit"></i>
                             </button>
                         </td>
                     </tr>
                     @if(count($inventoryMovement->inventoryMovementItems) > 0)
-                        <tr class="table-secondary">
-                            <th colspan="2"></th>
-                            <th class="text-center text-dark">
-                                Code
-                            </th>
-                            <th class="text-center text-dark">
-                                Name
-                            </th>
-                            <th class="text-center text-dark">
-                                Remarks
-                            </th>
-                            <th class="text-center text-dark">
-                                ETA
-                            </th>
-                            <th class="text-center text-dark">
-                                Qty
-                            </th>
-                            <th class="text-center text-dark">
-                                Status
-                            </th>
-                            <th></th>
-                        </tr>
                         @foreach($inventoryMovement->inventoryMovementItems as $inventoryMovementItemIndex => $inventoryMovementItem)
                             <tr class="ml-3">
                                 <td class="text-center" colspan="2">
@@ -221,6 +202,9 @@
                                 <td class="text-center">
                                     {{ \App\Models\InventoryMovementItem::RECEIVING_STATUSES[$inventoryMovementItem->status] }}
                                 </td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
                                 <td class="text-center">
                                     <div class="btn-group">
                                         @if($inventoryMovement->status > array_search('Pending', \App\Models\InventoryMovement::STATUSES))
@@ -252,7 +236,7 @@
                                                 Received
                                             </b>
                                         </td>
-                                        <td class="text-left" colspan="3">
+                                        <td class="text-left" colspan="2">
                                             {{ $inventoryMovementItemQuantity->remarks }}
                                         </td>
                                         <td class="text-center">
@@ -261,7 +245,11 @@
                                         <td class="text-center">
                                             {{ $inventoryMovementItemQuantity->qty }}
                                         </td>
-                                        <td class="text-center" colspan="2">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="text-center">
                                             <div class="btn-group">
                                                 @if($inventoryMovementItemQuantity->attachments()->exists())
                                                     <button type="button" class="btn btn-outline-dark btn-sm" wire:click="viewQuantityAttachments({{$inventoryMovementItemQuantity}})" wire:key="inventory-movement-item-quantity-attachment-{{$inventoryMovementItemQuantity->id}}" data-toggle="modal" data-target="#attachment-modal">
