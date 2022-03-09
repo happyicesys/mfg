@@ -784,6 +784,7 @@ class BomReceiving extends Component
     public function updateSingleInventoryMovementItem()
     {
         $inventoryMovementItem = InventoryMovementItem::findOrFail($this->inventoryMovementItemForm->id);
+
         $inventoryMovementItem->update([
             'qty' => $this->inventoryMovementItemForm->qty,
             'amount' => $this->inventoryMovementItemForm->amount,
@@ -800,6 +801,8 @@ class BomReceiving extends Component
                 'full_url' => $fullUrl,
             ]);
         }
+        $this->syncInventoryMovementItemStatus($inventoryMovementItem);
+        $this->syncInventoryMovementStatus($inventoryMovementItem->inventoryMovement);
         $this->emit('refresh');
         $this->emit('updated');
         session()->flash('success', 'Your entry has been updated');
@@ -909,5 +912,27 @@ class BomReceiving extends Component
             }
             $inventoryMovement->save();
         }
+    }
+
+    private function syncInventoryMovementItemStatus(InventoryMovementItem $inventoryMovementItem)
+    {
+        $isReceived = false;
+        if($inventoryMovementItem->inventoryMovementItemQuantities()->exists()) {
+            if($inventoryMovementItem->inventoryMovementItemQuantities()->sum('qty') == $inventoryMovementItem->qty) {
+                $isReceived = true;
+            }
+            foreach($inventoryMovementItem->inventoryMovementItemQuantities as $inventoryMovementItemQuantity) {
+                if($inventoryMovementItemQuantity->is_incomplete_qty) {
+                    $isReceived = true;
+                }
+            }
+        }
+
+        if($isReceived) {
+            $inventoryMovementItem->status = array_search('Received', InventoryMovementItem::RECEIVING_STATUSES);
+        }else {
+            $inventoryMovementItem->status = array_search('Ordered', InventoryMovementItem::RECEIVING_STATUSES);
+        }
+        $inventoryMovementItem->save();
     }
 }
