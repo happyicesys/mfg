@@ -15,6 +15,8 @@ class InventoryMovementItemQuantity extends Model
         'date',
         'qty',
         'remarks',
+        'is_incomplete_qty',
+        'created_by',
     ];
 
     // relationships
@@ -26,6 +28,11 @@ class InventoryMovementItemQuantity extends Model
     public function inventoryMovementItem()
     {
         return $this->belongsTo(InventoryMovementItem::class);
+    }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     // getter
@@ -40,6 +47,16 @@ class InventoryMovementItemQuantity extends Model
     {
         if(is_numeric($value)) {
             return $value + 0;
+        }
+    }
+
+    // setter
+    public function setIsIncompleteQtyAttribute($value)
+    {
+        if($value) {
+            $this->attributes['is_incomplete_qty'] = $value;
+        }else {
+            $this->attributes['is_incomplete_qty'] = false;
         }
     }
 

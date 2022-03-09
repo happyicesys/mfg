@@ -43,6 +43,7 @@ class InventoryMovementItem extends Model
         'created_by',
         'updated_by',
         'previous_status',
+        'is_incomplete_qty',
     ];
 
     // getter
@@ -53,9 +54,7 @@ class InventoryMovementItem extends Model
 
     public function getDateAttribute($value)
     {
-        if($value) {
-            return Carbon::parse($value)->toDateString();
-        }
+        return Carbon::parse($value)->format('Y-m-d');
     }
 
     public function getQtyAttribute($value)
@@ -85,6 +84,15 @@ class InventoryMovementItem extends Model
     {
         if($value) {
             $this->attributes['supplier_quote_price_id'] = $value;
+        }
+    }
+
+    public function setIsIncompleteQtyAttribute($value)
+    {
+        if($value) {
+            $this->attributes['is_incomplete_qty'] = $value;
+        }else {
+            $this->attributes['is_incomplete_qty'] = false;
         }
     }
 

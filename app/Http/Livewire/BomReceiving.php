@@ -79,7 +79,7 @@ class BomReceiving extends Component
             'inventoryMovementItemForm.amount' => 'sometimes|numeric',
             'inventoryMovementItemForm.supplier_quote_price_id' => 'sometimes',
             'inventoryMovementItemForm.remarks' => 'sometimes',
-            'inventoryMovementItemForm.bom_qty' => 'sometimes',
+            // 'inventoryMovementItemForm.bom_qty' => 'sometimes',
             'inventoryMovementItemForm.supplier_unit_price' => 'sometimes',
             'inventoryMovementItemForm.rate' => 'sometimes',
             'inventoryMovementItemForm.date' => 'sometimes',
@@ -88,6 +88,8 @@ class BomReceiving extends Component
             'inventoryMovementItemQuantityForm.date' => 'required',
             'inventoryMovementItemQuantityForm.qty' => 'required',
             'inventoryMovementItemQuantityForm.remarks' => 'sometimes',
+            'inventoryMovementItemQuantityForm.created_by' => 'sometimes',
+            'inventoryMovementItemQuantityForm.is_incomplete_qty' => 'sometimes',
             'inventoryMovementItemFormFilters.code' => 'sometimes',
             'inventoryMovementItemFormFilters.name' => 'sometimes',
             'inventoryMovementItemFormFilters.bom_item_type_id' => 'sometimes',
@@ -335,8 +337,9 @@ class BomReceiving extends Component
                     'date' => $inventoryMovementItem->date,
                     'inventoryMovementItemQuantities' => $inventoryMovementItem->inventoryMovementItemQuantities()->with(['attachments', 'inventoryMovementItem', 'inventoryMovementItem.inventoryMovement'])->get(),
                     'inventoryMovement' => $inventoryMovement,
-                    'attachment_url' => $inventoryMovementItem->attachments()->first() ? $inventoryMovementItem->attachments()->first()->full_url : '',
-                    'attachment' => $inventoryMovementItem->attachments()->first()
+                    'attachment_url' => $inventoryMovementItem->attachments()->latest()->first() ? $inventoryMovementItem->attachments()->latest()->first()->full_url : '',
+                    'attachment' => $inventoryMovementItem->attachments()->latest()->first(),
+                    'attachments' => $inventoryMovementItem->attachments,
                 ];
                 // dd($this->inventoryMovementItems);
                 array_push($this->inventoryMovementItems, $data);
@@ -536,6 +539,19 @@ class BomReceiving extends Component
 
     public function saveInventoryMovementItemQuantityForm()
     {
+        if(($this->inventoryMovementItemQuantityForm->qty + $this->inventoryMovementItemForm->inventoryMovementItemQuantities()->sum('qty') == $this->inventoryMovementItemForm->qty) or $this->inventoryMovementItemQuantityForm->is_incomplete_qty) {
+            $currentInventoryMovementItem = InventoryMovementItem::findOrFail($this->inventoryMovementItemForm->id);
+            $currentInventoryMovementItem->update([
+                'status' => array_search('Received', InventoryMovementItem::RECEIVING_STATUSES)
+            ]);
+            if($this->inventoryMovementItemQuantityForm->is_incomplete_qty) {
+                $currentInventoryMovementItem->update([
+                    'is_incomplete_qty' => true
+                ]);
+            }
+        }
+
+        $this->inventoryMovementItemQuantityForm->created_by = auth()->user()->id;
         $inventoryMovementItemQuantity = $this->inventoryMovementItemForm->inventoryMovementItemQuantities()->save($this->inventoryMovementItemQuantityForm);
         if($this->file) {
             $url = $this->file->storePublicly('receiving', 'digitaloceanspaces');
@@ -547,6 +563,7 @@ class BomReceiving extends Component
         }
         $this->addBomItemQtyAvailable($this->inventoryMovementItemForm->bomItem->id, $inventoryMovementItemQuantity->qty);
         $this->syncBomItemQty($this->inventoryMovementItemForm->bomItem->id);
+        $this->syncInventoryMovementStatus($this->inventoryMovementItemForm->inventoryMovement);
         $this->emit('refresh');
         $this->emit('updated');
         session()->flash('success', 'Your entry has been updated');
@@ -563,6 +580,7 @@ class BomReceiving extends Component
         }
         $inventoryMovementItemQuantity->delete();
         $this->reloadInventoryItems($inventoryMovement);
+        $this->syncInventoryMovementStatus($inventoryMovement);
         $this->inventoryMovement = new InventoryMovement();
         $this->inventoryMovementItemQuantity = new InventoryMovementItemQuantity();
         $inventoryMovementItemQuantity = new InventoryMovementItemQuantity();
@@ -583,6 +601,7 @@ class BomReceiving extends Component
         }
         $inventoryMovementItemQuantityCollection->delete();
         $this->reloadInventoryItems($inventoryMovement);
+        $this->syncInventoryMovementStatus($inventoryMovement);
         $this->inventoryMovement = null;
         $this->inventoryMovementItemQuantityCollection = null;
         $this->emit('refresh');
@@ -708,7 +727,8 @@ class BomReceiving extends Component
                 'date' => $inventoryMovementItem->date,
                 'remarks' => $inventoryMovementItem->remarks,
                 'inventoryMovement' => $inventoryMovementItem->inventoryMovement,
-                'attachment_url' => $inventoryMovementItem->attachments()->first() ? $inventoryMovementItem->attachments()->first()->full_url : '',
+                'attachment_url' => $inventoryMovementItem->attachments()->latest()->first() ? $inventoryMovementItem->attachments()->latest()->first()->full_url : '',
+                'attachments' =>  $inventoryMovementItem->attachments,
             ];
         }else {
             $data = [
@@ -724,6 +744,7 @@ class BomReceiving extends Component
                 'remarks' => $this->inventoryMovementItemForm->remarks,
                 'attachment_url' => $this->file ? $this->file->temporaryUrl() : '',
                 'attachment' => $this->file,
+                'attachments' => [$this->file],
             ];
         }
 
@@ -771,6 +792,14 @@ class BomReceiving extends Component
             'date' => $this->inventoryMovementItemForm->date,
             'remarks' => $this->inventoryMovementItemForm->remarks,
         ]);
+        if($this->file) {
+            $url = $this->file->storePublicly('receiving', 'digitaloceanspaces');
+            $fullUrl = Storage::url($url);
+            $inventoryMovementItem->attachments()->create([
+                'url' => $url,
+                'full_url' => $fullUrl,
+            ]);
+        }
         $this->emit('refresh');
         $this->emit('updated');
         session()->flash('success', 'Your entry has been updated');
@@ -782,6 +811,19 @@ class BomReceiving extends Component
             $this->inventoryMovementItemForm->amount = round($this->inventoryMovementItemForm->qty * $this->inventoryMovementItemForm->unit_price, 2);
         }else {
             $this->inventoryMovementItemForm->amount = 0.00;
+        }
+    }
+
+    public function onPrevNextDateinventoryMovementItemFormClicked($direction, $model)
+    {
+        $date = Carbon::now();
+        if($model) {
+            $date = Carbon::parse($this->inventoryMovementItemForm[$model]);
+        }
+        if($direction > 0) {
+            $this->inventoryMovementItemForm[$model] = $date->addDay()->toDateString();
+        }else {
+            $this->inventoryMovementItemForm[$model] = $date->subDay()->toDateString();
         }
     }
 
@@ -849,5 +891,23 @@ class BomReceiving extends Component
         $bomItem->planned_qty = $plannedQty;
 
         $bomItem->save();
+    }
+
+    private function syncInventoryMovementStatus(InventoryMovement $inventoryMovement)
+    {
+        if($inventoryMovement->inventoryMovementItems()->exists()){
+            $completeStatus = true;
+            foreach($inventoryMovement->inventoryMovementItems as $inventoryMovementItem) {
+                if($inventoryMovementItem->status != array_search('Received', InventoryMovementItem::RECEIVING_STATUSES)) {
+                    $completeStatus = false;
+                }
+            }
+            if($completeStatus) {
+                $inventoryMovement->status = array_search('Completed', InventoryMovement::STATUSES);
+            }else {
+                $inventoryMovement->status = array_search('Confirmed', InventoryMovement::STATUSES);
+            }
+            $inventoryMovement->save();
+        }
     }
 }
