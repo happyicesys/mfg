@@ -15,41 +15,56 @@
                     {{-- @if($showFilters) --}}
                         <div class="bg-light pt-2 pb-2 pl-2 pr-2 mb-2">
                             <div class="form-row">
-                                <div class="form-group col-md-4 col-xs-12">
+                                <div class="form-group col-md-3 col-xs-12">
                                     <label>
                                         Batch
                                     </label>
                                     <input wire:model="filters.batch" type="text" class="form-control" placeholder="Batch">
                                 </div>
-                                <div class="form-group col-md-4 col-xs-12">
+                                <div class="form-group col-md-3 col-xs-12">
                                     <label>
                                         Status
                                     </label>
                                     <select name="action" wire:model="filters.status" class="form-control">
                                         <option value="">All</option>
-                                        @foreach(\App\Models\InventoryMovement::STATUSES as $statusIndex => $status)
-                                            <option value="{{ $statusIndex }}">
-                                                {{ $status }}
+                                        <option value="{{array_search('Confirmed', \App\Models\InventoryMovement::STATUSES)}}">
+                                            Ordered
+                                        </option>
+                                        <option value="{{array_search('Completed', \App\Models\InventoryMovement::STATUSES)}}">
+                                            Completed
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-3 col-xs-12">
+                                    <label>
+                                        Supplier
+                                    </label>
+                                    <select name="supplier_id" wire:model="filters.supplier_id" class="select form-control">
+                                        <option value="">All</option>
+                                        @foreach($suppliers as $supplier)
+                                            <option value="{{$supplier->id}}">
+                                                {{$supplier->company_name}}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="form-group col-md-4 col-xs-12">
+{{--
+                                <div class="form-group col-md-3 col-xs-12">
                                     <label>
-                                        Created At
+                                        Rec From
                                     </label>
                                     <div class="input-group">
-                                        <input type="date" class="form-control" wire:model="filters.created_at">
+                                        <input type="date" class="form-control" wire:model="filters.receive_from">
                                         <div class="input-group-append">
-                                            <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateClicked(-1, 'created_at')">
+                                            <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateClicked(-1, 'receive_from')">
                                                 <i class="fas fa-caret-left"></i>
                                             </button>
-                                            <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateClicked(1, 'created_at')">
+                                            <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateClicked(1, 'receive_from')">
                                                 <i class="fas fa-caret-right"></i>
                                             </button>
                                         </div>
                                     </div>
-                                </div>
+                                </div> --}}
                             </div>
                             <div class="form-row d-flex justify-content-end">
                                 <div class="btn-group">

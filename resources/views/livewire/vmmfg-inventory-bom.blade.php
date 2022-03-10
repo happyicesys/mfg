@@ -179,10 +179,9 @@
                         <button type="button" wire:key="edit-bom-{{$bomItem->id}}" wire:click="edit({{$bomItem}})" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#edit-bom">
                             <i class="fas fa-edit"></i>
                         </button>
-{{--
-                        <button type="button" class="btn btn-primary" wire:key="replicate-scope-{{$bom->id}}"  onclick="return confirm('Are you sure you want to Replicate?') || event.stopImmediatePropagation()" wire:click.prevent="replicateScope({{$bom}})">
+                        <button type="button" class="btn btn-primary" wire:key="replicate-scope-{{$bomItem->id}}"  onclick="return confirm('Are you sure you want to Replicate?') || event.stopImmediatePropagation()" wire:click.prevent="replicateBom({{$bomItem}})">
                             <i class="fas fa-clone"></i>
-                        </button> --}}
+                        </button>
                     </div>
                 </td>
             </tr>
@@ -338,7 +337,12 @@
                                         </th>
                                         <th class="col-md-2 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-dark">
                                             {{$bomContent->bomItem->code}}
-                                            @if($bomContent->bomItem->bomContents()->count() > 1)
+                                            @php
+                                                $bomItemCount = \App\Models\BomContent::where('bom_item_id', $bomContent->bomItem->id)->whereHas('bomHeader', function($query) use ($bomContent) {
+                                                    $query->where('bom_id', $bomContent->bomHeader->bom_id);
+                                                })->count();
+                                            @endphp
+                                            @if($bomItemCount > 1)
                                                 <small>
                                                     <span class="badge badge-pill badge-danger">&nbsp;</span>
                                                 </small>
@@ -703,7 +707,12 @@
                 Part:
                 @endif
                 {{$bomContentForm->bomItem->sequence}}. {{$bomContentForm->bomItem->name}}
-                @if($bomContentForm->bomItem->bomContents()->count() > 1)
+                @php
+                    $bomItemCount = \App\Models\BomContent::where('bom_item_id', $bomContentForm->bomItem->id)->whereHas('bomHeader', function($query) use ($bomContentForm) {
+                        $query->where('bom_id', $bomContentForm->bomHeader->bom_id);
+                    })->count();
+                @endphp
+                @if($bomItemCount > 1)
                     <small>
                         <span class="badge badge-pill badge-danger">&nbsp;</span>
                     </small>

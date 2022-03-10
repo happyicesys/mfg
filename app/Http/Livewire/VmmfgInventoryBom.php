@@ -529,6 +529,36 @@ class VmmfgInventoryBom extends Component
         $this->attachments = $bomItem->attachments;
     }
 
+    public function replicateBom(Bom $bom)
+    {
+        $replicatedBom = $bom->replicate()->fill([
+            'name' => $bom->name.'-replicated',
+        ]);
+        $replicatedBom->save();
+
+        if($bom->bomHeaders()->exists()) {
+            foreach($bom->bomHeaders as $bomHeader) {
+                $replicatedBomHeader = $bomHeader->replicate()->fill([
+                    'bom_id' => $replicatedBom->id,
+                ]);
+                $replicatedBomHeader->save();
+
+                if($bomHeader->bomContents()->exists()) {
+                    foreach($bomHeader->bomContents as $bomContent) {
+                        $replicatedBomContent = $bomContent->replicate()->fill([
+                            'bom_header_id' => $replicatedBomHeader->id,
+                        ]);
+                        $replicatedBomContent->save();
+                    }
+                }
+            }
+        }
+
+        $this->emit('refresh');
+        $this->emit('updated');
+        session()->flash('success', 'Entry has been created');
+    }
+
     private function incrementNestedSequence($value)
     {
         for($updatedValue = explode( ".", $value ), $i = count($updatedValue) - 1; $i > -1; --$i) {

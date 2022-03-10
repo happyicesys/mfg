@@ -33,6 +33,7 @@ class BomInventory extends Component
         'bom_item_type_id' => '',
         'is_inventory' => '1',
         'is_consumable' => '0',
+        'supplier_id' => '',
     ];
     // public $bomItemForm = [
     //     'code' => '',
@@ -116,6 +117,13 @@ class BomInventory extends Component
             $isInventory = $this->filters['is_inventory'];
             $bomItems = $bomItems->where('is_inventory', $isInventory);
         }
+
+        if($supplierId = $this->filters['supplier_id']) {
+            $bomItems = $bomItems->whereHas('supplierQuotePrices', function($query) use ($supplierId) {
+                $query->where('supplier_id', $supplierId);
+            });
+        }
+
 
         $bomItems = $bomItems->where('is_part', 1);
 

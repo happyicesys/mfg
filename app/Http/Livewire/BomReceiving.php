@@ -36,6 +36,7 @@ class BomReceiving extends Component
         'action' => '',
         'status' => '',
         'created_at' => '',
+        'supplier_id' => '',
     ];
     public $inventoryMovementItemFormFilters = [
         'code' => '',
@@ -49,6 +50,21 @@ class BomReceiving extends Component
     public $bomItemTypes;
     public $suppliers;
     public $file;
+    public $monthOptions = [];
+    public $monthsArr = [
+        1 => 'Jan',
+        2 => 'Feb',
+        3 => 'Mar',
+        4 => 'Apr',
+        5 => 'May',
+        6 => 'Jun',
+        7 => 'Jul',
+        8 => 'Aug',
+        9 => 'Sep',
+        10 => 'Oct',
+        11 => 'Nov',
+        12 => 'Dec',
+    ];
     public InventoryMovement $inventoryMovementForm;
     public InventoryMovementItem $inventoryMovementItemForm;
     public InventoryMovementItem $editInventoryMovementItemForm;
@@ -106,6 +122,7 @@ class BomReceiving extends Component
         $this->bomItems = BomItem::where('is_part', 1)->where('is_inventory', 1)->orderBy('code')->get();
         $this->bomItemTypes = BomItemType::orderBy('name')->get();
         $this->suppliers = Supplier::orderBy('company_name')->get();
+        $this->monthOptions = [];
     }
 
     public function render()
@@ -121,7 +138,8 @@ class BomReceiving extends Component
         $inventoryMovements = $inventoryMovements
                 ->when($this->filters['batch'], fn($query, $input) => $query->searchLike('batch', $input))
                 ->when($this->filters['status'], fn($query, $input) => $query->search('status', $input))
-                ->when($this->filters['created_at'], fn($query, $input) => $query->searchDate('created_at', $input));
+                ->when($this->filters['created_at'], fn($query, $input) => $query->searchDate('created_at', $input))
+                ->when($this->filters['supplier_id'], fn($query, $input) => $query->search('supplier_id', $input));
 
         $inventoryMovements = $inventoryMovements->where('action', array_search('Receiving', \App\Models\InventoryMovement::ACTIONS));
 

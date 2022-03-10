@@ -60,6 +60,19 @@
                                     <option value="0">No</option>
                                 </select>
                             </div>
+                            <div class="form-group col-md-4 col-xs-12">
+                                <label>
+                                    Supplier
+                                </label>
+                                <select name="supplier_id" wire:model="filters.supplier_id" class="select form-control">
+                                    <option value="">All</option>
+                                    @foreach($suppliers as $supplier)
+                                        <option value="{{$supplier->id}}">
+                                            {{$supplier->company_name}}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
                         <div class="form-row d-flex justify-content-end">
                             <div class="btn-group">
