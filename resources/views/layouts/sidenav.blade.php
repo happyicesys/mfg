@@ -38,9 +38,11 @@
           <a href="{{ route('home') }}"><i class="fas fa-tachometer-alt"></i>Dashboard</a>
         </li>
 
+        @can('profile-access')
         <li class="header-menu">
           <span>Profile Management</span>
         </li>
+        @endcan
 {{--
         <li class="{{ $name == 'customer' ? 'active' : '' }}">
             <a href="{{ route('customer') }}"><i class="fas fa-users"></i>Customers</a>
@@ -112,7 +114,7 @@
         </li>
         @endcan
 
-        @can('vmmfg-setting-access')
+        @can('vmmfg-inventory-access')
         <li class="header-menu">
           <span>VM Mfg Inventory</span>
         </li>
@@ -125,12 +127,14 @@
         <li class="{{ $name == 'bom-receiving' ? 'active' : '' }}">
           <a href="{{ route('bom-receiving') }}"><i class="fas fa-truck-loading"></i>Receiving</a>
         </li>
+        @endcan
         {{-- <li class="{{ $name == 'bom-outgoing' ? 'active' : '' }}">
           <a href="{{ route('bom-outgoing') }}"><i class="fas fa-box-open"></i>Outgoing</a>
         </li>
         <li class="{{ $name == 'bom-movement' ? 'active' : '' }}">
           <a href="{{ route('bom-movement') }}"><i class="fas fa-truck-loading"></i>Movement</a>
         </li> --}}
+        @can('vmmfg-setting-access')
         <li class="{{ $name == 'bom-supplier' ? 'active' : '' }}">
           <a href="{{ route('bom-supplier') }}"><i class="fas fa-user-tie"></i>Supplier</a>
         </li>

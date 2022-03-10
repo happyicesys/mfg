@@ -32,9 +32,10 @@ class DatabaseSeeder extends Seeder
             // BomCategorySeeder::class,
             // BomItemTypeSeeder::class,
             // BomSeeder::class,
-            PaymentTermSeeder::class,
+            // PaymentTermSeeder::class,
             // SupplierAccessSeeder::class,
-            CurrencyRateSeeder::class,
+            // CurrencyRateSeeder::class,
+            PermissionVmmfgInventoryAccessSeeder::class,
        ]);
     //    \App\Models\User::factory(150)->create();
     }
