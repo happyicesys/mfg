@@ -28,7 +28,7 @@
                                     <select name="action" wire:model="filters.status" class="form-control">
                                         <option value="">All</option>
                                         <option value="{{array_search('Confirmed', \App\Models\InventoryMovement::STATUSES)}}">
-                                            Ordered
+                                            Incomplete
                                         </option>
                                         <option value="{{array_search('Completed', \App\Models\InventoryMovement::STATUSES)}}">
                                             Completed

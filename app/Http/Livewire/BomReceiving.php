@@ -123,6 +123,7 @@ class BomReceiving extends Component
         $this->bomItemTypes = BomItemType::orderBy('name')->get();
         $this->suppliers = Supplier::orderBy('company_name')->get();
         $this->monthOptions = [];
+        $this->filters['status'] = array_search('Confirmed', \App\Models\InventoryMovement::STATUSES);
     }
 
     public function render()

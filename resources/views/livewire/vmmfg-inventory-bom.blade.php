@@ -210,6 +210,15 @@
                 </label>
                 <textarea name="remarks" wire:model="bom.remarks" rows="5" class="form-control" placeholder="Remarks"></textarea>
             </div>
+            <div class="btn-group">
+                <button
+                type="submit"
+                class="btn btn-outline-secondary"
+                wire:click.prevent="save()"
+                >
+                    Save
+                </button>
+            </div>
             <hr>
             @if(isset($bom))
                 @role('admin')
