@@ -611,6 +611,7 @@ class BomReceiving extends Component
     {
         $inventoryMovementItemQuantityCollection = InventoryMovementItemQuantity::findOrFail($id);
         $inventoryMovement = $inventoryMovementItemQuantityCollection->inventoryMovementItem->inventoryMovement;
+        $inventoryMovementItem = $inventoryMovementItemQuantityCollection->inventoryMovementItem;
         $this->reduceBomItemQtyAvailable($inventoryMovementItemQuantityCollection->inventoryMovementItem->bomItem->id, $inventoryMovementItemQuantityCollection->qty);
         if($inventoryMovementItemQuantityCollection->attachments()->exists()) {
             foreach($inventoryMovementItemQuantityCollection->attachments as $attachment) {
@@ -619,8 +620,10 @@ class BomReceiving extends Component
         }
         $inventoryMovementItemQuantityCollection->delete();
         $this->reloadInventoryItems($inventoryMovement);
+        $this->syncInventoryMovementItemStatus($inventoryMovementItem);
         $this->syncInventoryMovementStatus($inventoryMovement);
         $this->inventoryMovement = null;
+        $this->inventoryMovementItem = null;
         $this->inventoryMovementItemQuantityCollection = null;
         $this->emit('refresh');
         $this->emit('updated');
