@@ -82,6 +82,13 @@
                     </div>
                 </div>
                 <div class="form-row">
+{{--
+                    <div class="mr-auto pl-1">
+                        <button class="btn btn-success" wire:click="toggle()" data-toggle="modal" data-target="#inventory-movement-modal">
+                            Planner
+                        </button>
+                    </div> --}}
+
                     <div class="ml-auto">
                         <div class="form-inline">
                             <label for="display_num">Display </label>
@@ -316,12 +323,12 @@
                         @endif
                         <hr>
                         <div class="mr-auto pl-1">
-                            @can('admin')
+                            @role('admin')
                             <button class="btn btn-success" wire:click="createSupplierQuotePrice()" data-toggle="modal" data-target="#create-supplier-quote-price-modal">
                                 <i class="fas fa-plus-circle"></i>
                                 Create Pricing
                             </button>
-                            @endcan
+                            @endrole
                         </div>
 
                         <div class="table-responsive pt-2">
@@ -367,14 +374,14 @@
                                         {{ \Carbon\Carbon::parse($supplierQuotePrice->created_at)->format('Y-m-d H:ia') }}
                                     </td>
                                     <td class="text-center">
-                                        @can('admin')
+                                        @role('admin')
                                         <button class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete the price?') || event.stopImmediatePropagation()" wire:click.prevent="deleteSingleSupplierQuotePrice({{$supplierQuotePrice}})" {{$supplierQuotePrice->inventoryMovementItems()->exists() ? 'disabled' : ''}}>
                                             <i class="fas fa-times-circle"></i>
                                             @if($supplierQuotePrice->inventoryMovementItems()->exists())
                                                 This Pricing is in Used in Receiving
                                             @endif
                                         </button>
-                                        @endcan
+                                        @endrole
                                     </td>
                                 </tr>
                                 @empty
@@ -394,12 +401,12 @@
                                 (This Item is Used in BOM)
                             @endif
                         </button>
-                        @can('admin')
+                        @role('admin')
                             <button type="submit" class="btn btn-success btn-xs-block" wire:click.prevent="save">
                                 <i class="fas fa-save"></i>
                                 Save
                             </button>
-                        @endcan
+                        @endrole
                     </x-slot>
                 </x-modal>
             {{-- </form> --}}

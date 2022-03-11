@@ -211,11 +211,11 @@
                                                     <button class="btn btn-sm btn-success" wire:click.prevent="editReceiveInventoryMovementItem({{$inventoryMovementItem}})" data-toggle="modal" data-target="#inventory-movement-item-quantity-modal" title="Create Receiving" {{$inventoryMovementItem->status == array_search('Received', \App\Models\InventoryMovementItem::RECEIVING_STATUSES) ? 'disabled' : ''}}>
                                                         <i class="fas fa-check-circle"></i>
                                                     </button>
-                                                    @can('admin')
+                                                    @role('admin')
                                                         <button class="btn btn-sm btn-danger" wire:click.prevent="deleteSingleInventoryMovementItem({{$inventoryMovementItem->id}})" {{$inventoryMovementItem['inventoryMovement']['status'] == array_search('Completed', \App\Models\InventoryMovement::STATUSES) ? 'disabled' : '' }}>
                                                             <i class="fas fa-times-circle"></i>
                                                         </button>
-                                                    @endcan
+                                                    @endrole
                                                 @endif
                                                 @if($inventoryMovementItem->attachments()->exists())
                                                     <button type="button" class="btn btn-outline-dark btn-sm" wire:click="viewInventoryItemAttachments({{$inventoryMovementItem}})" wire:key="inventory-movement-item-quantity-attachment-{{$inventoryMovementItem->id}}" data-toggle="modal" data-target="#attachment-modal">
@@ -621,11 +621,11 @@
                                                         <button class="btn btn-sm btn-outline-secondary" wire:click.prevent="editSingleInventoryMovementItem({{$inventoryMovementItem['id']}})" data-toggle="modal" data-target="#inventory-movement-edit-modal" {{$editSingleInventoryMovementItemDisabled ? 'disabled' : '' }}>
                                                             <i class="far fa-edit"></i>
                                                         </button>
-                                                        @can('admin')
+                                                        @role('admin')
                                                             <button class="btn btn-sm btn-danger" onclick="confirm('Are you sure you want to delete this part and its receiving?') || event.stopImmediatePropagation()" wire:click.prevent="deleteSingleInventoryMovementItem({{$inventoryMovementItem['id']}})" {{$editSingleInventoryMovementItemDisabled ? 'disabled' : '' }}>
                                                                 <i class="fas fa-times-circle"></i>
                                                             </button>
-                                                        @endcan
+                                                        @endrole
                                                     @else
                                                         <button class="btn btn-sm btn-danger" wire:click.prevent="deleteSingleInventoryMovementItemIndex({{$inventoryMovementItemIndex}})">
                                                             <i class="fas fa-times-circle"></i>
@@ -697,11 +697,11 @@
                     <x-slot name="footer" >
                         <div class="btn-group">
                             @if(isset($inventoryMovementForm->id))
-                                @can('admin')
+                                @role('admin')
                                     <a href="#" class="btn btn-xs-block btn-danger" onclick="return confirm('Are you sure you want to delete this receiving?') || event.stopImmediatePropagation()" wire:click.prevent="deleteInventoryMovement()" >
                                         Delete
                                     </a>
-                                @endcan
+                                @endrole
                             @endif
                             @if(!isset($inventoryMovementForm->id))
                                 <button
@@ -912,12 +912,12 @@
                             </div>
                     </x-slot>
                     <x-slot name="footer">
-                        @can('admin')
+                        @role('admin')
                             <button class="btn btn-success" wire:click="updateSingleInventoryMovementItem()" {{$inventoryMovementItemForm->bom_item_id && $inventoryMovementItemForm->qty ? '' : 'disabled' }}>
                                 <i class="fas fa-check"></i>
                                 Edit
                             </button>
-                        @endcan
+                        @endrole
                     </x-slot>
                 </x-modal>
                 <x-modal id="attachment-modal">
