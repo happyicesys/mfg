@@ -131,6 +131,7 @@ class BomReceiving extends Component
         $inventoryMovements = InventoryMovement::with([
                                     'inventoryMovementItems',
                                     'inventoryMovementItems.inventoryMovementItemQuantities',
+                                    'inventoryMovementItems.inventoryMovementItemQuantities.createdBy',
                                     'bom',
                                     'createdBy',
                                     'updatedBy',
@@ -354,7 +355,7 @@ class BomReceiving extends Component
                     'remarks' => $inventoryMovementItem->remarks,
                     'status' => $inventoryMovementItem->status,
                     'date' => $inventoryMovementItem->date,
-                    'inventoryMovementItemQuantities' => $inventoryMovementItem->inventoryMovementItemQuantities()->with(['attachments', 'inventoryMovementItem', 'inventoryMovementItem.inventoryMovement'])->get(),
+                    'inventoryMovementItemQuantities' => $inventoryMovementItem->inventoryMovementItemQuantities()->with(['attachments', 'inventoryMovementItem', 'inventoryMovementItem.inventoryMovement', 'createdBy'])->get(),
                     'inventoryMovement' => $inventoryMovement,
                     'attachment_url' => $inventoryMovementItem->attachments()->latest()->first() ? $inventoryMovementItem->attachments()->latest()->first()->full_url : '',
                     'attachment' => $inventoryMovementItem->attachments()->latest()->first(),

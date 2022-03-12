@@ -119,11 +119,11 @@
                 <a id="show-sidebar" class="btn btn-sm btn-dark d-flex align-items-center justify-content-center" href="#">
                     <i class="fas fa-bars"></i>
                 </a>
-                <div class="container-fluid">
+                <div class="container-fluid p-1">
                     @include('layouts.sidenav')
 
             @else
-                <div class="container-fluid">
+                <div class="container-fluid p-1">
             @endauth
                     <main class="page-content" style="margin-top: 3px;">
                         @auth

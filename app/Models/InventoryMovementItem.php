@@ -54,7 +54,7 @@ class InventoryMovementItem extends Model
 
     public function getDateAttribute($value)
     {
-        return Carbon::parse($value)->format('Y-m-d');
+        return Carbon::parse($value)->format('ymd');
     }
 
     public function getQtyAttribute($value)

@@ -178,7 +178,13 @@
                                         @endif
                                     </td> --}}
                                     <td class="text-left">
-                                        {{ $inventoryMovementItem->bomItem->code }}
+                                        @if($inventoryMovementItem->bomItem->attachments()->exists())
+                                            <a href="#" wire:click.prevent="viewBomItemAttachments({{$inventoryMovementItem->bomItem}})" data-toggle="modal" data-target="#attachment-modal-nonedit">
+                                                {{ $inventoryMovementItem->bomItem->code }}
+                                            </a>
+                                        @else
+                                            {{ $inventoryMovementItem->bomItem->code }}
+                                        @endif
                                     </td>
                                     <td class="text-left">
                                         {{ $inventoryMovementItem->bomItem->name }}
@@ -189,10 +195,10 @@
                                     <td class="text-center">
                                         {{ $inventoryMovementItem->qty }}
                                     </td>
-                                    <td class="text-center">
+                                    <td class="text-center @if(\Carbon\Carbon::createFromFormat('ymd', $inventoryMovementItem->date) < \Carbon\Carbon::today()) text-danger @endif">
                                         {{ $inventoryMovementItem->date }}
                                     </td>
-                                    <td class="text-center" style="{{($inventoryMovementItem->qty == $inventoryMovementItem->inventoryMovementItemQuantities()->sum('qty')) || $inventoryMovementItem->is_incomplete_qty ? 'background-color: #90eeb0;' : ''}}">
+                                    <td class="text-center" style="{{($inventoryMovementItem->qty == $inventoryMovementItem->inventoryMovementItemQuantities()->sum('qty')) ? 'background-color: #90eeb0;' : ''}} {{$inventoryMovementItem->is_incomplete_qty ? 'background-color: #83B795;' : ''}}">
                                         {{$inventoryMovementItem->inventoryMovementItemQuantities()->sum('qty') + 0}}
                                     </td>
                                     <td class="text-center">
@@ -201,7 +207,7 @@
                                                 $latestReceived = $inventoryMovementItem->inventoryMovementItemQuantities()->latest()->first();
                                             @endphp
                                             <b>{{ $latestReceived->createdBy ? $latestReceived->createdBy->name : null }}</b> <br>
-                                            {{ $latestReceived->created_at ? \Carbon\Carbon::parse($latestReceived->created_at)->format('Y-m-d h:ia') : null }}
+                                            {{ $latestReceived->created_at ? \Carbon\Carbon::parse($latestReceived->created_at)->format('ymd h:ia') : null }}
                                         @endif
                                     </td>
                                     <td class="text-center">
@@ -254,7 +260,7 @@
                                 <td></td>
                                 <td></td>
                                 <td class="text-center">
-                                    {{ $inventoryMovement->order_date ? \Carbon\Carbon::parse($inventoryMovement->order_date)->format('Y-m-d') : null }}
+                                    {{ $inventoryMovement->order_date ? \Carbon\Carbon::parse($inventoryMovement->order_date)->format('ymd') : null }}
                                 </td>
                                 <td class="text-center">
                                 </td>
@@ -565,7 +571,7 @@
                                                 {{ $inventoryMovementItem['bom_item_name'] }}
                                             </td>
                                             <td class="text-center">
-                                                {{ \Carbon\Carbon::parse($inventoryMovementItem['date'])->format('Y-m-d') }}
+                                                {{ \Carbon\Carbon::parse($inventoryMovementItem['date'])->format('ymd') }}
                                             </td>
                                             <td class="text-left">
                                                 {{ $inventoryMovementItem['remarks'] }}
@@ -642,6 +648,9 @@
                                                         <b>
                                                             Received
                                                         </b>
+                                                        @if($inventoryMovementItemQuantity['createdBy'])
+                                                            <b>({{$inventoryMovementItemQuantity['createdBy']['name']}}</b> {{\Carbon\Carbon::parse($inventoryMovementItemQuantity['created_at'])->format('ymd H:ia')}})
+                                                        @endif
                                                     </td>
                                                     <td class="text-center">
                                                         {{ $inventoryMovementItemQuantity['date'] }}
@@ -976,7 +985,54 @@
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </x-slot>
                 </x-modal>
-
+                <x-modal id="attachment-modal-nonedit">
+                    <x-slot name="title">
+                        Attachments
+                    </x-slot>
+                    <x-slot name="content">
+                        <div class="form-group">
+                            @if(isset($attachments))
+                                @foreach($attachments as $attachmentIndex => $attachment)
+                                {{-- @dd($attachments, $attachment); --}}
+                                <div class="card" style="max-width:600px;width:100%;" wire:key="attachment-{{$attachmentIndex}}">
+                                        @php
+                                            $ext = pathinfo($attachment->full_url, PATHINFO_EXTENSION);
+                                        @endphp
+                                        @if($ext === 'pdf')
+                                            <embed src="{{$attachment->full_url}}" type="application/pdf" class="card-img-top" style="min-height: 500px;">
+                                        @elseif($ext === 'mov' or $ext === 'mp4')
+                                            <div class="embed-responsive embed-responsive-16by9">
+                                                <video class=" embed-responsive-item video-js" controls>
+                                                    <source src="{{$attachment->full_url}}">
+                                                    Your browser does not support the video tag.
+                                                </video>
+                                            </div>
+                                        @else
+                                            <img class="card-img-top" src="{{$attachment->full_url}}" alt="">
+                                        @endif
+                                        <div class="card-body">
+                                            <div class="btn-group d-none d-sm-block">
+                                                <button type="button" class="btn btn-warning" wire:click="downloadAttachment({{$attachment}})">
+                                                    <i class="fas fa-cloud-download-alt"></i>
+                                                    Download
+                                                </button>
+                                            </div>
+                                            <div class="d-block d-sm-none">
+                                                <button type="button" class="btn btn-block btn-warning" wire:click="downloadAttachment({{$attachment}})">
+                                                    <i class="fas fa-cloud-download-alt"></i>
+                                                    Download
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endif
+                        </div>
+                    </x-slot>
+                    <x-slot name="footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </x-slot>
+                </x-modal>
 
         </div>
     </div>
