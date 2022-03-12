@@ -35,6 +35,10 @@ class BomInventory extends Component
         'is_consumable' => '0',
         'supplier_id' => '',
     ];
+    public $planner = [
+        'bom_id' => '',
+        'qty' => '',
+    ];
     // public $bomItemForm = [
     //     'code' => '',
     //     'name' => '',
@@ -53,6 +57,7 @@ class BomInventory extends Component
     public $supplierQuotePrices = [];
     public $attachments;
     public $file;
+    public $showPlannerArea = false;
 
     public BomItem $bomItemForm;
 
@@ -77,6 +82,7 @@ class BomInventory extends Component
         $this->bomItemForm = new BomItem();
         $this->bomItemTypes = BomItemType::orderBy('name')->get();
         $this->suppliers = Supplier::orderBy('company_name')->get();
+        $this->boms = Bom::latest()->get();
     }
 
     public function render()

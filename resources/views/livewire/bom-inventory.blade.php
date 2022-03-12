@@ -82,12 +82,17 @@
                     </div>
                 </div>
                 <div class="form-row">
-{{--
+
                     <div class="mr-auto pl-1">
-                        <button class="btn btn-success" wire:click="toggle()" data-toggle="modal" data-target="#inventory-movement-modal">
+                        <button class="btn btn-primary" wire:click.prevent="$toggle('showPlannerArea')">
                             Planner
+                            @if($showPlannerArea)
+                                <i class="fas fa-caret-right"></i>
+                            @else
+                                <i class="fas fa-sort-down"></i>
+                            @endif
                         </button>
-                    </div> --}}
+                    </div>
 
                     <div class="ml-auto">
                         <div class="form-inline">
@@ -108,6 +113,35 @@
                     </div>
                 </div>
             </div>
+
+            @if($showPlannerArea)
+            <div class="bg-light pt-2 pb-2 pl-2 pr-2 mb-2">
+                <div class="form-row">
+                    <div class="form-group col-md-4 col-xs-12">
+                        <label>
+                            BOM
+                        </label>
+                        <select name="bom_id" wire:model="planner.bom_id" class="select form-control">
+                            <option value="">Select..</option>
+                            @foreach($boms as $bom)
+                                <option value="{{$bom->id}}">
+                                    {{$bom->name}}
+                                    @if($bom->remarks)
+                                        ({{$bom->remarks}})
+                                    @endif
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group col-md-4 col-xs-12">
+                        <label>
+                            Outgoing Qty
+                        </label>
+                        <input wire:model="planner.qty" type="text" class="form-control" placeholder="Outgoing Qty">
+                    </div>
+                </div>
+            </div>
+            @endif
 
             <div class="table-responsive pt-3" style="font-size: 14px;">
                 <table class="table table-bordered table-hover">
@@ -148,6 +182,11 @@
                         <th class="text-center text-dark">
                             Action
                         </th>
+                        @if($showPlannerArea)
+                        <th class="text-center text-dark">
+                            Plan Outgoing
+                        </th>
+                        @endif
                     </tr>
                     @forelse($bomItems as $index => $bomItem)
 
@@ -167,6 +206,18 @@
                                                 $query->where('action', array_search('Outgoing', \App\Models\InventoryMovement::ACTIONS));
                                             })->latest()
                                             ->get();
+
+                            $planOutgoingQty = 0;
+
+                            if($planner['bom_id'] and $planner['qty']) {
+                                $bomItemQty = $bomItem
+                                                ->bomContents()
+                                                ->whereHas('bomHeader', function($query) use ($planner) {
+                                                    $query->where('bom_id', $planner['bom_id']);
+                                                })
+                                                ->sum('qty');
+                                $planOutgoingQty = $bomItemQty * $planner['qty'];
+                            }
                         @endphp
 
                         <tr class="row_edit" wire:loading.class.delay="opacity-2" wire:key="row-{{$index}}">
@@ -223,6 +274,11 @@
                                     </button>
                                 </div>
                             </td>
+                            @if($showPlannerArea)
+                            <td class="text-right">
+                                {{$planOutgoingQty}}
+                            </td>
+                            @endif
                         </tr>
                     @empty
                     <tr>
