@@ -221,14 +221,14 @@
             </div>
             <hr>
             @if(isset($bom))
-                @role('admin')
+                @hasanyrole('admin|superadmin')
                 <div class="btn-group">
                     <button type="button" class="btn btn-success btn-md" data-toggle="modal" data-target="#header-modal" wire:click.prevent="createHeader({{$bom}})">
                         <i class="fas fa-plus-circle"></i>
                         Group
                     </button>
                 </div>
-                @endrole
+                @endhasanyrole
 
                 <div class="table-responsive pt-3">
                     <table class="table table-bordered table-sm">
@@ -289,7 +289,7 @@
                                 </th>
                                 <td class="col-md-2 bg-info text-center">
                                     <div class="btn-group">
-                                        @role('admin')
+                                        @hasanyrole('admin|superadmin')
                                             <button type="button" wire:click="editHeader({{$bomHeader}})" wire:key="header-edit-{{$bomHeaderIndex}}" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#header-modal">
                                                 <i class="fas fa-edit"></i>
                                             </button>
@@ -301,7 +301,7 @@
                                                 <i class="fas fa-plus-circle"></i>
                                                 P
                                             </button>
-                                        @endrole
+                                        @endhasanyrole
                                         @if($bomHeader->bomItem->attachments()->exists())
                                             <button type="button" class="btn btn-outline-dark btn-sm" wire:click="viewAttachmentsByBomItem({{$bomHeader->bomItem}})" wire:key="header-view-attachment-{{$bomHeaderIndex}}" data-toggle="modal" data-target="#attachment-modal">
                                                 <i class="far fa-images"></i>
@@ -399,11 +399,11 @@
                                         </th>
                                         <td class="col-md-2 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-center">
                                             <div class="btn-group">
-                                                @role('admin')
+                                                @hasanyrole('admin|superadmin')
                                                     <button type="button" wire:click="editPart({{$bomContent}})" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#content-modal">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
-                                                @endrole
+                                                @endhasanyrole
                                                 @if($bomContent->bomItem->attachments()->exists())
                                                     <button type="button" class="btn btn-outline-dark btn-sm" wire:click="viewAttachmentsByBomItem({{$bomContent->bomItem}})" wire:key="content-view-attachment-{{$bomContent->id}}" data-toggle="modal" data-target="#attachment-modal">
                                                         <i class="far fa-images"></i>
