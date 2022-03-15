@@ -195,8 +195,9 @@
                                     <td class="text-center">
                                         {{ $inventoryMovementItem->qty }}
                                     </td>
-                                    <td class="text-center @if(\Carbon\Carbon::createFromFormat('ymd', $inventoryMovementItem->date) < \Carbon\Carbon::today()) text-danger @endif">
-                                        {{ $inventoryMovementItem->date }}
+                                    <td class="text-center @if(\Carbon\Carbon::createFromFormat('Y-m-d', $inventoryMovementItem->date) < \Carbon\Carbon::today()) text-danger @endif">
+                                    {{-- <td class="text-center"> --}}
+                                        {{ \Carbon\Carbon::parse($inventoryMovementItem->date)->format('ymd') }}
                                     </td>
                                     <td class="text-center" style="{{($inventoryMovementItem->qty == $inventoryMovementItem->inventoryMovementItemQuantities()->sum('qty')) ? 'background-color: #90eeb0;' : ''}} {{$inventoryMovementItem->is_incomplete_qty ? 'background-color: #83B795;' : ''}}">
                                         {{$inventoryMovementItem->inventoryMovementItemQuantities()->sum('qty') + 0}}
@@ -490,7 +491,7 @@
                                                 ETA
                                             </label>
                                             <div class="input-group">
-                                                <input type="date" class="form-control" wire:model="inventoryMovementItemForm.date">
+                                                <input type="date" class="form-control" wire:model.defer="inventoryMovementItemForm.date">
                                                 <div class="input-group-append">
                                                     <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateinventoryMovementItemFormClicked(-1, 'date')">
                                                         <i class="fas fa-caret-left"></i>
@@ -648,7 +649,7 @@
                                                         <b>
                                                             Received
                                                         </b>
-                                                        @if($inventoryMovementItemQuantity['createdBy'])
+                                                        @if(isset($inventoryMovementItemQuantity['createdBy']))
                                                             <b>({{$inventoryMovementItemQuantity['createdBy']['name']}}</b> {{\Carbon\Carbon::parse($inventoryMovementItemQuantity['created_at'])->format('ymd H:ia')}})
                                                         @endif
                                                     </td>
