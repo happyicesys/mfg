@@ -240,7 +240,11 @@
                                 <b>{{ $bomItem->ordered_qty }}</b>
                                 @foreach($orderedQty as $ordered)
                                     @if($ordered->date)
-                                        <br> <small class="{{\Carbon\Carbon::createFromFormat('ymd', $ordered->date) < \Carbon\Carbon::today() ? 'text-danger' : ''}}">{{ $ordered->date }}</small>
+                                        <br> <small class="{{\Carbon\Carbon::createFromFormat('Y-m-d', $ordered->date) < \Carbon\Carbon::today() ? 'text-danger' : ''}}">
+                                        {{
+                                            \Carbon\Carbon::parse($ordered->date)->format('ymd')
+                                        }}
+                                         </small>
                                     @endif
                                 @endforeach
                             </td>
@@ -251,7 +255,10 @@
                                 <b>{{ $bomItem->planned_qty }}</b>
                                 @foreach($plannedQty as $planned)
                                     @if($planned->date)
-                                        <br> <small class="{{\Carbon\Carbon::createFromFormat('ymd', $planned->date) < \Carbon\Carbon::today() ? 'text-danger' : ''}}">{{ $planned->date }}</small>
+                                        <br> <small class="
+                                        {{\Carbon\Carbon::createFromFormat('Y-m-d', $planned->date) < \Carbon\Carbon::today() ? 'text-danger' : ''}}">
+                                        {{ \Carbon\Carbon::parse($planned->date)->format('ymd') }}
+                                    </small>
                                     @endif
                                 @endforeach
                             </td>
