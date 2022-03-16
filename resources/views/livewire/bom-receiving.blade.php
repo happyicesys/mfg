@@ -48,23 +48,23 @@
                                         @endforeach
                                     </select>
                                 </div>
-{{--
+
                                 <div class="form-group col-md-3 col-xs-12">
                                     <label>
-                                        Rec From
+                                        Rec Date
                                     </label>
                                     <div class="input-group">
-                                        <input type="date" class="form-control" wire:model="filters.receive_from">
+                                        <input type="date" class="form-control" wire:model="filters.date">
                                         <div class="input-group-append">
-                                            <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateClicked(-1, 'receive_from')">
+                                            <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateFiltersClicked(-1, 'date')">
                                                 <i class="fas fa-caret-left"></i>
                                             </button>
-                                            <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateClicked(1, 'receive_from')">
+                                            <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateFiltersClicked(1, 'date')">
                                                 <i class="fas fa-caret-right"></i>
                                             </button>
                                         </div>
                                     </div>
-                                </div> --}}
+                                </div>
                             </div>
                             <div class="form-row d-flex justify-content-end">
                                 <div class="btn-group">
@@ -202,15 +202,27 @@
                                     <td class="text-center" style="{{($inventoryMovementItem->qty == $inventoryMovementItem->inventoryMovementItemQuantities()->sum('qty')) ? 'background-color: #90eeb0;' : ''}} {{$inventoryMovementItem->is_incomplete_qty ? 'background-color: #83B795;' : ''}}">
                                         {{$inventoryMovementItem->inventoryMovementItemQuantities()->sum('qty') + 0}}
                                     </td>
-                                    <td class="text-center">
-                                        @if($inventoryMovementItem->inventoryMovementItemQuantities()->exists())
-                                            @php
-                                                $latestReceived = $inventoryMovementItem->inventoryMovementItemQuantities()->latest()->first();
-                                            @endphp
+                                    @if($inventoryMovementItem->inventoryMovementItemQuantities()->exists())
+                                        @php
+                                            $latestReceived = $inventoryMovementItem->inventoryMovementItemQuantities()->latest()->first();
+                                            $highlightDate = false;
+                                            if($filters['date']) {
+                                                foreach($inventoryMovementItem->inventoryMovementItemQuantities as $inventoryMovementItemQuantity) {
+                                                    if(\Carbon\Carbon::parse($inventoryMovementItemQuantity->date)->eq(\Carbon\Carbon::parse($filters['date']))) {
+                                                        $highlightDate = true;
+                                                    }
+                                                }
+                                            }
+
+                                        @endphp
+                                        <td class="text-center {{$highlightDate ? 'bg-warning' : '' }}">
                                             <b>{{ $latestReceived->createdBy ? $latestReceived->createdBy->name : null }}</b> <br>
                                             {{ $latestReceived->created_at ? \Carbon\Carbon::parse($latestReceived->created_at)->format('ymd h:ia') : null }}
-                                        @endif
-                                    </td>
+                                        </td>
+                                    @else
+                                        <td></td>
+                                    @endif
+
                                     <td class="text-center">
                                         <div class="btn-group">
                                             @if($inventoryMovement->status > array_search('Pending', \App\Models\InventoryMovement::STATUSES))

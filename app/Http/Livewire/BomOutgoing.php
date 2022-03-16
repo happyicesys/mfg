@@ -5,6 +5,7 @@ namespace App\Http\Livewire;
 use App\Models\Attachment;
 use App\Models\Bom;
 use App\Models\BomContent;
+use App\Models\BomHeader;
 use App\Models\BomItem;
 use App\Models\Country;
 use App\Models\CurrencyRate;
@@ -56,6 +57,10 @@ class BomOutgoing extends Component
     public $negativeAvailableQtyAlert = false;
     public $attachments;
     public $file;
+    public $selectBomHeader = [];
+    public $selectBomContent = [];
+    public $selectAll = false;
+    public $selectedValue;
 
     protected $listeners = [
         'refresh' => '$refresh',
@@ -125,6 +130,41 @@ class BomOutgoing extends Component
         return view('livewire.bom-outgoing', [
             'inventoryMovements' => $inventoryMovements,
         ]);
+    }
+
+    public function updatedSelectAll($value)
+    {
+        if($value) {
+            $selectedBomId = $this->inventoryMovementForm->bom_id;
+            $this->selectBomHeader = BomHeader::where('bom_id', $selectedBomId)->pluck('id')->map(fn($id) => (string) $id);
+            $this->selectBomContent = BomContent::whereHas('bomHeader', function($query) use ($selectedBomId) {
+                $query->where('bom_id', $selectedBomId);
+            })->pluck('id')->map(fn($id) => (string) $id)->toArray();
+        }else {
+            $this->selectBomHeader = [];
+            $this->selectBomContent = [];
+        }
+    }
+
+    public function updatedSelectBomHeader($value)
+    {
+        if($value) {
+            $this->selectBomContent = BomContent::whereHas('bomHeader', function($query) use ($value) {
+                $query->whereIn('id', $value);
+            })->pluck('id')->map(fn($id) => (string) $id)->toArray();
+        }else {
+            $this->selectBomContent = [];
+        }
+    }
+
+    public function updatedSelectBomContent($value)
+    {
+
+    }
+
+    public function selectedAction($value)
+    {
+        $this->selectedValue = $value;
     }
 
     public function sortBy($key)

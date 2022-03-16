@@ -37,6 +37,7 @@ class BomReceiving extends Component
         'status' => '',
         'created_at' => '',
         'supplier_id' => '',
+        'date' => '',
     ];
     public $inventoryMovementItemFormFilters = [
         'code' => '',
@@ -142,6 +143,12 @@ class BomReceiving extends Component
                 ->when($this->filters['status'], fn($query, $input) => $query->search('status', $input))
                 ->when($this->filters['created_at'], fn($query, $input) => $query->searchDate('created_at', $input))
                 ->when($this->filters['supplier_id'], fn($query, $input) => $query->search('supplier_id', $input));
+
+        if($date = $this->filters['date']) {
+            $inventoryMovements = $inventoryMovements->whereHas('inventoryMovementItems.inventoryMovementItemQuantities', function($query) use ($date) {
+                $query->whereDate('date', $date);
+            });
+        }
 
         $inventoryMovements = $inventoryMovements->where('action', array_search('Receiving', \App\Models\InventoryMovement::ACTIONS));
 
@@ -253,6 +260,13 @@ class BomReceiving extends Component
             $this->inventoryMovementItemForm->supplier_unit_price = $this->supplierQuotedPrice;
             $this->inventoryMovementItemForm->rate = $this->supplierForm->transactedCurrency ? $this->supplierForm->transactedCurrency->currencyRates()->latest()->first()->rate : null;
             $this->calculateAmount();
+        }
+    }
+
+    public function updatedFiltersDate($value)
+    {
+        if($value) {
+            $this->filters['status'] = '';
         }
     }
 
@@ -694,6 +708,19 @@ class BomReceiving extends Component
             $this[$model] = $date->addDay()->toDateString();
         }else {
             $this[$model] = $date->subDay()->toDateString();
+        }
+    }
+
+    public function onPrevNextDateFiltersClicked($direction, $model)
+    {
+        $date = Carbon::now();
+        if($this->filters[$model]) {
+            $date = Carbon::parse($this->filters[$model]);
+        }
+        if($direction > 0) {
+            $this->filters[$model] = $date->addDay()->toDateString();
+        }else {
+            $this->filters[$model] = $date->subDay()->toDateString();
         }
     }
 

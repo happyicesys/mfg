@@ -60,12 +60,6 @@
                     {{-- @endif --}}
                 </div>
                 <div class="form-row">
-                    {{-- <div class="mr-auto pl-1">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-search"></i>
-                            Search
-                        </button>
-                    </div> --}}
                     <div class="mr-auto pl-1">
                         <button class="btn btn-success" wire:click="createInventoryMovement()" data-toggle="modal" data-target="#inventory-movement-modal">
                             <i class="fas fa-plus-circle"></i>
@@ -386,33 +380,41 @@
                                         </div>
 
                                         <div class="table-responsive">
+                                            <table class="table table-bordered table-sm">
+                                                <tr class="d-flex">
+                                                    <th class="col-md-1 bg-secondary text-white text-center">
+                                                        <input type="checkbox" wire:model="selectAll">
+                                                    </th>
+                                                    <th class="col-md-2 bg-secondary text-white text-center">
+                                                        Cat1/Cat2
+                                                    </th>
+                                                    <th class="col-md-1 bg-secondary text-white text-center">
+                                                        Type
+                                                    </th>
+                                                    <th class="col-md-2 bg-secondary text-white text-center">
+                                                        Code
+                                                    </th>
+                                                    <th class="col-md-4 bg-secondary text-white text-center">
+                                                        Name
+                                                    </th>
+                                                    <th class="col-md-1 bg-secondary text-white text-center">
+                                                        Qty
+                                                    </th>
+                                                    <th class="col-md-1 bg-secondary text-white text-center">
+                                                        Needed Qty
+                                                    </th>
+                                                    <th class="col-md-2 bg-secondary text-white text-center">
+                                                        Action
+                                                    </th>
+                                                </tr>
+                                            </table>
                                             @if($bom->bomHeaders()->exists())
                                                 @foreach($bom->bomHeaders as $bomHeaderIndex => $bomHeader)
                                                 <table class="table table-borderless table-sm" wire:key="header-table-{{$bomHeaderIndex}}">
-                                                    <tr class="d-flex">
-                                                        <th class="col-md-2 bg-secondary text-white text-center">
-                                                            Cat1/Cat2
-                                                        </th>
-                                                        <th class="col-md-1 bg-secondary text-white text-center">
-                                                            Type
-                                                        </th>
-                                                        <th class="col-md-2 bg-secondary text-white text-center">
-                                                            Code
-                                                        </th>
-                                                        <th class="col-md-4 bg-secondary text-white text-center">
-                                                            Name
-                                                        </th>
-                                                        <th class="col-md-1 bg-secondary text-white text-center">
-                                                            Qty
-                                                        </th>
-                                                        <th class="col-md-1 bg-secondary text-white text-center">
-                                                            Needed Qty
-                                                        </th>
-                                                        <th class="col-md-2 bg-secondary text-white text-center">
-                                                            Action
-                                                        </th>
-                                                    </tr>
                                                     <tr class="d-flex border border-secondary">
+                                                        <th class="col-md-1 bg-info text-dark text-center">
+                                                            <input type="checkbox" wire:click="selectedAction({{$bomHeader->id}})" wire:model="selectBomHeader"  value="{{$bomHeader->id}}">
+                                                        </th>
                                                         <th class="col-md-2 bg-info text-dark">
                                                             {{$bomHeader->sequence}}
                                                             @if($bomHeader->bomCategory)
@@ -460,6 +462,9 @@
                                                                 }
                                                             @endphp
                                                             <tr class="d-flex border border-secondary ml-3">
+                                                                <th class="col-md-1 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-dark text-center">
+                                                                    <input type="checkbox" wire:model.defer="selectBomContent" value="{{$bomContent->id}}">
+                                                                </th>
                                                                 <th class="col-md-2 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-dark">
                                                                     {{$bomContent->sequence}}
                                                                     @if($bomContent->bomSubCategory)
@@ -496,21 +501,13 @@
                                                                     @endif
                                                                 </th>
                                                                 <th class="col-md-1 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-dark text-center">
-                                                                    @if(!$bomContent->is_group)
-                                                                        {{
-                                                                            $neededQty = $bomContent->qty * (is_numeric($inventoryMovementItemForm->bom_qty) ? $inventoryMovementItemForm->bom_qty : 0)
-                                                                        }}
-    {{--
-                                                                        @if($bomContent->bomItem->is_inventory)
-                                                                            @if(($netQty = $bomContent->bomItem->available_qty - $neededQty) < 0)
-                                                                            <span style="color:red;">
-                                                                                ({{ $netQty }})
-                                                                            </span>
-                                                                            @else
-                                                                                ({{ $netQty }})
-                                                                            @endif
-                                                                        @endif --}}
-                                                                    @endif
+                                                                    @php
+                                                                        $neededQty = 0;
+                                                                        if(!$bomContent->is_group and array_search($bomContent->id, $selectBomContent) and is_numeric($inventoryMovementItemForm->bom_qty)) {
+                                                                            $neededQty = $bomContent->qty * $inventoryMovementItemForm->bom_qty;
+                                                                        }
+                                                                    @endphp
+                                                                        {{$neededQty}}
                                                                 </th>
                                                                 <td class="col-md-2 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-center">
                                                                     <div class="btn-group">
