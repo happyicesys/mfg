@@ -27,28 +27,13 @@
                                     </label>
                                     <select name="action" wire:model="filters.status" class="form-control">
                                         <option value="">All</option>
-                                        @foreach(\App\Models\InventoryMovement::STATUSES as $statusIndex => $status)
-                                            <option value="{{ $statusIndex }}">
-                                                {{ $status }}
-                                            </option>
-                                        @endforeach
+                                        <option value="{{array_search('Confirmed', \App\Models\InventoryMovement::STATUSES)}}">
+                                            Planned
+                                        </option>
+                                        <option value="{{array_search('Completed', \App\Models\InventoryMovement::STATUSES)}}">
+                                            Completed
+                                        </option>
                                     </select>
-                                </div>
-                                <div class="form-group col-md-4 col-xs-12">
-                                    <label>
-                                        Created At
-                                    </label>
-                                    <div class="input-group">
-                                        <input type="date" class="form-control" wire:model="filters.created_at">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateClicked(-1, 'created_at')">
-                                                <i class="fas fa-caret-left"></i>
-                                            </button>
-                                            <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateClicked(1, 'created_at')">
-                                                <i class="fas fa-caret-right"></i>
-                                            </button>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                             <div class="form-row d-flex justify-content-end">
@@ -87,184 +72,134 @@
             </div>
 
             <div class="table-responsive pt-3" style="font-size: 14px;">
-                <table class="table table-bordered table-hover">
+                <table class="table table-bordered table-hover table-sm">
                     <tr class="table-secondary">
-                        {{-- <th class="text-center">
-                            <input type="checkbox" name="" id="">
-                        </th> --}}
                         <th class="text-center">
                             #
                         </th>
                         <x-th-data model="batch" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Batch
                         </x-th-data>
-                        <x-th-data model="order_date" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
-                            Delivery Date
+                        <x-th-data model="bom_id" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
+                            BOM
                         </x-th-data>
-                        <x-th-data model="total_amount" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
-                            Total Amount
-                        </x-th-data>
-                        <x-th-data model="country_id" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
-                            Currency
-                        </x-th-data>
-                        <x-th-data model="created_at" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
-                            Created At
-                        </x-th-data>
-                        <x-th-data model="updated_at" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
-                            Updated At
-                        </x-th-data>
-                        <x-th-data model="status" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
-                            Status
-                        </x-th-data>
+                        <th class="text-center text-dark">
+                            Delivery Dt
+                        </th>
+                        <th class="text-center text-dark">
+                            Code
+                        </th>
+                        <th class="text-center text-dark">
+                            Part Name
+                        </th>
+                        <th class="text-center text-dark">
+                            Qty
+                        </th>
                         <th></th>
                     </tr>
                     @forelse($inventoryMovements as $index => $inventoryMovement)
-                    <tr class="row_edit m-b-3" wire:loading.class.delay="opacity-2" wire:key="row-{{$inventoryMovement->id}}" style="background-color: #adcfe6;">
-                        {{-- <th class="text-center">
-                            <input type="checkbox" wire:model="selected" value="{{$admin->id}}">
-                        </th> --}}
-                        <td class="text-center">
-                            <b>
-                                {{ $index + $from}}
-                            </b>
-                        </td>
-                        <td class="text-center">
-                            {{ $inventoryMovement->batch }}
-                        </td>
-                        <td class="text-center">
-                            {{ $inventoryMovement->order_date ? \Carbon\Carbon::parse($inventoryMovement->order_date)->format('Y-m-d') : null }}
-                        </td>
-                        <td class="text-right">
-                            {{ number_format($inventoryMovement->total_amount, '2', '.', ',') }}
-                        </td>
-                        <td class="text-center">
-                            {{ $inventoryMovement->country ? $inventoryMovement->country->currency_name : null }}
-                        </td>
-                        <td class="text-center">
-                            <b>{{ $inventoryMovement->createdBy ? $inventoryMovement->createdBy->name : null }}</b> <br>
-                            {{ $inventoryMovement->created_at ? \Carbon\Carbon::parse($inventoryMovement->created_at)->format('Y-m-d h:ia') : null }}
-                        </td>
-                        <td class="text-center">
-                            <b>{{ $inventoryMovement->updatedBy ? $inventoryMovement->updatedBy->name : null }}</b> <br>
-                            {{ $inventoryMovement->updated_at ? \Carbon\Carbon::parse($inventoryMovement->updated_at)->format('Y-m-d h:ia') : null }}
-                        </td>
-                        <td class="text-center">
-                            {{ $inventoryMovement->status ?
-                                \App\Models\InventoryMovement::STATUSES[$inventoryMovement->status] :
-                                null
-                            }}
-                        </td>
-                        <td class="text-center">
-                            <button type="button" wire:click="editInventoryMovement({{$inventoryMovement}})" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#inventory-movement-modal">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    @if(count($inventoryMovement->inventoryMovementItems) > 0)
-                        <tr class="table-secondary">
-                            <th colspan="2"></th>
-                            <th class="text-center text-dark">
-                                Code
-                            </th>
-                            <th class="text-center text-dark">
-                                Name
-                            </th>
-                            <th class="text-center text-dark" colspan="2">
-                                Remarks
-                            </th>
-                            <th class="text-center text-dark">
-                                Qty
-                            </th>
-                            <th class="text-center text-dark">
-                                Status
-                            </th>
-                            <th></th>
-                        </tr>
-                        @foreach($inventoryMovement->inventoryMovementItems as $inventoryMovementItemIndex => $inventoryMovementItem)
-                            <tr class="ml-3">
-                                <td class="text-center" colspan="2">
-                                    ({{ $inventoryMovementItemIndex + 1 }})
-                                    @if($inventoryMovementItem->bomItem->attachments()->exists())
-                                        <button type="button" class="btn btn-outline-dark btn-sm" wire:click="viewBomItemAttachments({{$inventoryMovementItem->bomItem}})" wire:key="inventory-movement-item-bom-item-attachment-{{$inventoryMovementItem->id}}" data-toggle="modal" data-target="#attachment-modal">
-                                            <i class="far fa-images"></i>
-                                        </button>
-                                    @endif
-                                </td>
-                                <td class="text-left">
-                                    {{ $inventoryMovementItem->bomItem->code }}
-                                </td>
-                                <td class="text-left">
-                                    {{ $inventoryMovementItem->bomItem->name }}
-                                </td>
-                                <td class="text-left" colspan="2">
-                                    {{ $inventoryMovementItem->remarks }}
-                                </td>
-                                <td class="text-center">
-                                    {{ $inventoryMovementItem->qty }}
-                                    @if($inventoryMovementItem->inventoryMovementItemQuantities()->exists() and ($inventoryMovementItem->qty - $inventoryMovementItem->inventoryMovementItemQuantities()->sum('qty')) > 0)
-                                        <br>
-                                        ({{$inventoryMovementItem->qty - $inventoryMovementItem->inventoryMovementItemQuantities()->sum('qty') + 0}})
-                                    @endif
-                                </td>
-                                <td class="text-center">
-                                    {{ \App\Models\InventoryMovementItem::OUTGOING_STATUSES[$inventoryMovementItem->status] }}
-                                </td>
-                                <td class="text-center">
-                                    <div class="btn-group">
-                                        @if($inventoryMovement->status > array_search('Pending', \App\Models\InventoryMovement::STATUSES))
-                                            <button class="btn btn-sm btn-success" wire:click.prevent="editReceiveInventoryMovementItem({{$inventoryMovementItem}})" data-toggle="modal" data-target="#inventory-movement-item-quantity-modal" title="Create Receiving">
-                                                <i class="fas fa-plus-circle"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-danger" wire:click.prevent="deleteSingleInventoryMovementItem({{$inventoryMovementItem->id}})" {{$inventoryMovementItem['inventoryMovement']['status'] == array_search('Completed', \App\Models\InventoryMovement::STATUSES) ? 'disabled' : '' }}>
-                                                <i class="fas fa-times-circle"></i>
-                                            </button>
-                                            @if($inventoryMovementItem->attachments()->exists())
-                                                <button type="button" class="btn btn-outline-dark btn-sm" wire:click="viewInventoryItemAttachments({{$inventoryMovementItem}})" wire:key="inventory-movement-item-quantity-attachment-{{$inventoryMovementItem->id}}" data-toggle="modal" data-target="#attachment-modal">
-                                                    <i class="far fa-images"></i>
+                        @if($inventoryMovement->inventoryMovementItems()->exists())
+                            @foreach($inventoryMovement->inventoryMovementItems as $inventoryMovementItemIndex => $inventoryMovementItem)
+                                <tr class="ml-3">
+                                    <td class="text-center">
+                                        @if($loop->first)
+                                            <b>
+                                                {{ $index + $from}}
+                                            </b>
+                                        @endif
+                                    </td>
+                                    @php
+                                        $bgColor = '';
+                                        if($inventoryMovement->status == array_search('Confirmed', \App\Models\InventoryMovement::STATUSES)) {
+                                            $bgColor = 'bg-warning';
+                                        }else if($inventoryMovement->status == array_search('Completed', \App\Models\InventoryMovement::STATUSES)) {
+                                            $bgColor = 'bg-success';
+                                        }
+                                    @endphp
+                                    <td class="text-left @if($loop->first) {{$bgColor}} @endif">
+                                        @if($loop->first)
+                                            <a href="#" wire:click="editInventoryMovement({{$inventoryMovement}})" data-toggle="modal" data-target="#inventory-movement-modal">
+                                                {{ $inventoryMovement->batch }}
+                                            </a>
+                                        @endif
+                                    </td>
+                                    <td class="text-left">
+                                        @if($loop->first)
+                                            <b>
+                                                {{ $inventoryMovement->bom->name }}
+                                            </b>
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        @if($loop->first)
+                                            <b>
+                                                {{ $inventoryMovement->order_date }}
+                                            </b>
+                                        @endif
+                                    </td>
+                                    <td class="text-left">
+                                        @if($inventoryMovementItem->bomItem->attachments()->exists())
+                                            <a href="#" wire:click.prevent="viewBomItemAttachments({{$inventoryMovementItem->bomItem}})" data-toggle="modal" data-target="#attachment-modal-nonedit">
+                                                {{ $inventoryMovementItem->bomItem->code }}
+                                            </a>
+                                        @else
+                                            {{ $inventoryMovementItem->bomItem->code }}
+                                        @endif
+                                    </td>
+                                    <td class="text-left">
+                                        {{ $inventoryMovementItem->bomItem->name }}
+                                    </td>
+                                    <td class="text-right">
+                                        {{ $inventoryMovementItem->qty }}
+                                    </td>
+
+                                    <td class="text-center">
+                                        <div class="btn-group">
+                                            @if($inventoryMovement->status > array_search('Pending', \App\Models\InventoryMovement::STATUSES))
+                                                @if($inventoryMovement->status != array_search('Completed', \App\Models\InventoryMovement::STATUSES))
+                                                    @role('admin')
+                                                        <button class="btn btn-sm btn-danger" wire:click.prevent="deleteSingleInventoryMovementItem({{$inventoryMovementItem->id}})" {{$inventoryMovementItem['inventoryMovement']['status'] == array_search('Completed', \App\Models\InventoryMovement::STATUSES) ? 'disabled' : '' }}>
+                                                            <i class="fas fa-times-circle"></i>
+                                                        </button>
+                                                    @endrole
+                                                @endif
+                                            @else
+                                                <button class="btn btn-sm btn-danger" wire:click.prevent="deleteSingleInventoryMovementItem({{$inventoryMovementItemIndex}})">
+                                                    <i class="fas fa-times-circle"></i>
                                                 </button>
                                             @endif
-                                        @else
-                                            <button class="btn btn-sm btn-danger" wire:click.prevent="deleteSingleInventoryMovementItem({{$inventoryMovementItemIndex}})">
-                                                <i class="fas fa-times-circle"></i>
-                                            </button>
-                                        @endif
-                                    </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @else
+                            <tr class="row_edit m-b-3" wire:loading.class.delay="opacity-2" wire:key="row-{{$inventoryMovement->id}}" style="background-color: #adcfe6;">
+                                <td class="text-center">
+                                    <b>
+                                        {{ $index + $from}}
+                                    </b>
+                                </td>
+                                <td class="text-left">
+                                    <a href="#" wire:click="editInventoryMovement({{$inventoryMovement}})" data-toggle="modal" data-target="#inventory-movement-modal">
+                                        {{ $inventoryMovement->batch }}
+                                    </a>
+                                </td>
+                                <td class="text-center">
+                                </td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="text-center">
+                                </td>
+                                <td class="text-center">
+                                    <button type="button" wire:click="editInventoryMovement({{$inventoryMovement}})" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#inventory-movement-modal">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
                                 </td>
                             </tr>
+                        @endif
+                    @if(count($inventoryMovement->inventoryMovementItems) > 0)
 
-                            @if($inventoryMovementItem->inventoryMovementItemQuantities()->exists())
-                                @foreach($inventoryMovementItem->inventoryMovementItemQuantities as $inventoryMovementItemQuantity)
-                                    <tr class="ml-5" style="background-color: #90eeb0;">
-                                        <td class="text-center" colspan="3">
-                                            <b>
-                                                Received
-                                            </b>
-                                        </td>
-                                        <td class="text-left" colspan="3">
-                                            {{ $inventoryMovementItemQuantity->remarks }}
-                                        </td>
-                                        <td class="text-center">
-                                            {{ $inventoryMovementItemQuantity->date }}
-                                        </td>
-                                        <td class="text-center">
-                                            {{ $inventoryMovementItemQuantity->qty }}
-                                        </td>
-                                        <td class="text-center" colspan="2">
-                                            <div class="btn-group">
-                                                @if($inventoryMovementItemQuantity->attachments()->exists())
-                                                    <button type="button" class="btn btn-outline-dark btn-sm" wire:click="viewQuantityAttachments({{$inventoryMovementItemQuantity}})" wire:key="inventory-movement-item-quantity-attachment-{{$inventoryMovementItemQuantity->id}}" data-toggle="modal" data-target="#attachment-modal">
-                                                        <i class="far fa-images"></i>
-                                                    </button>
-                                                @endif
-                                                <button type="button" class="btn btn-danger btn-sm" onclick="confirm('Are you sure you want to delete this received part?') || event.stopImmediatePropagation()" wire:click="removeQuantity({{$inventoryMovementItemQuantity}})" wire:key="inventory-movement-item-quantity-delete-{{$inventoryMovementItemQuantity->id}}" {{$inventoryMovementItemQuantity->inventoryMovementItem->inventoryMovement->status == array_search('Completed', \App\Models\InventoryMovement::STATUSES) ? 'disabled' : ''}}>
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            @endif
-                        @endforeach
                         <tr style="max-height: 15px;">
                             <td colspan="18"></td>
                         </tr>
@@ -313,6 +248,7 @@
                             <label for="bom_id">
                                 BOM
                             </label>
+                            <label for="*" class="text-danger">*</label>
                             <select name="bom_id" wire:model="inventoryMovementForm.bom_id" class="select form-control">
                                 <option value="">Select..</option>
                                 @foreach($boms as $bom)
@@ -333,10 +269,10 @@
                             <div class="input-group">
                                 <input type="date" class="form-control" wire:model="inventoryMovementForm.order_date">
                                 <div class="input-group-append">
-                                    <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateinventoryMovementFormClicked(-1, 'order_date')">
+                                    <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateInventoryMovementFormClicked(-1, 'order_date')">
                                         <i class="fas fa-caret-left"></i>
                                     </button>
-                                    <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateinventoryMovementFormClicked(1, 'order_date')">
+                                    <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateInventoryMovementFormClicked(1, 'order_date')">
                                         <i class="fas fa-caret-right"></i>
                                     </button>
                                 </div>
@@ -374,7 +310,7 @@
                                             <input type="text" wire:model="inventoryMovementItemForm.bom_qty" class="form-control">
                                         </div>
                                         <div class="form-group">
-                                            <button class="btn btn-success" wire:click.prevent="onGenerateOutgoingClicked()" {{ $inventoryMovementItemForm->bom_qty && is_numeric($inventoryMovementItemForm->bom_qty) ? '' : 'disabled' }}>
+                                            <button class="btn btn-success" wire:click.prevent="onGenerateOutgoingClicked()" {{ $inventoryMovementItemForm->bom_qty && is_numeric($inventoryMovementItemForm->bom_qty) && $this->selectBomContent ? '' : 'disabled' }}>
                                                 Generate Outgoing(s)
                                             </button>
                                         </div>
@@ -413,7 +349,7 @@
                                                 <table class="table table-borderless table-sm" wire:key="header-table-{{$bomHeaderIndex}}">
                                                     <tr class="d-flex border border-secondary">
                                                         <th class="col-md-1 bg-info text-dark text-center">
-                                                            <input type="checkbox" wire:click="selectedAction({{$bomHeader->id}})" wire:model="selectBomHeader"  value="{{$bomHeader->id}}">
+                                                            <input type="checkbox" wire:model="selectBomHeader" wire:click="selectedHeader({{$bomHeader->id}})" value="{{$bomHeader->id}}">
                                                         </th>
                                                         <th class="col-md-2 bg-info text-dark">
                                                             {{$bomHeader->sequence}}
@@ -443,7 +379,7 @@
                                                         </td>
                                                     </tr>
                                                     @if($bomHeader->bomContents()->exists())
-                                                        @foreach($bomHeader->bomContents->sortBy('sequence', SORT_NATURAL) as $bomContent)
+                                                        @foreach($bomHeader->bomContents->sortBy('sequence', SORT_NATURAL) as $bomContentIndex => $bomContent)
                                                             @php
                                                                 $sequenceStyle = '';
                                                                 $dotCount = substr_count($bomContent->sequence, '.');
@@ -461,9 +397,11 @@
                                                                         $sequenceStyle = 'text-dark';
                                                                 }
                                                             @endphp
-                                                            <tr class="d-flex border border-secondary ml-3">
+                                                            <tr class="d-flex border border-secondary ml-3" wire:key="content-table-{{$bomContentIndex}}">
+                                                                {{-- <th>{{$bomContent->id}}</th> --}}
+                                                                {{-- <th>@json($selectBomContent)</th> --}}
                                                                 <th class="col-md-1 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-dark text-center">
-                                                                    <input type="checkbox" wire:model.defer="selectBomContent" value="{{$bomContent->id}}">
+                                                                    <input type="checkbox" wire:model.defer="selectBomContent" wire:click="selectedContent({{$bomContent->id}})" value="{{$bomContent->id}}">
                                                                 </th>
                                                                 <th class="col-md-2 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-dark">
                                                                     {{$bomContent->sequence}}
@@ -503,7 +441,7 @@
                                                                 <th class="col-md-1 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-dark text-center">
                                                                     @php
                                                                         $neededQty = 0;
-                                                                        if(!$bomContent->is_group and array_search($bomContent->id, $selectBomContent) and is_numeric($inventoryMovementItemForm->bom_qty)) {
+                                                                        if(!$bomContent->is_group and is_numeric($inventoryMovementItemForm->bom_qty)) {
                                                                             $neededQty = $bomContent->qty * $inventoryMovementItemForm->bom_qty;
                                                                         }
                                                                     @endphp
@@ -525,6 +463,90 @@
                                                 @endforeach
                                             @endif
                                         </div>
+                                        @endif
+
+                                    <div class="form-group">
+                                        <button wire:click="$toggle('showGenerateLooseArea')" class="btn btn-outline-secondary btn-block">
+                                            Loose
+                                            @if($showGenerateLooseArea)
+                                                <i class="fas fa-caret-right"></i>
+                                            @else
+                                                <i class="fas fa-caret-down"></i>
+                                            @endif
+                                        </button>
+                                    </div>
+
+                                        @if($showGenerateLooseArea)
+                                            <div class="form-group">
+                                                <div class="bg-light p-3">
+                                                    <div class="form-row">
+                                                        <div class="form-group col-md-3 col-xs-12">
+                                                            <label for="name">
+                                                                Code Filter
+                                                            </label>
+                                                            <input type="text" wire:model.debounce.500ms="inventoryMovementItemFormFilters.code" class="form-control" placeholder="Code">
+                                                        </div>
+                                                        <div class="form-group col-md-3 col-xs-12">
+                                                            <label for="name">
+                                                                Name Filter
+                                                            </label>
+                                                            <input type="text" wire:model.debounce.500ms="inventoryMovementItemFormFilters.name" class="form-control" placeholder="Name">
+                                                        </div>
+                                                        <div class="form-group col-md-3 col-xs-12">
+                                                            <label for="name">
+                                                                Type Filter
+                                                            </label>
+                                                            <select class="select form-control" wire:model="inventoryMovementItemFormFilters.bom_item_type_id">
+                                                                <option value="">All</option>
+                                                                @foreach($bomItemTypes as $bomItemType)
+                                                                    <option value="{{$bomItemType->id}}" {{isset($bomItemForm->bom_item_type_id) && ($bomItemType->id == $bomItemForm->bom_item_type_id) ? 'selected' : ''}}>
+                                                                        {{ $bomItemType->name }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group col-md-3 col-xs-12">
+                                                            <label for="supplier_id">
+                                                                Supplier Filter
+                                                            </label>
+                                                            <select class="select form-control" wire:model="inventoryMovementItemFormFilters.supplier_id">
+                                                                <option value="">All</option>
+                                                                @foreach($suppliers as $supplierOption)
+                                                                    <option value="{{$supplierOption->id}}">
+                                                                        {{ $supplierOption->company_name }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group col-md-12 col-xs-12">
+                                                            <label for="bom_item_id">
+                                                                Part
+                                                            </label>
+                                                            <label for="*" class="text-danger">*</label>
+                                                            <select wire:model="inventoryMovementItemForm.bom_item_id" class="form-control select">
+                                                                <option value="">Select..</option>
+                                                                @foreach($bomItems as $bomItem)
+                                                                    <option value="{{ $bomItem->id }}">
+                                                                        {{ $bomItem->code }} - {{ $bomItem->name }} (Avail Qty: {{ $bomItem->available_qty }})
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group col-md-12 col-xs-12">
+                                                            <label for="qty">
+                                                                Qty
+                                                            </label>
+                                                            <label for="*" class="text-danger">*</label>
+                                                            <input type="text" wire:model.debounce.500ms="inventoryMovementItemForm.qty" class="form-control" placeholder="Qty">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <button class="btn btn-success" wire:click.prevent="onGenerateLooseClicked()" {{ $inventoryMovementItemForm->qty && is_numeric($inventoryMovementItemForm->qty) && $inventoryMovementItemForm->bom_item_id ? '' : 'disabled' }}>
+                                                                Add Loose
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         @endif
 
                                         <div class="table-responsive">
@@ -585,21 +607,31 @@
                                                         {{ $inventoryMovementItem['balance_qty'] }}
                                                     </td>
                                                     <td class="text-center">
-                                                        @if($inventoryMovementForm->status > 1)
-                                                            {{-- <div class="btn-group">
-                                                                @if($inventoryMovementItem['status'] != array_search('Confirmed', \App\Models\InventoryMovement::STATUSES))
-                                                                    <button class="btn btn-sm btn-success" wire:click.prevent="receivedSingleInventoryMovementItem({{$inventoryMovementItem['id']}})">
-                                                                        <i class="fas fa-check-square"></i>
-                                                                    </button>
-                                                                @endif
-                                                                @if($inventoryMovementItem['status'] != array_search('Cancelled', \App\Models\InventoryMovement::STATUSES))
-                                                                    <button class="btn btn-sm btn-danger" wire:click.prevent="voidSingleInventoryMovementItem({{$inventoryMovementItem['id']}})">
-                                                                        <i class="fas fa-minus-circle"></i>
-                                                                    </button>
-                                                                @endif
-                                                            </div> --}}
+                                                        @if(isset($inventoryMovementItem['id']))
+                                                            @if(isset($inventoryMovementItem['attachments']) and count($inventoryMovementItem['attachments']) > 0)
+                                                                <button type="button" class="btn btn-outline-dark btn-sm" wire:click="viewInventoryItemAttachments({{$inventoryMovementItem['id']}})" wire:key="inventory-movement-item-attachment-{{$inventoryMovementItem['id']}}" data-toggle="modal" data-target="#attachment-modal">
+                                                                    <i class="far fa-images"></i>
+                                                                </button>
+                                                            @endif
+                                                            @php
+                                                                $editSingleInventoryMovementItemDisabled = false;
+                                                                if($inventoryMovementItem['inventoryMovement']['status'] == array_search('Completed', \App\Models\InventoryMovement::STATUSES)) {
+                                                                    $editSingleInventoryMovementItemDisabled = true;
+                                                                }
+                                                                if(auth()->user()->hasRole('admin') or auth()->user()->hasRole('superadmin')) {
+                                                                    $editSingleInventoryMovementItemDisabled = false;
+                                                                }
+                                                            @endphp
+                                                            <button class="btn btn-sm btn-outline-secondary" wire:click.prevent="editSingleInventoryMovementItem({{$inventoryMovementItem['id']}})" data-toggle="modal" data-target="#inventory-movement-edit-modal" {{$editSingleInventoryMovementItemDisabled ? 'disabled' : '' }}>
+                                                                <i class="far fa-edit"></i>
+                                                            </button>
+                                                            @role('admin')
+                                                                <button class="btn btn-sm btn-danger" onclick="confirm('Are you sure you want to delete this outgoing item?') || event.stopImmediatePropagation()" wire:click.prevent="deleteSingleInventoryMovementItem({{$inventoryMovementItem['id']}})" {{$editSingleInventoryMovementItemDisabled ? 'disabled' : '' }}>
+                                                                    <i class="fas fa-times-circle"></i>
+                                                                </button>
+                                                            @endrole
                                                         @else
-                                                            <button class="btn btn-sm btn-danger" wire:click.prevent="deleteSingleInventoryMovementItem({{$inventoryMovementItemIndex}})">
+                                                            <button class="btn btn-sm btn-danger" wire:click.prevent="deleteSingleInventoryMovementItemIndex({{$inventoryMovementItemIndex}})">
                                                                 <i class="fas fa-times-circle"></i>
                                                             </button>
                                                         @endif
@@ -612,6 +644,8 @@
                                                 @endforelse
                                             </table>
                                         </div>
+
+
                                 @endif
                                 </div>
                             </div>
@@ -629,6 +663,7 @@
                                     type="submit"
                                     class="btn btn-success btn-xs-block"
                                     wire:click.prevent="saveInventoryMovementForm('Confirmed')"
+                                    {{count($inventoryMovementItems) > 0 ? '' : 'disabled'}}
                                 >
                                     Confirm
                                 </button>
@@ -673,75 +708,23 @@
                                 @endforeach
                             </select>
                         </div>
-                        @if($inventoryMovementItemForm->bom_item_id and isset($supplier) and $supplier->id)
-                            <hr>
-                            <div class="form-row">
-                                <div class="form-group col-md-6 col-xs-12">
-                                    <label for="supplier_unit_price">
-                                        Quoted Unit Price <br>({{$supplier->company_name}})
-                                    </label>
-                                    <input type="text" wire:model="inventoryMovementItemForm.supplier_unit_price" wire:change="calculateAmount()" class="form-control">
-                                </div>
-                                <div class="form-group col-md-6 col-xs-12">
-                                    <label for="supplier_unit_price">
-                                        Latest Currency Rate <br> ({{$supplier->transactedCurrency->currency_name}})
-                                    </label>
-                                    <input type="text" wire:model="inventoryMovementItemForm.rate" class="form-control">
-                                </div>
-                            </div>
-                            <hr>
-                        @endif
-                            <div class="form-row">
-                                <div class="form-group @if($this->inventoryMovementItemForm->bom_item_id and isset($supplier) and $supplier->id) col-md-4 col-xs-12 @else col-md-12 col-xs-12 @endif ">
-                                    <label>
-                                        Qty
-                                    </label>
-                                    <label for="*" class="text-danger">*</label>
-                                    <input wire:model="inventoryMovementItemForm.qty" wire:change="calculateAmount()" type="text" class="form-control" placeholder="Qty">
-                                </div>
-                                @if($this->inventoryMovementItemForm->bom_item_id and isset($supplier) and $supplier->id)
-                                <div class="form-group col-md-4 col-xs-12">
-                                    <label>
-                                        Unit Price
-                                    </label>
-                                    <input wire:model="inventoryMovementItemForm.unit_price" wire:change="calculateAmount()" type="text" class="form-control" placeholder="Unit Price">
-                                </div>
-                                <div class="form-group col-md-4 col-xs-12">
-                                    <label>
-                                        Amount
-                                    </label>
-                                    <input wire:model="inventoryMovementItemForm.amount" type="text" class="form-control" placeholder="Unit Price" disabled>
-                                </div>
-                                @endif
-                            </div>
-                            <div class="form-group">
+                        <div class="form-row">
+                            <div class="form-group @if($this->inventoryMovementItemForm->bom_item_id and isset($supplier) and $supplier->id) col-md-4 col-xs-12 @else col-md-12 col-xs-12 @endif ">
                                 <label>
-                                    ETA
+                                    Qty
                                 </label>
-                                <div class="input-group">
-                                    <input type="date" class="form-control" wire:model="inventoryMovementItemForm.date">
-                                    <div class="input-group-append">
-                                        <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateinventoryMovementItemFormClicked(-1, 'date')">
-                                            <i class="fas fa-caret-left"></i>
-                                        </button>
-                                        <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateinventoryMovementItemFormClicked(1, 'date')">
-                                            <i class="fas fa-caret-right"></i>
-                                        </button>
-                                    </div>
-                                </div>
+                                <label for="*" class="text-danger">*</label>
+                                <input wire:model="inventoryMovementItemForm.qty" type="text" class="form-control" placeholder="Qty">
                             </div>
-                            <div class="form-group">
-                                <label>
-                                    Remarks
-                                </label>
-                                <textarea wire:model.defer="inventoryMovementItemForm.remarks" class="form-control" name="remarks" rows="3"></textarea>
-                            </div>
+                        </div>
                     </x-slot>
                     <x-slot name="footer">
-                        <button class="btn btn-success" wire:click="updateSingleInventoryMovementItem()" {{$inventoryMovementItemForm->bom_item_id && $inventoryMovementItemForm->qty ? '' : 'disabled' }}>
-                            <i class="fas fa-check"></i>
-                            Edit
-                        </button>
+                        @role('admin')
+                            <button class="btn btn-success" wire:click="updateSingleInventoryMovementItem()" {{$inventoryMovementItemForm->bom_item_id && $inventoryMovementItemForm->qty ? '' : 'disabled' }}>
+                                <i class="fas fa-check"></i>
+                                Edit
+                            </button>
+                        @endrole
                     </x-slot>
                 </x-modal>
                 <x-modal id="attachment-modal">

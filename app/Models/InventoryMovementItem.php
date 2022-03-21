@@ -25,8 +25,9 @@ class InventoryMovementItem extends Model
     ];
 
     const OUTGOING_STATUSES = [
-        1 => 'Planned',
-        2 => 'Delivered',
+        1 => 'New',
+        2 => 'Planned',
+        4 => 'Delivered',
         99 => 'Void',
     ];
 

@@ -455,7 +455,6 @@
                                                 </option>
                                             @endforeach
                                         </select>
-                                        {{-- {{$selectedBomItem->supplierQuotePrices()->latest()->with('supplier')->first()}} --}}
                                     </div>
                                     @if($inventoryMovementItemForm->bom_item_id and isset($supplierForm) and $supplierForm->id)
                                         <hr>

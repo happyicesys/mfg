@@ -7,10 +7,12 @@ use App\Models\Bom;
 use App\Models\BomContent;
 use App\Models\BomHeader;
 use App\Models\BomItem;
+use App\Models\BomItemType;
 use App\Models\Country;
 use App\Models\CurrencyRate;
 use App\Models\InventoryMovement;
 use App\Models\InventoryMovementItem;
+use App\Models\InventoryMovementItemQuantity;
 use App\Models\Supplier;
 use App\Models\SupplierQuotePrice;
 use DB;
@@ -38,6 +40,7 @@ class BomOutgoing extends Component
         'code' => '',
         'name' => '',
         'bom_item_type_id' => '',
+        'supplier_id' => ''
     ];
     public Bom $bom;
     public BomItem $selectedBomItem;
@@ -54,6 +57,7 @@ class BomOutgoing extends Component
     public $totalAmount = 0.00;
     public $countries;
     public $showGenerateByBomArea = false;
+    public $showGenerateLooseArea = false;
     public $negativeAvailableQtyAlert = false;
     public $attachments;
     public $file;
@@ -61,6 +65,9 @@ class BomOutgoing extends Component
     public $selectBomContent = [];
     public $selectAll = false;
     public $selectedValue;
+    public $selectedContentValue;
+    public $bomItemTypes = [];
+    public $suppliers = [];
 
     protected $listeners = [
         'refresh' => '$refresh',
@@ -90,6 +97,10 @@ class BomOutgoing extends Component
             'inventoryMovementItemForm.date' => 'sometimes',
             'editInventoryMovementItemForm.date' => 'sometimes',
             'editInventoryMovementItemForm.remarks' => 'sometimes',
+            'inventoryMovementItemFormFilters.code' => 'sometimes',
+            'inventoryMovementItemFormFilters.name' => 'sometimes',
+            'inventoryMovementItemFormFilters.bom_item_type_id' => 'sometimes',
+            'inventoryMovementItemFormFilters.supplier_id' => 'sometimes',
         ];
     }
 
@@ -100,6 +111,8 @@ class BomOutgoing extends Component
         $this->countries = Country::orderBy('currency_name')->get();
         $this->boms = Bom::latest()->get();
         $this->bomItems = BomItem::where('is_part', 1)->where('is_inventory', 1)->orderBy('code')->get();
+        $this->bomItemTypes = BomItemType::orderBy('name')->get();
+        $this->suppliers = Supplier::orderBy('company_name')->get();
     }
 
     public function render()
@@ -132,11 +145,39 @@ class BomOutgoing extends Component
         ]);
     }
 
+    public function updated($name, $value)
+    {
+        if($name == 'inventoryMovementItemFormFilters.code' or $name == 'inventoryMovementItemFormFilters.name' or $name == 'inventoryMovementItemFormFilters.bom_item_type_id' or $name == 'inventoryMovementItemFormFilters.supplier_id') {
+            $bomItems = BomItem::when($this->inventoryMovementItemFormFilters['code'], fn($query, $input) => $query->searchLike('code', $input))
+                                    ->when($this->inventoryMovementItemFormFilters['name'], fn($query, $input) => $query->searchLike('name', $input))
+                                    ->when($this->inventoryMovementItemFormFilters['bom_item_type_id'], fn($query, $input) => $query->whereHas('bomItemType', function($query) use ($input) { $query->search('id', $input); }));
+
+            if($supplierId = $this->inventoryMovementItemFormFilters['supplier_id']) {
+                $bomItems = $bomItems->where(function($query) use ($supplierId) {
+                    $query->whereHas('supplierQuotePrices', function($query) use ($supplierId) {
+                        $query->where('supplier_id', $supplierId);
+                    });
+                });
+            }
+
+
+            $this->bomItems = $bomItems->where('is_part', 1)->where('is_inventory', 1)->orderBy('code')->get();
+        }
+
+        if($name == 'showGenerateByBomArea' and $value == 'true') {
+            $this->showGenerateLooseArea = false;
+        }
+
+        if($name == 'showGenerateLooseArea' and $value == 'true') {
+            $this->showGenerateByBomArea = false;
+        }
+    }
+
     public function updatedSelectAll($value)
     {
         if($value) {
             $selectedBomId = $this->inventoryMovementForm->bom_id;
-            $this->selectBomHeader = BomHeader::where('bom_id', $selectedBomId)->pluck('id')->map(fn($id) => (string) $id);
+            $this->selectBomHeader = BomHeader::where('bom_id', $selectedBomId)->pluck('id')->map(fn($id) => (string) $id)->toArray();
             $this->selectBomContent = BomContent::whereHas('bomHeader', function($query) use ($selectedBomId) {
                 $query->where('bom_id', $selectedBomId);
             })->pluck('id')->map(fn($id) => (string) $id)->toArray();
@@ -146,25 +187,54 @@ class BomOutgoing extends Component
         }
     }
 
-    public function updatedSelectBomHeader($value)
+    public function selectedHeader($value)
     {
         if($value) {
-            $this->selectBomContent = BomContent::whereHas('bomHeader', function($query) use ($value) {
-                $query->whereIn('id', $value);
+            $subBomHeaderIds = BomContent::whereHas('bomHeader', function($query) use ($value) {
+                $query->where('id', $value);
             })->pluck('id')->map(fn($id) => (string) $id)->toArray();
-        }else {
-            $this->selectBomContent = [];
+
+            if(in_array($value, $this->selectBomHeader)) {
+                $this->selectBomContent = array_unique(array_merge($this->selectBomContent, $subBomHeaderIds));
+            }else {
+                if($subBomHeaderIds) {
+                    foreach($this->selectBomContent as $selectBomContentIndex => $selectBomContentValue) {
+                        foreach($subBomHeaderIds as $idValue) {
+                            if($selectBomContentValue == $idValue) {
+                                unset($this->selectBomContent[$selectBomContentIndex]);
+                            }
+                        }
+                    }
+                }
+            }
         }
+        $this->selectBomContent = array_values($this->selectBomContent);
     }
 
-    public function updatedSelectBomContent($value)
+    public function selectedContent($value)
     {
+        if($value) {
+            $selectedBomContent = BomContent::findOrFail($value);
 
-    }
+            if($selectedBomContent->is_group) {
+                $subBomContentIds = array_map('strval', BomContent::where('sequence', 'LIKE', $selectedBomContent->sequence.'%')->pluck('id')->map(fn($id) => (string) $id)->toArray());
 
-    public function selectedAction($value)
-    {
-        $this->selectedValue = $value;
+                if(in_array($value, $this->selectBomContent)) {
+                    $this->selectBomContent = array_unique(array_merge($this->selectBomContent, $subBomContentIds));
+                }else {
+                    if($subBomContentIds) {
+                        foreach($this->selectBomContent as $selectBomContentIndex => $selectBomContentValue) {
+                            foreach($subBomContentIds as $idValue) {
+                                if($selectBomContentValue == $idValue) {
+                                    unset($this->selectBomContent[$selectBomContentIndex]);
+                                }
+                            }
+                        }
+                    }
+                }
+                $this->selectBomContent = array_values($this->selectBomContent);
+            }
+        }
     }
 
     public function sortBy($key)
@@ -188,6 +258,295 @@ class BomOutgoing extends Component
     {
         $this->inventoryMovementForm = new InventoryMovement();
         $this->inventoryMovementForm->order_date = Carbon::today()->toDateString();
+        $this->selectedContent = [];
+        $this->inventoryMovementItems = [];
         $this->reset('inventoryMovementItemFormFilters');
+    }
+
+    public function editInventoryMovement(InventoryMovement $inventoryMovement)
+    {
+        $this->inventoryMovementForm = $inventoryMovement;
+        $this->inventoryMovementItemForm = new InventoryMovementItem();
+        $this->reloadInventoryItems($inventoryMovement);
+        $this->bomItems = BomItem::where('is_part', 1)->where('is_inventory', 1)->orderBy('code')->get();
+    }
+
+    public function editSingleInventoryMovementItem($inventoryMovementItemId)
+    {
+        $this->inventoryMovementItemForm = InventoryMovementItem::findOrFail($inventoryMovementItemId);
+        $this->attachments = $this->inventoryMovementItemForm->attachments;
+        $this->bomItems = BomItem::where('is_part', 1)->where('is_inventory', 1)->orderBy('code')->get();
+    }
+
+    public function onGenerateOutgoingClicked()
+    {
+        $bomId = $this->inventoryMovementForm->bom_id;
+        $bomQty = $this->inventoryMovementItemForm->bom_qty;
+        $bomContents = BomContent::whereIn('id', $this->selectBomContent)->where('is_group', false)->get();
+
+        $inventoryMovementItemArr = [];
+        foreach($bomContents as $bomContent) {
+            if($bomContent->qty > 0) {
+                $inventoryMovementItemArr[$bomContent->bom_item_id] = [
+                    'bom_item_id' => $bomContent->bomItem->id,
+                    'bom_item_code' => $bomContent->bomItem->code,
+                    'bom_item_name' => $bomContent->bomItem->name,
+                    'unit_price' => 0,
+                    'amount' => 0,
+                    'available_qty' => $bomContent->bomItem->available_qty,
+                ];
+                if(isset($inventoryMovementItemArr[$bomContent->bom_item_id]['qty'])) {
+                    $inventoryMovementItemArr[$bomContent->bom_item_id]['qty'] += $bomContent->qty * $bomQty;
+                }else {
+                    $inventoryMovementItemArr[$bomContent->bom_item_id]['qty'] = $bomContent->qty * $bomQty;
+                }
+                $inventoryMovementItemArr[$bomContent->bom_item_id]['balance_qty'] = $inventoryMovementItemArr[$bomContent->bom_item_id]['available_qty'] - $inventoryMovementItemArr[$bomContent->bom_item_id]['qty'];
+            }
+        }
+        $this->inventoryMovementItems = $inventoryMovementItemArr;
+        $this->showGenerateByBomArea = false;
+        $this->showGenerateLooseArea = false;
+    }
+
+    public function onGenerateLooseClicked()
+    {
+        $looseBomItem = BomItem::findOrFail($this->inventoryMovementItemForm->bom_item_id);
+        $this->inventoryMovementItems[$looseBomItem->id] = [
+            'bom_item_id' => $looseBomItem->id,
+            'bom_item_code' => $looseBomItem->code,
+            'bom_item_name' => $looseBomItem->name,
+            'unit_price' => 0,
+            'amount' => 0,
+            'available_qty' => $looseBomItem->available_qty,
+            'qty' => $this->inventoryMovementItemForm->qty,
+            'balance_qty' => $looseBomItem->available_qty - $this->inventoryMovementItemForm->qty,
+        ];
+        $this->showGenerateByBomArea = false;
+        $this->showGenerateLooseArea = false;
+    }
+
+    public function saveInventoryMovementForm($statusStr = null)
+    {
+        $this->validate([
+            'inventoryMovementForm.bom_id' => 'required',
+            'inventoryMovementForm.batch' => 'required',
+        ], [
+            'inventoryMovementForm.bom_id.required' => 'Please select a BOM',
+            'inventoryMovementForm.batch.required' => 'Please fill in the Batch',
+        ]);
+
+        $status = $statusStr ? array_search($statusStr, InventoryMovement::STATUSES) : $this->inventoryMovementForm->status;
+
+        $action = array_search('Outgoing', InventoryMovement::ACTIONS);
+
+        if(!$this->inventoryMovementForm->id) {
+            $inventoryMovement = InventoryMovement::create([
+                'batch' => $this->inventoryMovementForm->batch,
+                'remarks' => $this->inventoryMovementForm->remarks,
+                'action' => $action,
+                'bom_id' => $this->inventoryMovementForm->bom_id ? $this->inventoryMovementForm->bom_id : null,
+                'country_id' => $this->inventoryMovementForm->country_id ? $this->inventoryMovementForm->country_id : null,
+                'status' => $status,
+                'total_amount' => $this->inventoryMovementForm->total_amount,
+                'created_by' => auth()->user()->id,
+                'order_date' => $this->inventoryMovementForm->order_date,
+                'supplier_id' => $this->inventoryMovementForm->supplier_id ? $this->inventoryMovementForm->supplier_id : null,
+            ]);
+        }else {
+            $this->inventoryMovementForm->update([
+                'batch' => $this->inventoryMovementForm->batch,
+                'remarks' => $this->inventoryMovementForm->remarks,
+                'action' => $action,
+                'bom_id' => $this->inventoryMovementForm->bom_id ? $this->inventoryMovementForm->bom_id : null,
+                'country_id' => $this->inventoryMovementForm->country_id ? $this->inventoryMovementForm->country_id : null,
+                'status' => $status,
+                'total_amount' => $this->inventoryMovementForm->total_amount,
+                'updated_by' => auth()->user()->id,
+                'order_date' => $this->inventoryMovementForm->order_date,
+                'supplier_id' => $this->inventoryMovementForm->supplier_id ? $this->inventoryMovementForm->supplier_id : null,
+            ]);
+
+            $inventoryMovement = $this->inventoryMovementForm;
+        }
+
+        if($action == array_search('Outgoing', InventoryMovement::ACTIONS)) {
+            if($this->inventoryMovementItems) {
+                foreach($this->inventoryMovementItems as $inventoryMovementItem) {
+                    $bomItem = BomItem::findOrFail($inventoryMovementItem['bom_item_id']);
+
+                    if(isset($inventoryMovementItem['id'])) {
+                        InventoryMovementItem::findOrFail($inventoryMovementItem['id'])->update([
+                            'bom_item_id' => $bomItem->id,
+                            'inventory_movement_id' => $inventoryMovement->id,
+                            'status' => $status,
+                            'qty' => $inventoryMovementItem['qty'],
+                            'amount' => 0,
+                            'unit_price'  => 0,
+                            'created_by' => auth()->user()->id,
+                            'date' => $inventoryMovementItem['date'],
+                        ]);
+                    }else {
+                        // dd($inventoryMovementItem);
+                        $createdItem = InventoryMovementItem::create([
+                            'bom_item_id' => $bomItem->id,
+                            'inventory_movement_id' => $inventoryMovement->id,
+                            'status' => $status,
+                            'qty' => $inventoryMovementItem['qty'],
+                            'amount' => 0,
+                            'unit_price'  => 0,
+                            'created_by' => auth()->user()->id,
+                            'date' => $inventoryMovement->order_date,
+                        ]);
+                    }
+
+                    if($status == array_search('Completed', InventoryMovement::STATUSES)) {
+                        $this->reduceBomItemQtyAvailable($bomItem->id, $inventoryMovementItem['qty']);
+                    }
+
+                    $this->syncBomItemQty($bomItem->id);
+                }
+            }
+        }
+
+        $this->emit('refresh');
+        $this->emit('updated');
+        session()->flash('success', 'Your entry has been added');
+    }
+
+    public function updateSingleInventoryMovementItem()
+    {
+        $inventoryMovementItem = InventoryMovementItem::findOrFail($this->inventoryMovementItemForm->id);
+
+        $inventoryMovementItem->update([
+            'qty' => $this->inventoryMovementItemForm->qty,
+            'amount' => 0,
+            'unit_price' => 0,
+            'updated_by' => auth()->user()->id,
+        ]);
+        $this->syncInventoryMovementItemStatus($inventoryMovementItem);
+        $this->emit('refresh');
+        $this->emit('updated');
+        session()->flash('success', 'Your entry has been updated');
+    }
+
+    public function onPrevNextDateInventoryMovementFormClicked($direction, $model)
+    {
+        $date = Carbon::now();
+        if($model) {
+            $date = Carbon::parse($this->inventoryMovementForm[$model]);
+        }
+        if($direction > 0) {
+            $this->inventoryMovementForm[$model] = $date->addDay()->toDateString();
+        }else {
+            $this->inventoryMovementForm[$model] = $date->subDay()->toDateString();
+        }
+    }
+
+    public function reloadInventoryItems($inventoryMovement)
+    {
+        $this->inventoryMovementItems = [];
+        if($inventoryMovement->inventoryMovementItems) {
+            foreach($inventoryMovement->inventoryMovementItems as $inventoryMovementItem) {
+                $data = [
+                    'id' => $inventoryMovementItem->id,
+                    'bom_item_id' => $inventoryMovementItem->bomItem->id,
+                    'bom_item_code' => $inventoryMovementItem->bomItem->code,
+                    'bom_item_name' => $inventoryMovementItem->bomItem->name,
+                    'unit_price' => $inventoryMovementItem->unit_price,
+                    'amount' => $inventoryMovementItem->amount,
+                    'qty' => $inventoryMovementItem->qty + 0,
+                    'supplier_quote_price_id' => $inventoryMovementItem->supplier_quote_price_id,
+                    'remarks' => $inventoryMovementItem->remarks,
+                    'status' => $inventoryMovementItem->status,
+                    'date' => $inventoryMovementItem->date,
+                    'inventoryMovementItemQuantities' => $inventoryMovementItem->inventoryMovementItemQuantities()->with(['attachments', 'inventoryMovementItem', 'inventoryMovementItem.inventoryMovement', 'createdBy'])->get(),
+                    'inventoryMovement' => $inventoryMovement,
+                    'attachment_url' => $inventoryMovementItem->attachments()->latest()->first() ? $inventoryMovementItem->attachments()->latest()->first()->full_url : '',
+                    'attachment' => $inventoryMovementItem->attachments()->latest()->first(),
+                    'attachments' => $inventoryMovementItem->attachments,
+                ];
+                // dd($this->inventoryMovementItems);
+                array_push($this->inventoryMovementItems, $data);
+            }
+        }
+    }
+
+    public function deleteSingleInventoryMovementItemIndex($index)
+    {
+        unset($this->inventoryMovementItems[$index]);
+    }
+
+    public function deleteSingleInventoryMovementItem($inventoryMovementItemId)
+    {
+        $inventoryMovementItem = InventoryMovementItem::findOrFail($inventoryMovementItemId);
+        $inventoryMovement = $inventoryMovementItem->inventoryMovement;
+        $bomItemId = $inventoryMovementItem->bomItem->id;
+        $this->addBomItemQtyAvailable($bomItemId, $inventoryMovementItem->qty);
+        if($inventoryMovementItem->attachments()->exists()) {
+            foreach($inventoryMovementItem->attachments as $attachment) {
+                $this->deleteAttachment($attachment);
+            }
+        }
+        $inventoryMovementItem->delete();
+        $this->syncBomItemQty($bomItemId);
+        $this->reloadInventoryItems($inventoryMovementItem->inventoryMovement);
+        $this->inventoryMovement = new InventoryMovement();
+        $this->inventoryMovementItem = new InventoryMovementItem();
+        $this->inventoryMovementItemQuantity = new InventoryMovementItemQuantity();
+        $this->emit('refresh');
+    }
+
+    private function syncBomItemQty($bomItemId)
+    {
+        $bomItem = BomItem::findOrFail($bomItemId);
+
+        $orderedQty = $bomItem
+                        ->inventoryMovementItems()
+                        ->where('status', array_search('Ordered', InventoryMovementItem::RECEIVING_STATUSES))
+                        ->whereHas('inventoryMovement', function($query) {
+                            $query->where('action', array_search('Receiving', InventoryMovement::ACTIONS));
+                        })->sum('qty');
+        $bomItem->ordered_qty = $orderedQty;
+
+        $plannedQty = $bomItem
+                        ->inventoryMovementItems()
+                        ->where('status', array_search('Planned', InventoryMovementItem::OUTGOING_STATUSES))
+                        ->whereHas('inventoryMovement', function($query) {
+                            $query->where('action', array_search('Outgoing', InventoryMovement::ACTIONS));
+                        })->sum('qty');
+        $bomItem->planned_qty = $plannedQty;
+
+        $bomItem->save();
+    }
+
+    private function syncInventoryMovementItemStatus(InventoryMovementItem $inventoryMovementItem)
+    {
+        $isDelivered = false;
+        if($inventoryMovementItem->inventoryMovement->status == array_search('Completed', InventoryMovement::STATUSES)) {
+            $isDelivered = true;
+        }
+
+        if($isDelivered) {
+            $inventoryMovementItem->status = array_search('Delivered', InventoryMovementItem::OUTGOING_STATUSES);
+        }else {
+            $inventoryMovementItem->status = array_search('Planned', InventoryMovementItem::OUTGOING_STATUSES);
+        }
+        $inventoryMovementItem->save();
+    }
+
+    private function addBomItemQtyAvailable($bomItemId, $qty)
+    {
+        $bomItem = BomItem::findOrFail($bomItemId);
+        $bomItem->available_qty += $qty;
+        $bomItem->save();
+        $this->syncBomItemQty($bomItemId);
+    }
+
+    private function reduceBomItemQtyAvailable($bomItemId, $qty)
+    {
+        $bomItem = BomItem::findOrFail($bomItemId);
+        $bomItem->available_qty -= $qty;
+        $bomItem->save();
+        $this->syncBomItemQty($bomItemId);
     }
 }

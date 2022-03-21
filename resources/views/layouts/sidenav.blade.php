@@ -128,9 +128,10 @@
           <a href="{{ route('bom-receiving') }}"><i class="fas fa-truck-loading"></i>Receiving</a>
         </li>
         @endcan
-        {{-- <li class="{{ $name == 'bom-outgoing' ? 'active' : '' }}">
+        <li class="{{ $name == 'bom-outgoing' ? 'active' : '' }}">
           <a href="{{ route('bom-outgoing') }}"><i class="fas fa-box-open"></i>Outgoing</a>
         </li>
+{{--
         <li class="{{ $name == 'bom-movement' ? 'active' : '' }}">
           <a href="{{ route('bom-movement') }}"><i class="fas fa-truck-loading"></i>Movement</a>
         </li> --}}
