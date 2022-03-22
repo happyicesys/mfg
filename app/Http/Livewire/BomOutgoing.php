@@ -35,6 +35,11 @@ class BomOutgoing extends Component
         'action' => '',
         'status' => '',
         'created_at' => '',
+        'name' => '',
+        'bom_item_type_id' => '',
+        'is_consumable' => '',
+        'is_inventory' => '',
+        'supplier_id' => '',
     ];
     public $inventoryMovementItemFormFilters = [
         'code' => '',
@@ -119,7 +124,9 @@ class BomOutgoing extends Component
     {
         $inventoryMovements = InventoryMovement::with([
                                     'inventoryMovementItems',
-                                    'inventoryMovementItems.inventoryMovementItemQuantities',
+                                    'inventoryMovementItems.bomItem',
+                                    'inventoryMovementItems.bomItem.bomItemType',
+                                    'inventoryMovementItems.bomItem.supplierQuotePrices',
                                     'bom',
                                     'createdBy',
                                     'updatedBy',
@@ -129,6 +136,42 @@ class BomOutgoing extends Component
                 ->when($this->filters['batch'], fn($query, $input) => $query->searchLike('batch', $input))
                 ->when($this->filters['status'], fn($query, $input) => $query->search('status', $input))
                 ->when($this->filters['created_at'], fn($query, $input) => $query->searchDate('created_at', $input));
+
+        if($filtersName = $this->filters['name']) {
+            $inventoryMovements = $inventoryMovements->whereHas('inventoryMovementItems.bomItem', function($query) use ($filtersName) {
+                $query->where('name', 'LIKE', '%'.$filtersName.'%');
+            });
+        }
+
+        if($filtersBomItemTypeId = $this->filters['bom_item_type_id']) {
+            $inventoryMovements = $inventoryMovements->whereHas('inventoryMovementItems.bomItem.bomItemType', function($query) use ($filtersBomItemTypeId) {
+                $query->where('id', $filtersBomItemTypeId);
+            });
+        }
+
+        if($this->filters['is_consumable'] != '') {
+            $filtersIsConsumable = $this->filters['is_consumable'];
+            $inventoryMovements = $inventoryMovements->whereHas('inventoryMovementItems.bomItem.bomItemType', function($query) use ($filtersIsConsumable) {
+                if($filtersIsConsumable) {
+                    $query->whereIn('name', ['C', 'CB']);
+                }else {
+                    $query->whereNotIn('name', ['C', 'CB']);
+                }
+            });
+        }
+
+        if($this->filters['is_inventory'] != '') {
+            $filtersIsInventory = $this->filters['is_inventory'];
+            $inventoryMovements = $inventoryMovements->whereHas('inventoryMovementItems.bomItem', function($query) use ($filtersIsInventory) {
+                $query->where('is_inventory', $filtersIsInventory);
+            });
+        }
+
+        if($filtersSupplierId = $this->filters['supplier_id']) {
+            $inventoryMovements = $inventoryMovements->whereHas('inventoryMovementItems.bomItem.supplierQuotePrices', function($query) use ($filtersSupplierId) {
+                $query->where('supplier_id', $filtersSupplierId);
+            });
+        }
 
         $inventoryMovements = $inventoryMovements->where('action', array_search('Outgoing', \App\Models\InventoryMovement::ACTIONS));
 
@@ -494,6 +537,29 @@ class BomOutgoing extends Component
         $this->inventoryMovementItem = new InventoryMovementItem();
         $this->inventoryMovementItemQuantity = new InventoryMovementItemQuantity();
         $this->emit('refresh');
+    }
+
+    public function deleteInventoryMovement()
+    {
+        if($this->inventoryMovementForm->inventoryMovementItems()->exists()) {
+            foreach($this->inventoryMovementForm->inventoryMovementItems as $inventoryMovementItem) {
+                $bomItemId = $inventoryMovementItem->bomItem->id;
+                $this->addBomItemQtyAvailable($bomItemId, $inventoryMovementItem->qty);
+                $inventoryMovementItem->delete();
+                $this->syncBomItemQty($bomItemId);
+            }
+        }
+        if($this->inventoryMovementForm->exists()) {
+            $this->inventoryMovementForm->delete();
+        }
+
+        $this->inventoryMovementItem = new InventoryMovementItem();
+        $this->inventoryMovementForm = new InventoryMovement();
+        $this->bomItemId = null;
+
+        $this->emit('refresh');
+        $this->emit('updated');
+        session()->flash('success', 'Your entry has been deleted');
     }
 
     private function syncBomItemQty($bomItemId)

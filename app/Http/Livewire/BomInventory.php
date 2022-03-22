@@ -34,6 +34,7 @@ class BomInventory extends Component
         'is_inventory' => '1',
         'is_consumable' => '0',
         'supplier_id' => '',
+        'qty_status' => '',
     ];
     public $planner = [
         'bom_id' => '',
@@ -130,6 +131,10 @@ class BomInventory extends Component
             });
         }
 
+        if($qtyStatus = $this->filters['qty_status']) {
+            $bomItems = $bomItems->where('planned_qty', '>', 'available_qty');
+        }
+
 
         $bomItems = $bomItems->where('is_part', 1);
 
@@ -206,6 +211,18 @@ class BomInventory extends Component
     public function updatedFilters()
     {
         $this->resetPage();
+    }
+
+    public function updatedFiltersQtyStatus($value)
+    {
+        if($value) {
+            $this->filters['code'] = '';
+            $this->filters['name'] = '';
+            $this->filters['bom_item_type_id'] = '';
+            $this->filters['is_inventory'] = '';
+            $this->filters['is_consumable'] = '';
+            $this->filters['supplier_id'] = '';
+        }
     }
 
     public function createSupplierQuotePrice()

@@ -15,13 +15,13 @@
                     {{-- @if($showFilters) --}}
                         <div class="bg-light pt-2 pb-2 pl-2 pr-2 mb-2">
                             <div class="form-row">
-                                <div class="form-group col-md-4 col-xs-12">
+                                <div class="form-group col-md-3 col-xs-12">
                                     <label>
                                         Batch
                                     </label>
                                     <input wire:model="filters.batch" type="text" class="form-control" placeholder="Batch">
                                 </div>
-                                <div class="form-group col-md-4 col-xs-12">
+                                <div class="form-group col-md-3 col-xs-12">
                                     <label>
                                         Status
                                     </label>
@@ -33,6 +33,58 @@
                                         <option value="{{array_search('Completed', \App\Models\InventoryMovement::STATUSES)}}">
                                             Completed
                                         </option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-3 col-xs-12">
+                                    <label>
+                                        Name
+                                    </label>
+                                    <input wire:model="filters.name" type="text" class="form-control" placeholder="Name">
+                                </div>
+                                <div class="form-group col-md-3 col-xs-12">
+                                    <label>
+                                        Type
+                                    </label>
+                                    <select name="bom_item_type_id" wire:model="filters.bom_item_type_id" class="select form-control">
+                                        <option value="">All</option>
+                                        @foreach($bomItemTypes as $bomItemType)
+                                            <option value="{{$bomItemType->id}}">
+                                                {{$bomItemType->name}}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-3 col-xs-12">
+                                    <label>
+                                        Is Consumable(C) or Cable(CB)?
+                                    </label>
+                                    <select name="is_consumable" wire:model="filters.is_consumable" class="select form-control">
+                                        <option value="">All</option>
+                                        <option value="1">Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-3 col-xs-12">
+                                    <label>
+                                        Is Inventory?
+                                    </label>
+                                    <select name="is_inventory" wire:model="filters.is_inventory" class="select form-control">
+                                        <option value="">All</option>
+                                        <option value="1">Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-3 col-xs-12">
+                                    <label>
+                                        Supplier
+                                    </label>
+                                    <select name="supplier_id" wire:model="filters.supplier_id" class="select form-control">
+                                        <option value="">All</option>
+                                        @foreach($suppliers as $supplier)
+                                            <option value="{{$supplier->id}}">
+                                                {{$supplier->company_name}}
+                                            </option>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>
@@ -93,6 +145,9 @@
                             Part Name
                         </th>
                         <th class="text-center text-dark">
+                            Type
+                        </th>
+                        <th class="text-center text-dark">
                             Qty
                         </th>
                         <th></th>
@@ -137,7 +192,51 @@
                                             </b>
                                         @endif
                                     </td>
-                                    <td class="text-left">
+                                    @php
+                                        $bgColor = '';
+                                        $bgColorBoolean = false;
+
+                                        if($filters['name']) {
+                                            if(str_contains(strtolower($inventoryMovementItem->bomItem->name), strtolower($filters['name']))) {
+                                                $bgColorBoolean = true;
+                                            }
+                                        }
+
+                                        if($filters['bom_item_type_id']) {
+                                            if($filters['bom_item_type_id'] == $inventoryMovementItem->bomItem->bomItemType->id) {
+                                                $bgColorBoolean = true;
+                                            }
+                                        }
+
+                                        if($filters['is_consumable'] != '') {
+                                            if($filters['is_consumable']) {
+                                                if($inventoryMovementItem->bomItem->bomItemType->name == 'C' or $inventoryMovementItem->bomItem->bomItemType->name == 'CB') {
+                                                    $bgColorBoolean = true;
+                                                }
+                                            }else {
+                                                if($inventoryMovementItem->bomItem->bomItemType->name != 'C' or $inventoryMovementItem->bomItem->bomItemType->name != 'CB') {
+                                                    $bgColorBoolean = true;
+                                                }
+                                            }
+                                        }
+
+                                        if($filters['is_inventory'] != '') {
+                                            if($filters['is_inventory'] == $inventoryMovementItem->bomItem->is_inventory) {
+                                                $bgColorBoolean = true;
+                                            }
+                                        }
+
+                                        if($filters['supplier_id']) {
+                                            if($inventoryMovementItem->bomItem->supplierQuotePrices()->where('supplier_id', $filters['supplier_id'])->exists()) {
+                                                $bgColorBoolean = true;
+                                            }
+                                        }
+
+                                        if($bgColorBoolean) {
+                                            $bgColor = 'bg-info';
+                                        }
+                                    @endphp
+                                    <td class="text-left {{$bgColor}}">
                                         @if($inventoryMovementItem->bomItem->attachments()->exists())
                                             <a href="#" wire:click.prevent="viewBomItemAttachments({{$inventoryMovementItem->bomItem}})" data-toggle="modal" data-target="#attachment-modal-nonedit">
                                                 {{ $inventoryMovementItem->bomItem->code }}
@@ -146,14 +245,17 @@
                                             {{ $inventoryMovementItem->bomItem->code }}
                                         @endif
                                     </td>
-                                    <td class="text-left">
+                                    <td class="text-left {{$bgColor}}">
                                         {{ $inventoryMovementItem->bomItem->name }}
                                     </td>
-                                    <td class="text-right">
+                                    <td class="text-left {{$bgColor}}">
+                                        {{ $inventoryMovementItem->bomItem->bomItemType->name }}
+                                    </td>
+                                    <td class="text-right {{$bgColor}}">
                                         {{ $inventoryMovementItem->qty }}
                                     </td>
 
-                                    <td class="text-center">
+                                    <td class="text-center {{$bgColor}}">
                                         <div class="btn-group">
                                             @if($inventoryMovement->status > array_search('Pending', \App\Models\InventoryMovement::STATUSES))
                                                 @if($inventoryMovement->status != array_search('Completed', \App\Models\InventoryMovement::STATUSES))
@@ -654,7 +756,7 @@
                     <x-slot name="footer" >
                         <div class="btn-group">
                             @if(isset($inventoryMovementForm->id))
-                                <a href="#" class="btn btn-xs-block btn-danger" onclick="return confirm('Are you sure you want to delete this receiving?') || event.stopImmediatePropagation()" wire:click.prevent="deleteInventoryMovement()" >
+                                <a href="#" class="btn btn-xs-block btn-danger" onclick="return confirm('Are you sure you want to delete this outgoing?') || event.stopImmediatePropagation()" wire:click.prevent="deleteInventoryMovement()" >
                                     Delete
                                 </a>
                             @endif

@@ -78,6 +78,9 @@ class VmmfgInventoryBom extends Component
     public $bomItemSubGroups;
     public $file;
     public $attachments;
+    public $selectAll = false;
+    public $selectBomHeader = [];
+    public $selectBomContent = [];
 
     protected $listeners = [
         'refresh' => '$refresh',
@@ -170,6 +173,70 @@ class VmmfgInventoryBom extends Component
         // dd($boms->toArray());
 
         return view('livewire.vmmfg-inventory-bom', ['boms' => $boms]);
+    }
+
+    public function updatedSelectAll($value)
+    {
+        if($value) {
+            $selectedBomId = $this->bom->id;
+            $this->selectBomHeader = BomHeader::where('bom_id', $selectedBomId)->pluck('id')->map(fn($id) => (string) $id)->toArray();
+            $this->selectBomContent = BomContent::whereHas('bomHeader', function($query) use ($selectedBomId) {
+                $query->where('bom_id', $selectedBomId);
+            })->pluck('id')->map(fn($id) => (string) $id)->toArray();
+        }else {
+            $this->selectBomHeader = [];
+            $this->selectBomContent = [];
+        }
+    }
+
+    public function selectedHeader($value)
+    {
+        if($value) {
+            $subBomHeaderIds = BomContent::whereHas('bomHeader', function($query) use ($value) {
+                $query->where('id', $value);
+            })->pluck('id')->map(fn($id) => (string) $id)->toArray();
+
+            if(in_array($value, $this->selectBomHeader)) {
+                $this->selectBomContent = array_unique(array_merge($this->selectBomContent, $subBomHeaderIds));
+            }else {
+                if($subBomHeaderIds) {
+                    foreach($this->selectBomContent as $selectBomContentIndex => $selectBomContentValue) {
+                        foreach($subBomHeaderIds as $idValue) {
+                            if($selectBomContentValue == $idValue) {
+                                unset($this->selectBomContent[$selectBomContentIndex]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        $this->selectBomContent = array_values($this->selectBomContent);
+    }
+
+    public function selectedContent($value)
+    {
+        if($value) {
+            $selectedBomContent = BomContent::findOrFail($value);
+
+            if($selectedBomContent->is_group) {
+                $subBomContentIds = array_map('strval', BomContent::where('sequence', 'LIKE', $selectedBomContent->sequence.'%')->pluck('id')->map(fn($id) => (string) $id)->toArray());
+
+                if(in_array($value, $this->selectBomContent)) {
+                    $this->selectBomContent = array_unique(array_merge($this->selectBomContent, $subBomContentIds));
+                }else {
+                    if($subBomContentIds) {
+                        foreach($this->selectBomContent as $selectBomContentIndex => $selectBomContentValue) {
+                            foreach($subBomContentIds as $idValue) {
+                                if($selectBomContentValue == $idValue) {
+                                    unset($this->selectBomContent[$selectBomContentIndex]);
+                                }
+                            }
+                        }
+                    }
+                }
+                $this->selectBomContent = array_values($this->selectBomContent);
+            }
+        }
     }
 
     public function sortBy($key)
@@ -557,6 +624,44 @@ class VmmfgInventoryBom extends Component
         $this->emit('refresh');
         $this->emit('updated');
         session()->flash('success', 'Entry has been created');
+    }
+
+    public function deleteBom(Bom $bom)
+    {
+        if($bom->bomHeaders()->exists()) {
+            foreach($bom->bomHeaders as $bomHeader) {
+                if($bomHeader->bomContents()->exists()) {
+                    foreach($bomHeader->bomContents as $bomContent) {
+                        $bomContent->delete();
+                    }
+                }
+                $bomHeader->delete();
+            }
+        }
+        $bom->delete();
+        $this->bom = new Bom();
+        $bom = new Bom();
+        $this->emit('refresh');
+        $this->emit('updated');
+        session()->flash('success', 'Entry has been deleted');
+    }
+
+    public function batchDeleteBomHeaderBomContent(Bom $bom)
+    {
+        if($this->selectBomContent) {
+            BomContent::whereIn('id', $this->selectBomContent)->delete();
+        }
+
+        if($bom->bomHeaders()->exists()) {
+            foreach($bom->bomHeaders as $bomHeader) {
+                if($bomHeader->bomContents()->doesntExist()) {
+                    $bomHeader->delete();
+                }
+            }
+        }
+        $this->emit('refresh');
+        $this->emit('updated');
+        session()->flash('success', 'Entry has been deleted');
     }
 
     private function incrementNestedSequence($value)

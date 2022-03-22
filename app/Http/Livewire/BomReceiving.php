@@ -46,6 +46,7 @@ class BomReceiving extends Component
     ];
     public $inventoryMovementItems = [];
     public $totalAmount = 0.00;
+    public $totalQty = 0;
     public $attachments;
     public $bomItems;
     public $bomItemTypes;
@@ -378,6 +379,7 @@ class BomReceiving extends Component
                 // dd($this->inventoryMovementItems);
                 array_push($this->inventoryMovementItems, $data);
                 $this->inventoryMovementForm->total_amount = $this->calculateTotalAmount($this->inventoryMovementItems);
+                $this->inventoryMovementForm->total_qty = $this->calculateTotalQty($this->inventoryMovementItems);
             }
         }
     }
@@ -519,6 +521,7 @@ class BomReceiving extends Component
             }
         }
         $this->syncTotalAmount($inventoryMovement->id);
+        $this->syncTotalQty($inventoryMovement->id);
 
         $this->emit('refresh');
         $this->emit('updated');
@@ -538,6 +541,7 @@ class BomReceiving extends Component
         unset($this->inventoryMovementItems[$index]);
 
         $this->inventoryMovementForm->total_amount = $this->calculateTotalAmount($this->inventoryMovementItems);
+        $this->inventoryMovementForm->total_qty = $this->calculateTotalQty($this->inventoryMovementItems);
     }
 
     public function deleteSingleInventoryMovementItem($inventoryMovementItemId)
@@ -564,6 +568,7 @@ class BomReceiving extends Component
         $inventoryMovementItem->delete();
         $this->syncBomItemQty($bomItemId);
         $this->syncTotalAmount($inventoryMovement->id);
+        $this->syncTotalQty($inventoryMovement->id);
         $this->reloadInventoryItems($inventoryMovementItem->inventoryMovement);
         $this->inventoryMovement = new InventoryMovement();
         $this->inventoryMovementItem = new InventoryMovementItem();
@@ -816,6 +821,7 @@ class BomReceiving extends Component
         // dd($this->inventoryMovementItems);
 
         $this->inventoryMovementForm->total_amount = $this->calculateTotalAmount($this->inventoryMovementItems);
+        $this->inventoryMovementForm->total_qty = $this->calculateTotalQty($this->inventoryMovementItems);
     }
 
     public function editSingleInventoryMovementItem($inventoryMovementItemId)
@@ -903,6 +909,32 @@ class BomReceiving extends Component
             }
         }
         $inventoryMovement->total_amount = $totalAmount;
+        $inventoryMovement->save();
+    }
+
+    private function calculateTotalQty($inventoryMovementItemArr)
+    {
+        $totalQty = 0;
+
+        if($inventoryMovementItemArr) {
+            foreach($inventoryMovementItemArr as $inventoryMovementItem) {
+                $totalQty += $inventoryMovementItem['qty'];
+            }
+        }
+
+        return $totalQty;
+    }
+
+    private function syncTotalQty($inventoryMovementId)
+    {
+        $totalQty = 0;
+        $inventoryMovement = InventoryMovement::findOrFail($inventoryMovementId);
+        if($inventoryMovement->inventoryMovementItems()->exists()) {
+            foreach($inventoryMovement->inventoryMovementItems as $inventoryMovementItem) {
+                $totalQty += $inventoryMovementItem->qty;
+            }
+        }
+        $inventoryMovement->total_qty = $totalQty;
         $inventoryMovement->save();
     }
 

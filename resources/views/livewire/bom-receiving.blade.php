@@ -704,9 +704,13 @@
                                     </tr>
                                     @endforelse
                                     @if(count($inventoryMovementItems) > 0)
-                                        <td colspan="7" class="text-center">
+                                        <td colspan="5" class="text-center">
                                             Total
                                         </td>
+                                        <td class="text-right">
+                                            {{ $inventoryMovementForm->total_qty }}
+                                        </td>
+                                        <td></td>
                                         <td class="text-right">
                                             {{ number_format($inventoryMovementForm->total_amount, 2, '.', ',') }}
                                         </td>

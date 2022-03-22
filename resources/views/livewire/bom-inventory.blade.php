@@ -15,19 +15,19 @@
                 <div>
                     <div class="bg-light pt-2 pb-2 pl-2 pr-2 mb-2">
                         <div class="form-row">
-                            <div class="form-group col-md-4 col-xs-12">
+                            <div class="form-group col-md-3 col-xs-12">
                                 <label>
                                     Code
                                 </label>
                                 <input wire:model="filters.code" type="text" class="form-control" placeholder="Code">
                             </div>
-                            <div class="form-group col-md-4 col-xs-12">
+                            <div class="form-group col-md-3 col-xs-12">
                                 <label>
                                     Name
                                 </label>
                                 <input wire:model="filters.name" type="text" class="form-control" placeholder="Name">
                             </div>
-                            <div class="form-group col-md-4 col-xs-12">
+                            <div class="form-group col-md-3 col-xs-12">
                                 <label>
                                     Type
                                 </label>
@@ -40,7 +40,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="form-group col-md-4 col-xs-12">
+                            <div class="form-group col-md-3 col-xs-12">
                                 <label>
                                     Is Consumable(C) or Cable(CB)?
                                 </label>
@@ -50,7 +50,7 @@
                                     <option value="0">No</option>
                                 </select>
                             </div>
-                            <div class="form-group col-md-4 col-xs-12">
+                            <div class="form-group col-md-3 col-xs-12">
                                 <label>
                                     Is Inventory?
                                 </label>
@@ -60,7 +60,7 @@
                                     <option value="0">No</option>
                                 </select>
                             </div>
-                            <div class="form-group col-md-4 col-xs-12">
+                            <div class="form-group col-md-3 col-xs-12">
                                 <label>
                                     Supplier
                                 </label>
@@ -72,6 +72,20 @@
                                         </option>
                                     @endforeach
                                 </select>
+                            </div>
+                            <div class="form-group col-md-3 col-xs-12">
+                                <label>
+                                    Qty Status
+                                </label>
+                                <select name="qty_status" wire:model="filters.qty_status" class="select form-control">
+                                    <option value="">All</option>
+                                    <option value="1">Planned Greater than Available</option>
+                                </select>
+                                <span class="text-danger">
+                                    <small>
+                                    * Override filter
+                                    </small>
+                                </span>
                             </div>
                         </div>
                         <div class="form-row d-flex justify-content-end">
@@ -184,7 +198,7 @@
                         </th>
                         @if($showPlannerArea)
                         <th class="text-center text-dark">
-                            Plan Outgoing
+                            Plan Outgoing Qty
                         </th>
                         @endif
                     </tr>
@@ -241,9 +255,7 @@
                                 @foreach($orderedQty as $ordered)
                                     @if($ordered->date)
                                         <br> <small class="{{\Carbon\Carbon::createFromFormat('Y-m-d', $ordered->date) < \Carbon\Carbon::today() ? 'text-danger' : ''}}">
-                                        {{
-                                            \Carbon\Carbon::parse($ordered->date)->format('ymd')
-                                        }}
+                                        {{\Carbon\Carbon::parse($ordered->date)->format('ymd')}}({{$ordered->qty}})
                                          </small>
                                     @endif
                                 @endforeach
@@ -257,7 +269,7 @@
                                     @if($planned->date)
                                         <br> <small class="
                                         {{\Carbon\Carbon::createFromFormat('Y-m-d', $planned->date) < \Carbon\Carbon::today() ? 'text-danger' : ''}}">
-                                        {{ \Carbon\Carbon::parse($planned->date)->format('ymd') }}
+                                        {{\Carbon\Carbon::parse($planned->date)->format('ymd')}}({{$planned->qty}})
                                     </small>
                                     @endif
                                 @endforeach

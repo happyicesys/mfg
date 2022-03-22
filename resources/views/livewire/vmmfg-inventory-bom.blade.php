@@ -218,6 +218,10 @@
                 >
                     Save
                 </button>
+                <button type="button" class="btn btn-danger btn-md" onclick="confirm('Are you sure you want to remove this bom?') || event.stopImmediatePropagation()" wire:click="deleteBom({{$bom}})">
+                    <i class="fas fa-trash"></i>
+                    Delete
+                </button>
             </div>
             <hr>
             @if(isset($bom))
@@ -227,12 +231,19 @@
                         <i class="fas fa-plus-circle"></i>
                         Group
                     </button>
+                    <button type="button" class="btn btn-danger btn-md" onclick="confirm('Are you sure you want to remove these BOM part(s)?') || event.stopImmediatePropagation()" wire:click="batchDeleteBomHeaderBomContent({{$bom}})">
+                        <i class="fas fa-trash"></i>
+                        Batch Delete Part(s)
+                    </button>
                 </div>
                 @endhasanyrole
 
                 <div class="table-responsive pt-3">
                     <table class="table table-bordered table-sm">
                         <tr class="d-flex">
+                            <th class="col-md-1 bg-secondary text-white text-center">
+                                <input type="checkbox" wire:model="selectAll">
+                            </th>
                             <th class="col-md-2 bg-secondary text-white text-center">
                                 Cat1/Cat2
                             </th>
@@ -263,6 +274,9 @@
                         @foreach($bom->bomHeaders as $bomHeaderIndex => $bomHeader)
                         <table class="table table-borderless table-sm" wire:key="header-table-{{$bomHeaderIndex}}">
                             <tr class="d-flex border border-secondary">
+                                <th class="col-md-1 bg-info text-dark text-center">
+                                    <input type="checkbox" wire:model="selectBomHeader" wire:click="selectedHeader({{$bomHeader->id}})" value="{{$bomHeader->id}}">
+                                </th>
                                 <th class="col-md-2 bg-info text-dark">
                                     {{$bomHeader->sequence}}
                                     @if($bomHeader->bomCategory)
@@ -333,6 +347,9 @@
                                         }
                                     @endphp
                                     <tr class="d-flex border border-secondary ml-3">
+                                        <th class="col-md-1 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-dark text-center">
+                                            <input type="checkbox" wire:model.defer="selectBomContent" wire:click="selectedContent({{$bomContent->id}})" value="{{$bomContent->id}}">
+                                        </th>
                                         <th class="col-md-2 {{$bomContent->is_group ? 'bg-info' : 'bg-light'}} text-dark">
                                             {{$bomContent->sequence}}
                                             @if($bomContent->bomSubCategory)
@@ -418,51 +435,6 @@
                         @endforeach
                     @endif
                 </div>
-                {{-- <ul class="list-group pt-2" wire:key="bom-{{$bom->id}}">
-                    @if($bom->bomGroups()->exists())
-                    @foreach($bom->bomGroups as $bomGroup)
-                    <li class="list-group-item mt-2" style="background-color: #9bc2cf;" wire:key="title-{{$titleIndex}}">
-                        <div class="form-group">
-                            <span class="float-left">
-                                {{$bomGroup->sequence}}.  {{$bomGroup->name}}
-                                @if($bomGroup->bomCategory)
-                                    <span class="badge badge-warning">
-                                        {{$bomGroup->bomCategory->name}}
-                                    </span>
-                                @endif
-                            </span>
-                            <span class="float-right">
-                                <div class="btn-group">
-                                    <button type="button" wire:click="editTitle({{$title}})" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#title-modal">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-success btn-md" data-toggle="modal" data-target="#task-modal" wire:click="createTask({{$title}})">
-                                        <i class="fas fa-plus-circle"></i>
-                                        Task
-                                    </button>
-                                </div>
-                            </span>
-                        </div>
-                    </li>
-                        @if($title->vmmfgItems()->exists())
-                            @foreach($title->vmmfgItems as $itemIndex => $item)
-                            <li class="list-group-item ml-2" style="background-color: #e6f3f7;" wire:key="item-{{$itemIndex}}">
-                                <div class="form-group">
-                                    <span class="float-left">
-                                        {{$item->sequence}}.  {{$item->name}}
-                                    </span>
-                                    <span class="float-right">
-                                        <button type="button" wire:click="editTask({{$item}})" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#task-modal">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                    </span>
-                                </div>
-                            </li>
-                            @endforeach
-                        @endif
-                    @endforeach
-                    @endif
-                </ul> --}}
             @endif
         </x-slot>
         <x-slot name="footer"></x-slot>
