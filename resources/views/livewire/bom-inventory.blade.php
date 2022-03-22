@@ -255,7 +255,7 @@
                                 @foreach($orderedQty as $ordered)
                                     @if($ordered->date)
                                         <br> <small class="{{\Carbon\Carbon::createFromFormat('Y-m-d', $ordered->date) < \Carbon\Carbon::today() ? 'text-danger' : ''}}">
-                                        {{\Carbon\Carbon::parse($ordered->date)->format('ymd')}}({{$ordered->qty}})
+                                        {{\Carbon\Carbon::parse($ordered->date)->format('ymd')}}(<b>{{$ordered->qty}}</b>)
                                          </small>
                                     @endif
                                 @endforeach
@@ -269,7 +269,7 @@
                                     @if($planned->date)
                                         <br> <small class="
                                         {{\Carbon\Carbon::createFromFormat('Y-m-d', $planned->date) < \Carbon\Carbon::today() ? 'text-danger' : ''}}">
-                                        {{\Carbon\Carbon::parse($planned->date)->format('ymd')}}({{$planned->qty}})
+                                        {{\Carbon\Carbon::parse($planned->date)->format('ymd')}}(<b>{{$planned->qty}}</b>)
                                     </small>
                                     @endif
                                 @endforeach
