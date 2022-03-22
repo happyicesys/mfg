@@ -649,7 +649,11 @@ class VmmfgInventoryBom extends Component
     public function batchDeleteBomHeaderBomContent(Bom $bom)
     {
         if($this->selectBomContent) {
-            BomContent::whereIn('id', $this->selectBomContent)->delete();
+            if($bom->bomHeaders()->exists()) {
+                foreach($bom->bomHeaders as $bomHeader) {
+                    $bomHeader->bomContents()->whereIn('id', $this->selectBomContent)->delete();
+                }
+            }
         }
 
         if($bom->bomHeaders()->exists()) {
