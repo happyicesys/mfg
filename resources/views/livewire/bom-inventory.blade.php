@@ -182,7 +182,10 @@
                             Available Qty
                         </x-th-data>
                         <x-th-data model="planned_qty" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
-                            Planned Qty
+                            Plan Outgoing Qty
+                        </th>
+                        <th class="text-center text-dark">
+                            Out Qty
                         </x-th-data>
                         <th class="text-center text-dark">
                             Supplier
@@ -198,7 +201,7 @@
                         </th>
                         @if($showPlannerArea)
                         <th class="text-center text-dark">
-                            Plan Outgoing Qty
+                            Planner Qty
                         </th>
                         @endif
                     </tr>
@@ -221,8 +224,24 @@
                                             })->latest()
                                             ->get();
 
-                            $planOutgoingQty = 0;
 
+                            // $inQty = InventoryMovementItemQuantity::whereHas('inventoryMovementItem.bomItem', function($query) use ($bomItem) {
+                            //                 $query->where('id', $bomItem->id);
+                            //             })->latest()
+                            //             ->limit(3)
+                            //             ->get();
+
+                            $outQty = $bomItem
+                                            ->inventoryMovementItems()
+                                            ->where('status', array_search('Delivered', \App\Models\InventoryMovementItem::OUTGOING_STATUSES))
+                                            ->whereHas('inventoryMovement', function($query) {
+                                                $query->where('action', array_search('Outgoing', \App\Models\InventoryMovement::ACTIONS));
+                                            })->latest()
+                                            ->limit(3)
+                                            ->get();
+
+
+                            $planOutgoingQty = 0;
                             if($planner['bom_id'] and $planner['qty']) {
                                 $bomItemQty = $bomItem
                                                 ->bomContents()
@@ -270,6 +289,15 @@
                                         <br> <small class="
                                         {{\Carbon\Carbon::createFromFormat('Y-m-d', $planned->date) < \Carbon\Carbon::today() ? 'text-danger' : ''}}">
                                         {{\Carbon\Carbon::parse($planned->date)->format('ymd')}}(<b>{{$planned->qty}}</b>)
+                                    </small>
+                                    @endif
+                                @endforeach
+                            </td>
+                            <td class="text-center">
+                                @foreach($outQty as $out)
+                                    @if($out->inventoryMovement->order_date)
+                                    <small>
+                                        {{\Carbon\Carbon::parse($out->inventoryMovement->order_date)->format('ymd')}}(<b>{{$out->qty}}</b>)
                                     </small>
                                     @endif
                                 @endforeach
