@@ -173,7 +173,7 @@
                                     @endphp
                                     <td class="text-left @if($loop->first) {{$bgColor}} @endif">
                                         @if($loop->first)
-                                            <a href="#" wire:click="editInventoryMovement({{$inventoryMovement}})" data-toggle="modal" data-target="#inventory-movement-modal">
+                                            <a href="#" class="text-dark" wire:click="editInventoryMovement({{$inventoryMovement}})" data-toggle="modal" data-target="#inventory-movement-modal">
                                                 {{ $inventoryMovement->batch }}
                                             </a>
                                         @endif
