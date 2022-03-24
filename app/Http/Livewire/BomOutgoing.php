@@ -48,6 +48,7 @@ class BomOutgoing extends Component
         'supplier_id' => ''
     ];
     public Bom $bom;
+    public Bom $bomForm;
     public BomItem $selectedBomItem;
     public InventoryMovement $inventoryMovementForm;
     public InventoryMovementItem $inventoryMovementItemForm;
@@ -228,6 +229,11 @@ class BomOutgoing extends Component
             $this->selectBomHeader = [];
             $this->selectBomContent = [];
         }
+    }
+
+    public function updatedInventoryMovementFormBomId($value)
+    {
+        $this->bomForm = Bom::findOrFail($value);
     }
 
     public function selectedHeader($value)

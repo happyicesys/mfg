@@ -446,8 +446,8 @@
                                                     </th>
                                                 </tr>
                                             </table>
-                                            @if($bom->bomHeaders()->exists())
-                                                @foreach($bom->bomHeaders as $bomHeaderIndex => $bomHeader)
+                                            @if($bomForm->bomHeaders()->exists())
+                                                @foreach($bomForm->bomHeaders as $bomHeaderIndex => $bomHeader)
                                                 <table class="table table-borderless table-sm" wire:key="header-table-{{$bomHeaderIndex}}">
                                                     <tr class="d-flex border border-secondary">
                                                         <th class="col-md-1 bg-info text-dark text-center">
