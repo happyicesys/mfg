@@ -188,7 +188,7 @@
                                     <td class="text-center">
                                         @if($loop->first)
                                             <b>
-                                                {{ $inventoryMovement->order_date }}
+                                                {{ $inventoryMovement->delivery_date }}
                                             </b>
                                         @endif
                                     </td>
@@ -367,7 +367,7 @@
                         </x-input>
                         <div class="form-group">
                             <label>
-                                Delivery Date
+                                Order Date
                             </label>
                             <div class="input-group">
                                 <input type="date" class="form-control" wire:model="inventoryMovementForm.order_date">
@@ -376,6 +376,22 @@
                                         <i class="fas fa-caret-left"></i>
                                     </button>
                                     <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateInventoryMovementFormClicked(1, 'order_date')">
+                                        <i class="fas fa-caret-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                Delivery Date
+                            </label>
+                            <div class="input-group">
+                                <input type="date" class="form-control" wire:model="inventoryMovementForm.delivery_date">
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateInventoryMovementFormClicked(-1, 'delivery_date')">
+                                        <i class="fas fa-caret-left"></i>
+                                    </button>
+                                    <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateInventoryMovementFormClicked(1, 'delivery_date')">
                                         <i class="fas fa-caret-right"></i>
                                     </button>
                                 </div>

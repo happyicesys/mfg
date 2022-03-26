@@ -91,6 +91,7 @@ class BomOutgoing extends Component
             'inventoryMovementForm.country_id' => 'sometimes',
             'inventoryMovementForm.bom_id' => 'sometimes',
             'inventoryMovementForm.order_date' => 'sometimes',
+            'inventoryMovementForm.delivery_date' => 'sometimes',
             'inventoryMovementItemForm.bom_item_id' => 'sometimes',
             'inventoryMovementItemForm.unit_price' => 'sometimes|numeric',
             'inventoryMovementItemForm.qty' => 'sometimes|numeric',
@@ -400,6 +401,7 @@ class BomOutgoing extends Component
                 'created_by' => auth()->user()->id,
                 'order_date' => $this->inventoryMovementForm->order_date,
                 'supplier_id' => $this->inventoryMovementForm->supplier_id ? $this->inventoryMovementForm->supplier_id : null,
+                'created_at' => $this->inventoryMovementForm->created_at,
             ]);
         }else {
             $this->inventoryMovementForm->update([
@@ -413,6 +415,7 @@ class BomOutgoing extends Component
                 'updated_by' => auth()->user()->id,
                 'order_date' => $this->inventoryMovementForm->order_date,
                 'supplier_id' => $this->inventoryMovementForm->supplier_id ? $this->inventoryMovementForm->supplier_id : null,
+                'created_at' => $this->inventoryMovementForm->created_at,
             ]);
 
             $inventoryMovement = $this->inventoryMovementForm;

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\HasSearch;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -36,6 +37,7 @@ class InventoryMovement extends Model
         'country_id',
         'order_date',
         'supplier_id',
+        'delivery_date',
     ];
 
     // getter
@@ -47,6 +49,16 @@ class InventoryMovement extends Model
     public function getTotalAmountAttribute($value)
     {
         return round($value/ 100, 2);
+    }
+
+    public function getOrderDateAttribute($value)
+    {
+        return Carbon::parse($value)->format('Y-m-d');
+    }
+
+    public function getDeliveryDateAttribute($value)
+    {
+        return Carbon::parse($value)->format('Y-m-d');
     }
 
     // setter
