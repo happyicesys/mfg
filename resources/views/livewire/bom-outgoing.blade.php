@@ -282,12 +282,13 @@
                                     </b>
                                 </td>
                                 <td class="text-left">
-                                    <a href="#" wire:click="editInventoryMovement({{$inventoryMovement}})" data-toggle="modal" data-target="#inventory-movement-modal">
+                                    <a href="#" class="text-dark" wire:click="editInventoryMovement({{$inventoryMovement}})" data-toggle="modal" data-target="#inventory-movement-modal">
                                         {{ $inventoryMovement->batch }}
                                     </a>
                                 </td>
                                 <td class="text-center">
                                 </td>
+                                <td></td>
                                 <td></td>
                                 <td></td>
                                 <td></td>

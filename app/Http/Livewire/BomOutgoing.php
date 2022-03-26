@@ -418,38 +418,35 @@ class BomOutgoing extends Component
             $inventoryMovement = $this->inventoryMovementForm;
         }
 
+        // dd($inventoryMovement->status, isset($statusStr), $statusStr);
+
         if($action == array_search('Outgoing', InventoryMovement::ACTIONS)) {
+            if($inventoryMovement->inventoryMovementItems()->exists()) {
+                // if(($inventoryMovement->status == array_search('Completed', InventoryMovement::STATUSES))) {
+                if($inventoryMovement->status == array_search('Completed', InventoryMovement::STATUSES) and $statusStr == null) {
+                    foreach($inventoryMovement->inventoryMovementItems as $inventoryMovementItem) {
+                        $this->addBomItemQtyAvailable($inventoryMovementItem->bomItem->id, $inventoryMovementItem['qty']);
+                    }
+                }
+                $inventoryMovement->inventoryMovementItems()->delete();
+            }
             if($this->inventoryMovementItems) {
                 foreach($this->inventoryMovementItems as $inventoryMovementItem) {
                     $bomItem = BomItem::findOrFail($inventoryMovementItem['bom_item_id']);
 
-                    if(isset($inventoryMovementItem['id'])) {
-                        InventoryMovementItem::findOrFail($inventoryMovementItem['id'])->update([
-                            'bom_item_id' => $bomItem->id,
-                            'inventory_movement_id' => $inventoryMovement->id,
-                            'status' => $status,
-                            'qty' => $inventoryMovementItem['qty'],
-                            'amount' => 0,
-                            'unit_price'  => 0,
-                            'created_by' => auth()->user()->id,
-                            'date' => $inventoryMovementItem['date'],
-                        ]);
-                    }else {
-                        // dd($inventoryMovementItem);
-                        $createdItem = InventoryMovementItem::create([
-                            'bom_item_id' => $bomItem->id,
-                            'inventory_movement_id' => $inventoryMovement->id,
-                            'status' => $status,
-                            'qty' => $inventoryMovementItem['qty'],
-                            'amount' => 0,
-                            'unit_price'  => 0,
-                            'created_by' => auth()->user()->id,
-                            'date' => $inventoryMovement->order_date,
-                        ]);
-                    }
+                    $createdInventoryMovementItem = InventoryMovementItem::create([
+                        'bom_item_id' => $bomItem->id,
+                        'inventory_movement_id' => $inventoryMovement->id,
+                        'status' => $status,
+                        'qty' => $inventoryMovementItem['qty'],
+                        'amount' => 0,
+                        'unit_price'  => 0,
+                        'created_by' => auth()->user()->id,
+                        'date' => $inventoryMovement->order_date,
+                    ]);
 
-                    if($status == array_search('Completed', InventoryMovement::STATUSES)) {
-                        $this->reduceBomItemQtyAvailable($bomItem->id, $inventoryMovementItem['qty']);
+                    if(($inventoryMovement->status == array_search('Completed', InventoryMovement::STATUSES)) or (isset($statusStr) and $statusStr == 'Completed')) {
+                        $this->reduceBomItemQtyAvailable($createdInventoryMovementItem->bom_item_id, $createdInventoryMovementItem->qty);
                     }
 
                     $this->syncBomItemQty($bomItem->id);
@@ -530,7 +527,9 @@ class BomOutgoing extends Component
         $inventoryMovementItem = InventoryMovementItem::findOrFail($inventoryMovementItemId);
         $inventoryMovement = $inventoryMovementItem->inventoryMovement;
         $bomItemId = $inventoryMovementItem->bomItem->id;
-        $this->addBomItemQtyAvailable($bomItemId, $inventoryMovementItem->qty);
+        if($inventoryMovement->status == array_search('Completed', InventoryMovement::STATUSES)) {
+            $this->addBomItemQtyAvailable($bomItemId, $inventoryMovementItem->qty);
+        }
         if($inventoryMovementItem->attachments()->exists()) {
             foreach($inventoryMovementItem->attachments as $attachment) {
                 $this->deleteAttachment($attachment);
@@ -550,7 +549,9 @@ class BomOutgoing extends Component
         if($this->inventoryMovementForm->inventoryMovementItems()->exists()) {
             foreach($this->inventoryMovementForm->inventoryMovementItems as $inventoryMovementItem) {
                 $bomItemId = $inventoryMovementItem->bomItem->id;
-                $this->addBomItemQtyAvailable($bomItemId, $inventoryMovementItem->qty);
+                if($inventoryMovementItem->inventoryMovement->status == array_search('Completed', InventoryMovement::STATUSES)) {
+                    $this->addBomItemQtyAvailable($bomItemId, $inventoryMovementItem->qty);
+                }
                 $inventoryMovementItem->delete();
                 $this->syncBomItemQty($bomItemId);
             }
@@ -612,6 +613,7 @@ class BomOutgoing extends Component
         $bomItem->available_qty += $qty;
         $bomItem->save();
         $this->syncBomItemQty($bomItemId);
+        // dd($bomItemId, $qty, $bomItem->toArray());
     }
 
     private function reduceBomItemQtyAvailable($bomItemId, $qty)
