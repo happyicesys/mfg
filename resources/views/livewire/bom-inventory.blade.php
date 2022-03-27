@@ -231,6 +231,28 @@
                             //             ->limit(3)
                             //             ->get();
 
+                            $inQtyQuery = \App\Models\InventoryMovementItemQuantity::query()
+                                            ->leftJoin('inventory_movement_items', 'inventory_movement_items.id', '=', 'inventory_movement_item_quantities.inventory_movement_item_id')
+                                            ->leftJoin('bom_items', 'bom_items.id', '=', 'inventory_movement_items.bom_item_id')
+                                            ->leftJoin('inventory_movements', 'inventory_movements.id', '=', 'inventory_movement_items.inventory_movement_id')
+                                            ->select('inventory_movement_item_quantities.date', 'inventory_movement_item_quantities.qty', 'inventory_movements.action', 'bom_items.id AS bom_item_id')
+                                            ->where('bom_items.id', $bomItem->id)
+                                            ->latest('inventory_movement_item_quantities.date');
+
+                            $outQtyQuery = \App\Models\InventoryMovementItem::query()
+                                            ->leftjoin('inventory_movements', 'inventory_movements.id', '=', 'inventory_movement_items.inventory_movement_id')
+                                            ->select('inventory_movement_items.date', 'inventory_movement_items.qty', 'inventory_movements.action', 'inventory_movement_items.bom_item_id AS bom_item_id')
+                                            ->where('inventory_movement_items.status', array_search('Delivered', \App\Models\InventoryMovementItem::OUTGOING_STATUSES))
+                                            ->whereHas('inventoryMovement', function($query) {
+                                                $query->where('action', array_search('Outgoing', \App\Models\InventoryMovement::ACTIONS));
+                                            })
+                                            ->where('inventory_movement_items.bom_item_id', $bomItem->id)
+                                            ->latest('inventory_movement_items.date');
+
+                            $qtyArr = $inQtyQuery->union($outQtyQuery)->latest('date')->limit(3)->get();
+
+                            // dd($qtyArr->toArray());
+
                             $outQty = $bomItem
                                             ->inventoryMovementItems()
                                             ->where('status', array_search('Delivered', \App\Models\InventoryMovementItem::OUTGOING_STATUSES))
@@ -239,7 +261,6 @@
                                             })->latest()
                                             ->limit(3)
                                             ->get();
-
 
                             $planOutgoingQty = 0;
                             if($planner['bom_id'] and $planner['qty']) {
@@ -281,6 +302,23 @@
                             </td>
                             <td class="text-center">
                                 <b>{{ $bomItem->available_qty }}</b>
+                                @foreach($qtyArr as $availQty)
+                                    @php
+                                        $movementStr = '';
+                                        $movementColor = '';
+                                        if($availQty->action == array_search('Receiving', \App\Models\InventoryMovement::ACTIONS)) {
+                                            $movementStr = '[in]';
+                                            $movementColor = 'text-primary';
+                                        }elseif($availQty->action == array_search('Outgoing', \App\Models\InventoryMovement::ACTIONS)) {
+                                            $movementStr = '[out]';
+                                            $movementColor = 'text-danger';
+                                        }
+                                    @endphp
+                                    <br>
+                                        <small class="{{$movementColor}}">
+                                            {{$movementStr}}{{\Carbon\Carbon::parse($availQty->date)->format('ymd')}}(<b>{{$availQty->qty}}</b>)
+                                        </small>
+                                @endforeach
                             </td>
                             <td class="text-center">
                                 <b>{{ $bomItem->planned_qty }}</b>
