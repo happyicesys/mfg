@@ -866,18 +866,18 @@
                                 @endforeach
                             </select>
                         </div>
-                        @if($inventoryMovementItemForm->bom_item_id and isset($supplier) and $supplier->id)
+                        @if($inventoryMovementItemForm->bom_item_id and isset($supplierForm) and $supplierForm->id)
                             <hr>
                             <div class="form-row">
                                 <div class="form-group col-md-6 col-xs-12">
                                     <label for="supplier_unit_price">
-                                        Quoted Unit Price <br>({{$supplier->company_name}})
+                                        Quoted Unit Price <br>({{$supplierForm->company_name}})
                                     </label>
                                     <input type="text" wire:model="inventoryMovementItemForm.supplier_unit_price" wire:change="calculateAmount()" class="form-control">
                                 </div>
                                 <div class="form-group col-md-6 col-xs-12">
                                     <label for="supplier_unit_price">
-                                        Latest Currency Rate <br> ({{$supplier->transactedCurrency->currency_name}})
+                                        Latest Currency Rate <br> ({{$supplierForm->transactedCurrency->currency_name}})
                                     </label>
                                     <input type="text" wire:model="inventoryMovementItemForm.rate" class="form-control">
                                 </div>
@@ -885,14 +885,14 @@
                             <hr>
                         @endif
                             <div class="form-row">
-                                <div class="form-group @if($this->inventoryMovementItemForm->bom_item_id and isset($supplier) and $supplier->id) col-md-4 col-xs-12 @else col-md-12 col-xs-12 @endif ">
+                                <div class="form-group @if($this->inventoryMovementItemForm->bom_item_id and isset($supplierForm) and $supplierForm->id) col-md-4 col-xs-12 @else col-md-12 col-xs-12 @endif ">
                                     <label>
                                         Qty
                                     </label>
                                     <label for="*" class="text-danger">*</label>
                                     <input wire:model="inventoryMovementItemForm.qty" wire:change="calculateAmount()" type="text" class="form-control" placeholder="Qty">
                                 </div>
-                                @if($this->inventoryMovementItemForm->bom_item_id and isset($supplier) and $supplier->id)
+                                @if($this->inventoryMovementItemForm->bom_item_id and isset($supplierForm) and $supplierForm->id)
                                 <div class="form-group col-md-4 col-xs-12">
                                     <label>
                                         Unit Price

@@ -835,6 +835,8 @@ class BomReceiving extends Component
                 $query->where('country_id', $inventoryMovementCollection->country_id);
             });
         })->where('is_part', 1)->where('is_inventory', 1)->orderBy('code')->get();
+        $this->supplierForm = $this->inventoryMovementItemForm->supplierQuotePrice()->exists() ?                $this->inventoryMovementItemForm->supplierQuotePrice()->latest()->first()->supplier : new Supplier();
+        // dd($this->supplierForm->toArray());
     }
 
     public function updateSingleInventoryMovementItem()
