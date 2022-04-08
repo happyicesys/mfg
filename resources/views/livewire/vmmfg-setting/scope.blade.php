@@ -345,6 +345,15 @@
                                             <div class="form-group">
                                                 <span class="float-left">
                                                     {{$item->sequence}}.  {{$item->name}}
+                                                    @if($item->flag_id == array_search('New', \App\Models\VmmfgItem::FLAGS))
+                                                        <span class="badge badge-danger">
+                                                            New
+                                                        </span>
+                                                    @elseif($item->flag_id == array_search('Updated', \App\Models\VmmfgItem::FLAGS))
+                                                        <span class="badge badge-success">
+                                                            Updated
+                                                        </span>
+                                                    @endif
                                                 </span>
                                                 <span class="float-right">
                                                     <button type="button" wire:click="editTask({{$item}})" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#task-modal">
@@ -462,6 +471,15 @@
             <x-modal id="task-modal">
                 <x-slot name="title">
                     @if(isset($this->item) and $this->item->id) Edit Task: {{$this->item->sequence}}. {{$this->item->name}} @else Create Task @endif
+                    @if($this->item->flag_id == array_search('New', \App\Models\VmmfgItem::FLAGS))
+                        <span class="badge badge-danger">
+                            New
+                        </span>
+                    @elseif($this->item->flag_id == array_search('Updated', \App\Models\VmmfgItem::FLAGS))
+                        <span class="badge badge-success">
+                            Updated
+                        </span>
+                    @endif
                 </x-slot>
                 <x-slot name="content">
                     <x-input type="text" model="item.sequence">
@@ -475,6 +493,19 @@
                             Desc
                         </label>
                         <textarea name="remarks" rows="5" wire:model.defer="item.remarks" class="form-control" placeholder="Desc"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            Flag
+                        </label>
+                        <select name="flag_id" wire:model.defer="item.flag_id" class="select form-control">
+                            <option value="">None</option>
+                            @foreach(\App\Models\VmmfgItem::FLAGS as $flagIndex => $flag)
+                                <option value="{{$flagIndex}}">
+                                    {{$flag}}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
                     @if(isset($this->item) and $this->item->id)
                         <div class="form-group">

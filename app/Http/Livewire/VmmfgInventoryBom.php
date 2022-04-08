@@ -10,6 +10,7 @@ use App\Models\BomSubCategory;
 use App\Models\BomItem;
 use App\Models\BomItemType;
 use App\Models\BomContent;
+use App\Models\Supplier;
 use App\Models\VmmfgItem;
 use Carbon\Carbon;
 use DB;
@@ -72,6 +73,12 @@ class VmmfgInventoryBom extends Component
         'is_part' => false,
 
     ];
+    public $bomContentFormFilters = [
+        'code' => '',
+        'name' => '',
+        'bom_item_type_id' => '',
+        'supplier_id' => '',
+    ];
     public $vmmfgItems;
     public $bomItemGroups;
     public $bomItemParts;
@@ -81,6 +88,9 @@ class VmmfgInventoryBom extends Component
     public $selectAll = false;
     public $selectBomHeader = [];
     public $selectBomContent = [];
+    public $suppliers = [];
+    public $bomItems;
+    public $bomItemsFilters;
 
     protected $listeners = [
         'refresh' => '$refresh',
@@ -118,6 +128,11 @@ class VmmfgInventoryBom extends Component
             'bomContentForm.is_inventory' => 'sometimes',
             'bomContentForm.is_sub_header' => 'sometimes',
             'bomContentForm.is_part' => 'sometimes',
+            // 'bomContentForm.bom_item_parent_id' => 'sometimes',
+            'bomContentFormFilters.code' => 'sometimes',
+            'bomContentFormFilters.name' => 'sometimes',
+            'bomContentFormFilters.bom_item_type_id' => 'sometimes',
+            'bomContentFormFilters.supplier_id' => 'sometimes',
             'file' => 'sometimes',
         ];
     }
@@ -139,9 +154,12 @@ class VmmfgInventoryBom extends Component
                                     ->has('bomHeaders.bomCategory')
                                     ->orderBy('bom_items.code')
                                     ->get();
+        $this->bomItems = BomItem::where('is_part', 1)->where('is_inventory', 1)->orderBy('code')->get();
+        $this->bomItemsFilters = BomItem::where('is_part', 1)->where('is_inventory', 1)->orderBy('code')->get();
         $this->bomHeaderForm = new BomHeader();
         $this->bomContentForm = new BomContent();
         $this->bom = new Bom();
+        $this->suppliers = Supplier::orderBy('company_name')->get();
 
     }
 
@@ -186,6 +204,26 @@ class VmmfgInventoryBom extends Component
         }else {
             $this->selectBomHeader = [];
             $this->selectBomContent = [];
+        }
+    }
+
+    public function updated($name, $value)
+    {
+        if($name == 'bomContentFormFilters.code' or $name == 'bomContentFormFilters.name' or $name == 'bomContentFormFilters.bom_item_type_id' or $name == 'bomContentFormFilters.supplier_id') {
+            $bomItemsFilters = BomItem::when($this->bomContentFormFilters['code'], fn($query, $input) => $query->searchLike('code', $input))
+                                    ->when($this->bomContentFormFilters['name'], fn($query, $input) => $query->searchLike('name', $input))
+                                    ->when($this->bomContentFormFilters['bom_item_type_id'], fn($query, $input) => $query->whereHas('bomItemType', function($query) use ($input) { $query->search('id', $input); }));
+
+            if($supplierId = $this->bomContentFormFilters['supplier_id']) {
+                $bomItemsFilters = $bomItemsFilters->where(function($query) use ($supplierId) {
+                    $query->whereHas('supplierQuotePrices', function($query) use ($supplierId) {
+                        $query->where('supplier_id', $supplierId);
+                    });
+                });
+            }
+
+
+            $this->bomItemsFilters = $bomItemsFilters->where('is_part', 1)->where('is_inventory', 1)->orderBy('code')->get();
         }
     }
 
@@ -474,6 +512,7 @@ class VmmfgInventoryBom extends Component
                     'is_group' => $this->bomContentForm->is_group,
                     'vmmfg_item_id' => $this->bomContentForm->vmmfg_item_id,
                     'qty' => $this->bomContentForm->qty,
+                    // 'bom_item_parent_id' => $this->bomContentForm->bom_item_parent_id,
                 ]);
                 $this->bomContent->bomItem()->update([
                     'code' => $this->bomContentForm->code,
@@ -512,6 +551,7 @@ class VmmfgInventoryBom extends Component
                 'is_group' => $this->bomContentForm->is_group,
                 'vmmfg_item_id' => $this->bomContentForm->vmmfg_item_id,
                 'qty' => $this->bomContentForm->qty,
+                // 'bom_item_parent_id' => $this->bomContentForm->bom_item_parent_id,
             ]);
         }
 

@@ -375,6 +375,7 @@ class BomReceiving extends Component
                     'attachment_url' => $inventoryMovementItem->attachments()->latest()->first() ? $inventoryMovementItem->attachments()->latest()->first()->full_url : '',
                     'attachment' => $inventoryMovementItem->attachments()->latest()->first(),
                     'attachments' => $inventoryMovementItem->attachments,
+                    'is_incomplete_qty' => $inventoryMovementItem->is_incomplete_qty,
                 ];
                 // dd($this->inventoryMovementItems);
                 array_push($this->inventoryMovementItems, $data);
@@ -784,6 +785,7 @@ class BomReceiving extends Component
                 'inventoryMovement' => $inventoryMovementItem->inventoryMovement,
                 'attachment_url' => $inventoryMovementItem->attachments()->latest()->first() ? $inventoryMovementItem->attachments()->latest()->first()->full_url : '',
                 'attachments' =>  $inventoryMovementItem->attachments,
+                'is_incomplete_qty' => $inventoryMovementItem->is_incomplete_qty,
             ];
         }else {
             $data = [
@@ -800,6 +802,7 @@ class BomReceiving extends Component
                 'attachment_url' => $this->file ? $this->file->temporaryUrl() : '',
                 'attachment' => $this->file,
                 'attachments' => [$this->file],
+                'is_incomplete_qty' => $this->inventoryMovementItemForm->is_incomplete_qty,
             ];
         }
 
@@ -861,8 +864,28 @@ class BomReceiving extends Component
         }
         $this->syncInventoryMovementItemStatus($inventoryMovementItem);
         $this->syncInventoryMovementStatus($inventoryMovementItem->inventoryMovement);
-        $this->emit('refresh');
+
         $this->emit('updated');
+        session()->flash('success', 'Your entry has been updated');
+    }
+
+    public function revertInventoryMovementItemIsIncompleteQty($inventoryMovementItemId)
+    {
+        $inventoryMovementItem = InventoryMovementItem::findOrFail($inventoryMovementItemId);
+        if($inventoryMovementItem->inventoryMovementItemQuantities()->exists()) {
+            foreach($inventoryMovementItem->inventoryMovementItemQuantities as $inventoryMovementItemQuantity) {
+                $inventoryMovementItemQuantity->is_incomplete_qty = false;
+                $inventoryMovementItemQuantity->save();
+            }
+        }
+        $inventoryMovementItem->status = array_search('Ordered', InventoryMovementItem::RECEIVING_STATUSES);
+        $inventoryMovementItem->is_incomplete_qty = false;
+        $inventoryMovementItem->save();
+
+        $inventoryMovementItem->inventoryMovement->status = array_search('Confirmed', InventoryMovement::STATUSES);
+        $inventoryMovementItem->inventoryMovement->save();
+        $this->reloadInventoryItems($inventoryMovementItem->inventoryMovement);
+        $this->emit('refresh');
         session()->flash('success', 'Your entry has been updated');
     }
 

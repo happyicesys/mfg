@@ -55,12 +55,14 @@ class Scope extends Component
             'item.remarks' => 'sometimes',
             'item.is_required_upload' => 'sometimes',
             'item.is_required' => 'sometimes',
+            'item.flag_id' => 'sometimes',
         ];
     }
 
     public function mount()
     {
         $this->vmmfgTitleCategories = VmmfgTitleCategory::oldest()->get();
+        $this->item = new VmmfgItem();
     }
 
 
@@ -242,6 +244,7 @@ class Scope extends Component
                 'sequence' => $this->item->sequence,
                 'name' => $this->item->name,
                 'remarks' => $this->item->remarks,
+                'flag_id' => $this->item->flag_id,
             ]);
         }else {
             VmmfgItem::create([
@@ -249,6 +252,7 @@ class Scope extends Component
                 'name' => $this->item->name,
                 'remarks' => $this->item->remarks,
                 'vmmfg_title_id' => $this->title->id,
+                'flag_id' => $this->item->flag_id,
             ]);
         }
         // $this->emit('updated');

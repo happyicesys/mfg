@@ -643,6 +643,12 @@
                                                             <button class="btn btn-sm btn-danger" onclick="confirm('Are you sure you want to delete this part and its receiving?') || event.stopImmediatePropagation()" wire:click.prevent="deleteSingleInventoryMovementItem({{$inventoryMovementItem['id']}})" {{$editSingleInventoryMovementItemDisabled ? 'disabled' : '' }}>
                                                                 <i class="fas fa-times-circle"></i>
                                                             </button>
+                                                            @if($inventoryMovementItem['is_incomplete_qty'])
+                                                            {{-- <i class="fas fa-history"></i> --}}
+                                                                <button class="btn btn-sm btn-info" onclick="confirm('Are you sure you want to revert this incomplete status?') || event.stopImmediatePropagation()" wire:click.prevent="revertInventoryMovementItemIsIncompleteQty({{$inventoryMovementItem['id']}})">
+                                                                    <i class="fas fa-history"></i>
+                                                                </button>
+                                                            @endif
                                                         @endrole
                                                     @else
                                                         <button class="btn btn-sm btn-danger" wire:click.prevent="deleteSingleInventoryMovementItemIndex({{$inventoryMovementItemIndex}})">

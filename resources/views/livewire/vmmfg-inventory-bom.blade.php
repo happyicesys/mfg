@@ -241,7 +241,7 @@
                 <div class="table-responsive pt-3">
                     <table class="table table-bordered table-sm">
                         <tr class="d-flex">
-                            <th class="col-md-1 bg-secondary text-white text-center">
+                            <th class="col bg-secondary text-white text-center">
                                 <input type="checkbox" wire:model="selectAll">
                             </th>
                             <th class="col-md-2 bg-secondary text-white text-center">
@@ -411,6 +411,12 @@
                                                     <i class="far fa-check-circle text-success"></i>
                                                 @else
                                                     <i class="far fa-times-circle text-danger"></i>
+{{--
+                                                    @if($bomContent->bom_item_parent_id)
+                                                        <span class="badge badge-info">
+                                                            {{ $bomContent->bomItemParent->code }}
+                                                        </span>
+                                                    @endif --}}
                                                 @endif
                                             @endif
                                         </th>
@@ -793,6 +799,7 @@
                         </span>
                     @enderror
                 </div>
+                <hr>
                 @if(!$bomContentForm->is_group)
                     <div class="form-group">
                         <div class="form-check form-check-inline">
@@ -801,6 +808,69 @@
                         </div>
                     </div>
                 @endif
+{{--
+                @if($bomContentForm->is_inventory == false)
+                    <div class="bg-light pt-2 pb-2 pl-2 pr-2 mb-2">
+                    <div class="form-row">
+                        <div class="form-group col-md-12 col-xs-12">
+                            <label class="form-check-label">Is the Children for</label>
+                        </div>
+                        <div class="form-group col-md-3 col-xs-12">
+                            <label for="name">
+                                Code Filter
+                            </label>
+                            <input type="text" wire:model.debounce.500ms="bomContentFormFilters.code" class="form-control" placeholder="Code">
+                        </div>
+                        <div class="form-group col-md-3 col-xs-12">
+                            <label for="name">
+                                Name Filter
+                            </label>
+                            <input type="text" wire:model.debounce.500ms="bomContentFormFilters.name" class="form-control" placeholder="Name">
+                        </div>
+                        <div class="form-group col-md-3 col-xs-12">
+                            <label for="name">
+                                Type Filter
+                            </label>
+                            <select class="select form-control" wire:model="bomContentFormFilters.bom_item_type_id">
+                                <option value="">All</option>
+                                @foreach($bomItemTypes as $bomItemType)
+                                    <option value="{{$bomItemType->id}}" {{isset($bomItemForm->bom_item_type_id) && ($bomItemType->id == $bomItemForm->bom_item_type_id) ? 'selected' : ''}}>
+                                        {{ $bomItemType->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3 col-xs-12">
+                            <label for="supplier_id">
+                                Supplier Filter
+                            </label>
+                            <select class="select form-control" wire:model="bomContentFormFilters.supplier_id">
+                                <option value="">All</option>
+                                @foreach($suppliers as $supplierOption)
+                                    <option value="{{$supplierOption->id}}">
+                                        {{ $supplierOption->company_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group col-md-12 col-xs-12">
+                            <label for="bom_item_id">
+                                Part
+                            </label>
+                            <label for="*" class="text-danger">*</label>
+                            <select wire:model.defer="bomContentForm.bom_item_parent_id" class="form-control select">
+                                <option value="">Select..</option>
+                                @foreach($bomItemsFilters as $bomItemsFilter)
+                                    <option value="{{ $bomItemsFilter->id }}" {{isset($bomContentForm->bom_item_parent_id) && ($bomItemsFilter->id == $bomContentForm->bom_item_parent_id) ? 'selected' : ''}}>
+                                        {{ $bomItemsFilter->code }} - {{ $bomItemsFilter->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    </div>
+                @endif --}}
+                <hr>
                 <div class="form-group">
                     <label for="file">
                         Upload File(s)

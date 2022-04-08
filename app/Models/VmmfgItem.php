@@ -10,6 +10,11 @@ class VmmfgItem extends Model
 {
     use HasFactory, HasSearch;
 
+    const FLAGS = [
+        1 => 'New',
+        2 => 'Updated',
+    ];
+
     protected $fillable = [
         'sequence',
         'name',
@@ -17,6 +22,8 @@ class VmmfgItem extends Model
         'vmmfg_title_id',
         'is_required_upload',
         'is_required',
+        'status',
+        'flag_id',
     ];
 
     //relationships
