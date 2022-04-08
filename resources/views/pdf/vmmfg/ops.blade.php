@@ -181,6 +181,15 @@
                     <div class="row">
                         <span class="mr-auto" >
                             <u style="font-family: 'founder-type'; font-weight: bold; word-wrap: break-word;">{{$item->sequence}}.  {{$item->name}}</u>
+                            @if($item->flag_id == array_search('New', \App\Models\VmmfgItem::FLAGS))
+                                <span class="badge badge-danger">
+                                    New
+                                </span>
+                            @elseif($item->flag_id == array_search('Updated', \App\Models\VmmfgItem::FLAGS))
+                                <span class="badge badge-success">
+                                    Updated
+                                </span>
+                            @endif
                         </span>
                         @if($item->remarks)
                         <div class="p-2 mb-1 bg-light">
