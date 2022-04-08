@@ -244,7 +244,7 @@ class Scope extends Component
                 'sequence' => $this->item->sequence,
                 'name' => $this->item->name,
                 'remarks' => $this->item->remarks,
-                'flag_id' => $this->item->flag_id,
+                'flag_id' => $this->item->flag_id ? $this->item->flag_id : null,
             ]);
         }else {
             VmmfgItem::create([
@@ -252,7 +252,7 @@ class Scope extends Component
                 'name' => $this->item->name,
                 'remarks' => $this->item->remarks,
                 'vmmfg_title_id' => $this->title->id,
-                'flag_id' => $this->item->flag_id,
+                'flag_id' => $this->item->flag_id ? $this->item->flag_id : null,
             ]);
         }
         // $this->emit('updated');
