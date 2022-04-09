@@ -238,13 +238,13 @@
                                             </div>
                                         @endif
                                         @if($item->flag_id == array_search('New', \App\Models\VmmfgItem::FLAGS))
-                                            <span class="badge badge-danger">
-                                                New
-                                            </span>
+                                        <span class="badge badge-danger">
+                                        New
+                                        </span>
                                         @elseif($item->flag_id == array_search('Updated', \App\Models\VmmfgItem::FLAGS))
-                                            <span class="badge badge-success">
-                                                Updated
-                                            </span>
+                                        <span class="badge badge-success">
+                                        Updated
+                                        </span>
                                         @endif
                                     </span>
                                     <span class="ml-auto">

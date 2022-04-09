@@ -520,6 +520,17 @@ class BomOutgoing extends Component
         }
     }
 
+    public function deleteAttachment(Attachment $attachment)
+    {
+        if(Attachment::where('full_url', $attachment->full_url)->count() === 1) {
+            Storage::disk('digitaloceanspaces')->delete($attachment->url);
+        }
+        $attachment->delete();
+
+        $this->emit('updated');
+        session()->flash('success', 'Entry has been removed');
+    }
+
     public function deleteSingleInventoryMovementItemIndex($index)
     {
         unset($this->inventoryMovementItems[$index]);

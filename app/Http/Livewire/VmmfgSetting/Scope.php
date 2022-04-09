@@ -129,10 +129,12 @@ class Scope extends Component
                     foreach($title->vmmfgItems as $item) {
                         if($item->attachments()->exists()) {
                             foreach($item->attachments as $attachment) {
-                                if(Attachment::where('full_url', $attachment->full_url)->count() === 1) {
-                                    Storage::disk('digitaloceanspaces')->delete($attachment->url);
-                                }
-                                $attachment->delete();
+                                $this->deleteAttachment($attachment);
+
+                                // if(Attachment::where('full_url', $attachment->full_url)->count() === 1) {
+                                //     Storage::disk('digitaloceanspaces')->delete($attachment->url);
+                                // }
+                                // $attachment->delete();
                             }
                         }
                         $item->delete();
@@ -268,10 +270,12 @@ class Scope extends Component
     {
         if($this->item->attachments){
             foreach($this->item->attachments as $attachment) {
-                $deleteFile = Storage::disk('digitaloceanspaces')->delete($attachment->url);
-                if($deleteFile){
-                    $attachment->delete();
-                }
+                $this->deleteAttachment($attachment);
+
+                // $deleteFile = Storage::disk('digitaloceanspaces')->delete($attachment->url);
+                // if($deleteFile){
+                //     $attachment->delete();
+                // }
             }
         }
         $this->item->vmmfgTasks()->delete();

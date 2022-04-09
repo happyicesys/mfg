@@ -646,12 +646,23 @@ class BomMovement extends Component
         session()->flash('success', 'Your entry has been deleted');
     }
 
+    // public function deleteAttachment(Attachment $attachment)
+    // {
+    //     $deleteFile = Storage::disk('digitaloceanspaces')->delete($attachment->url);
+    //     if($deleteFile){
+    //         $attachment->delete();
+    //     }
+    //     $this->emit('updated');
+    //     session()->flash('success', 'Entry has been removed');
+    // }
+
     public function deleteAttachment(Attachment $attachment)
     {
-        $deleteFile = Storage::disk('digitaloceanspaces')->delete($attachment->url);
-        if($deleteFile){
-            $attachment->delete();
+        if(Attachment::where('full_url', $attachment->full_url)->count() === 1) {
+            Storage::disk('digitaloceanspaces')->delete($attachment->url);
         }
+        $attachment->delete();
+
         $this->emit('updated');
         session()->flash('success', 'Entry has been removed');
     }
