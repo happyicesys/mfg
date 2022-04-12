@@ -46,6 +46,12 @@ class BomInventory extends Component
     //     'bom_item_type_id' => '',
     //     'is_inventory' => '',
     // ];
+    public $bomItemFormFilters = [
+        'code' => '',
+        'name' => '',
+        'bom_item_type_id' => '',
+        'supplier_id' => '',
+    ];
     public $supplierQuotePriceForm = [
         'supplier_id' => '',
         'unit_price' => '',
@@ -59,6 +65,7 @@ class BomInventory extends Component
     public $attachments;
     public $file;
     public $showPlannerArea = false;
+    public $bomItemsFilters;
 
     public BomItem $bomItemForm;
 
@@ -73,8 +80,13 @@ class BomInventory extends Component
             'bomItemForm.name' => 'required',
             'bomItemForm.bom_item_type_id' => 'sometimes',
             'bomItemForm.is_inventory' => 'sometimes',
+            'bomItemForm.bom_item_parent_id' => 'sometimes',
             'supplierQuotePriceForm.supplier_id' => 'sometimes',
             'supplierQuotePriceForm.unit_price' => 'sometimes',
+            'bomItemFormFilters.code' => 'sometimes',
+            'bomItemFormFilters.name' => 'sometimes',
+            'bomItemFormFilters.bom_item_type_id' => 'sometimes',
+            'bomItemFormFilters.supplier_id' => 'sometimes',
         ];
     }
 
@@ -84,6 +96,7 @@ class BomInventory extends Component
         $this->bomItemTypes = BomItemType::orderBy('name')->get();
         $this->suppliers = Supplier::orderBy('company_name')->get();
         $this->boms = Bom::latest()->get();
+        $this->bomItemsFilters = BomItem::where('is_part', 1)->where('is_inventory', 1)->orderBy('code')->get();
     }
 
     public function render()
@@ -222,6 +235,26 @@ class BomInventory extends Component
             $this->filters['is_inventory'] = '';
             $this->filters['is_consumable'] = '';
             $this->filters['supplier_id'] = '';
+        }
+    }
+
+    public function updated($name, $value)
+    {
+        if($name == 'bomItemFormFilters.code' or $name == 'bomItemFormFilters.name' or $name == 'bomItemFormFilters.bom_item_type_id' or $name == 'bomItemFormFilters.supplier_id') {
+            $bomItemsFilters = BomItem::when($this->bomItemFormFilters['code'], fn($query, $input) => $query->searchLike('code', $input))
+                                    ->when($this->bomItemFormFilters['name'], fn($query, $input) => $query->searchLike('name', $input))
+                                    ->when($this->bomItemFormFilters['bom_item_type_id'], fn($query, $input) => $query->whereHas('bomItemType', function($query) use ($input) { $query->search('id', $input); }));
+
+            if($supplierId = $this->bomItemFormFilters['supplier_id']) {
+                $bomItemsFilters = $bomItemsFilters->where(function($query) use ($supplierId) {
+                    $query->whereHas('supplierQuotePrices', function($query) use ($supplierId) {
+                        $query->where('supplier_id', $supplierId);
+                    });
+                });
+            }
+
+
+            $this->bomItemsFilters = $bomItemsFilters->where('is_part', 1)->where('is_inventory', 1)->orderBy('code')->get();
         }
     }
 

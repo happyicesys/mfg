@@ -71,6 +71,7 @@ class VmmfgInventoryBom extends Component
         'is_inventory' => true,
         'is_sub_header' => false,
         'is_part' => false,
+        'bom_item_parent_id' => '',
 
     ];
     public $bomContentFormFilters = [
@@ -128,7 +129,7 @@ class VmmfgInventoryBom extends Component
             'bomContentForm.is_inventory' => 'sometimes',
             'bomContentForm.is_sub_header' => 'sometimes',
             'bomContentForm.is_part' => 'sometimes',
-            // 'bomContentForm.bom_item_parent_id' => 'sometimes',
+            'bomContentForm.bom_item_parent_id' => 'sometimes',
             'bomContentFormFilters.code' => 'sometimes',
             'bomContentFormFilters.name' => 'sometimes',
             'bomContentFormFilters.bom_item_type_id' => 'sometimes',
@@ -519,6 +520,7 @@ class VmmfgInventoryBom extends Component
                     'name' => $this->bomContentForm->name,
                     'bom_item_type_id' => $this->bomContentForm->bom_item_type_id,
                     'is_inventory' => $this->bomContentForm->is_inventory ? $this->bomContentForm->is_inventory : false,
+                    'bom_item_parent_id' => $this->bomContentForm->bom_item_parent_id,
                 ]);
             }
 
@@ -540,6 +542,7 @@ class VmmfgInventoryBom extends Component
                     'is_inventory' => $this->bomContentForm->is_inventory ? $this->bomContentForm->is_inventory : false,
                     'is_sub_header' => $this->bomContentForm->is_group ? true : false,
                     'is_part' => $this->bomContentForm->is_group ? false : true,
+                    'bom_item_parent_id' => $this->bomContentForm->bom_item_parent_id,
                 ]);
                 $bomItemId = $bomContentItem->id;
             }
@@ -583,6 +586,7 @@ class VmmfgInventoryBom extends Component
         $this->bomContentForm->is_inventory = $bomContent->bomItem->is_inventory;
         $this->bomContentForm->bom_item_type_id = $bomContent->bomItem->bomItemType ? $bomContent->bomItem->bomItemType->id : null;
         $this->bomContentForm->is_edit = true;
+        $this->bomContentForm->bom_item_parent_id = $bomContent->bomItem->bom_item_parent_id;
 
         if($this->bomContentForm->is_group) {
             $this->bomItemSubGroups = BomItem::where('is_sub_header', 1)

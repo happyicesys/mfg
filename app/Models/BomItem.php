@@ -25,6 +25,7 @@ class BomItem extends Model
         'base_avg_price',
         'ordered_qty',
         'planned_qty',
+        'bom_item_parent_id',
     ];
 
     // relationships
@@ -53,6 +54,11 @@ class BomItem extends Model
         return $this->belongsTo(BomItemType::class);
     }
 
+    public function children()
+    {
+        return $this->hasMany(BomItem::class, 'bom_item_parent_id');
+    }
+
     public function inventoryMovementItems()
     {
         return $this->hasMany(InventoryMovementItem::class);
@@ -61,6 +67,11 @@ class BomItem extends Model
     public function orderBy()
     {
         return $this->belongsTo(User::class, 'order_by');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(BomItem::class, 'bom_item_parent_id');
     }
 
     public function supplier()

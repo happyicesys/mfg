@@ -376,6 +376,7 @@ class BomReceiving extends Component
                     'attachment' => $inventoryMovementItem->attachments()->latest()->first(),
                     'attachments' => $inventoryMovementItem->attachments,
                     'is_incomplete_qty' => $inventoryMovementItem->is_incomplete_qty,
+                    'is_children' => $inventoryMovementItem->bomItem->parent()->exists() ? true : false,
                 ];
                 // dd($this->inventoryMovementItems);
                 array_push($this->inventoryMovementItems, $data);
@@ -584,10 +585,33 @@ class BomReceiving extends Component
             $currentInventoryMovementItem->update([
                 'status' => array_search('Received', InventoryMovementItem::RECEIVING_STATUSES)
             ]);
+
+            if($currentInventoryMovementItem->bomItem->children()->exists()) {
+                $childrenInventoryMovementItems = InventoryMovementItem::query()
+                                                    ->where('inventory_movement_id', $currentInventoryMovementItem->inventoryMovement->id)
+                                                    ->whereIn('bom_item_id', $currentInventoryMovementItem->bomItem->children()->pluck('id'))
+                                                    ->get();
+                if($childrenInventoryMovementItems) {
+                    foreach($childrenInventoryMovementItems as $childrenInventoryMovementItem) {
+                        $childrenInventoryMovementItem->update([
+                            'status' => array_search('Received', InventoryMovementItem::RECEIVING_STATUSES)
+                        ]);
+                    }
+                }
+            }
+
             if($this->inventoryMovementItemQuantityForm->is_incomplete_qty) {
                 $currentInventoryMovementItem->update([
                     'is_incomplete_qty' => true
                 ]);
+
+                if($childrenInventoryMovementItems) {
+                    foreach($childrenInventoryMovementItems as $childrenInventoryMovementItem) {
+                        $childrenInventoryMovementItem->update([
+                            'is_incomplete_qty' => true
+                        ]);
+                    }
+                }
             }
         }
 
@@ -603,6 +627,32 @@ class BomReceiving extends Component
         }
         $this->addBomItemQtyAvailable($this->inventoryMovementItemForm->bomItem->id, $inventoryMovementItemQuantity->qty);
         $this->syncBomItemQty($this->inventoryMovementItemForm->bomItem->id);
+
+
+        if($this->inventoryMovementItemForm->bomItem->children()->exists()) {
+            $itemsArr = InventoryMovementItem::query()
+                        ->where('inventory_movement_id', $this->inventoryMovementItemForm->inventoryMovement->id)
+                        ->whereIn('bom_item_id', $this->inventoryMovementItemForm->bomItem->children()->pluck('id'))
+                        ->get();
+                // dd($items->toArray());
+            if($itemsArr) {
+                foreach($itemsArr as $itemObj) {
+                    $qtyObj = InventoryMovementItemQuantity::create([
+                        'inventory_movement_item_id' => $itemObj->id,
+                        'date' => $this->inventoryMovementItemQuantityForm->date,
+                        'qty' => $this->inventoryMovementItemQuantityForm->qty,
+                        'remarks' => $this->inventoryMovementItemQuantityForm->remarks,
+                        'is_incomplete_qty' => $this->inventoryMovementItemQuantityForm->is_incomplete_qty ? true : false,
+                        'created_by' => auth()->user()->id,
+                    ]);
+                    // $itemQty = $itemObj->inventoryMovementItemQuantities()->save($this->inventoryMovementItemQuantityForm);
+                    // dd($itemQty->toArray());
+                    $this->addBomItemQtyAvailable($itemObj->bom_item_id, $qtyObj->qty);
+                    $this->syncBomItemQty($itemObj->bom_item_id);
+                }
+            }
+        }
+
         $this->syncInventoryMovementStatus($this->inventoryMovementItemForm->inventoryMovement);
         $this->emit('refresh');
         $this->emit('updated');
@@ -757,6 +807,7 @@ class BomReceiving extends Component
     public function addInventoryMovementItem()
     {
         $bomItem = BomItem::findOrFail($this->inventoryMovementItemForm->bom_item_id);
+
         if(isset($this->inventoryMovementForm->id)) {
             $inventoryMovementItem = InventoryMovementItem::create([
                 'bom_item_id' => $bomItem->id,
@@ -779,8 +830,6 @@ class BomReceiving extends Component
                 ]);
             }
 
-            $this->syncBomItemQty($bomItem->id);
-
             $data = [
                 'id' => $inventoryMovementItem->id,
                 'bom_item_id' => $inventoryMovementItem->bom_item_id,
@@ -797,6 +846,7 @@ class BomReceiving extends Component
                 'attachment_url' => $inventoryMovementItem->attachments()->latest()->first() ? $inventoryMovementItem->attachments()->latest()->first()->full_url : '',
                 'attachments' =>  $inventoryMovementItem->attachments,
                 'is_incomplete_qty' => $inventoryMovementItem->is_incomplete_qty,
+                'is_children' => false,
             ];
         }else {
             $data = [
@@ -814,6 +864,7 @@ class BomReceiving extends Component
                 'attachment' => $this->file,
                 'attachments' => [$this->file],
                 'is_incomplete_qty' => $this->inventoryMovementItemForm->is_incomplete_qty,
+                'is_children' => false,
             ];
         }
 
@@ -832,10 +883,71 @@ class BomReceiving extends Component
         }
 
         array_push($this->inventoryMovementItems, $data);
-        // dd($this->inventoryMovementItems);
+
+        if($bomItem->children()->exists()) {
+            foreach($bomItem->children as $child) {
+                if(isset($this->inventoryMovementForm->id)) {
+                    $childInventoryMovementItem = InventoryMovementItem::create([
+                        'bom_item_id' => $child->id,
+                        'inventory_movement_id' => $this->inventoryMovementForm->id,
+                        'supplier_quote_price_id' => $child->supplierQuotePrices()->exists() ? $child->supplierQuotePrices()->latest()->first()->id : null,
+                        'status' => $this->inventoryMovementForm->status,
+                        'qty' => $this->inventoryMovementItemForm->qty,
+                        'amount' => ($child->supplierQuotePrices()->exists() ? $child->supplierQuotePrices()->latest()->first()->unit_price : 0) * $this->inventoryMovementItemForm->qty,
+                        'unit_price' => $child->supplierQuotePrices()->exists() ? $child->supplierQuotePrices()->latest()->first()->unit_price : 0,
+                        'created_by' => auth()->user()->id,
+                        'date' => $this->inventoryMovementItemForm->date,
+                        'remarks' => null,
+                    ]);
+                    $childData = [
+                        'id' => $childInventoryMovementItem->id,
+                        'bom_item_id' => $childInventoryMovementItem->bom_item_id,
+                        'bom_item_code' => $childInventoryMovementItem->bomItem->code,
+                        'bom_item_name' => $childInventoryMovementItem->bomItem->name,
+                        'unit_price' => $childInventoryMovementItem->unit_price,
+                        'amount' => $childInventoryMovementItem->amount,
+                        'qty' => $childInventoryMovementItem->qty,
+                        'supplier_quote_price_id' => $childInventoryMovementItem->supplier_quote_price_id,
+                        'status' => $childInventoryMovementItem->status,
+                        'date' => $childInventoryMovementItem->date,
+                        'remarks' => $childInventoryMovementItem->remarks,
+                        'inventoryMovement' => $childInventoryMovementItem->inventoryMovement,
+                        'attachment_url' => $childInventoryMovementItem->attachments()->latest()->first() ? $childInventoryMovementItem->attachments()->latest()->first()->full_url : '',
+                        'attachments' =>  $childInventoryMovementItem->attachments,
+                        'is_incomplete_qty' => $childInventoryMovementItem->is_incomplete_qty,
+                        'is_children' => true,
+                        'supplier_unit_price' => $childInventoryMovementItem->unit_price,
+                        'country_id' => $childInventoryMovementItem->supplierQuotePrice()->exists() ? $childInventoryMovementItem->supplierQuotePrice->supplier->transactedCurrency->id : null,
+                        'rate' => $childInventoryMovementItem->supplierQuotePrice()->exists() ? $childInventoryMovementItem->supplierQuotePrice->supplier->transactedCurrency->currencyRates()->latest()->first()->rate : null,
+                    ];
+                }else {
+                    $childData = [
+                        'bom_item_id' => $child->id,
+                        'bom_item_code' => $child->code,
+                        'bom_item_name' => $child->name,
+                        'unit_price' => $child->supplierQuotePrices()->exists() ? $child->supplierQuotePrices()->latest()->first()->unit_price : 0,
+                        'amount' => ($child->supplierQuotePrices()->exists() ? $child->supplierQuotePrices()->latest()->first()->unit_price : 0) * $this->inventoryMovementItemForm->qty,
+                        'qty' => $this->inventoryMovementItemForm->qty,
+                        'supplier_quote_price_id' => $child->supplierQuotePrices()->exists() ? $child->supplierQuotePrices()->latest()->first()->id : null,
+                        'status' => null,
+                        'date' => $this->inventoryMovementItemForm->date,
+                        'remarks' => null,
+                        'attachment_url' => $this->file ? $this->file->temporaryUrl() : '',
+                        'attachment' => $this->file,
+                        'attachments' => [$this->file],
+                        'is_incomplete_qty' => $this->inventoryMovementItemForm->is_incomplete_qty,
+                        'is_children' => true,
+                        'country_id' => $child->supplierQuotePrices()->exists() ? $child->supplierQuotePrices()->latest()->first()->supplier->transactedCurrency->id : null,
+                        'rate' => $child->supplierQuotePrices()->exists() ? $child->supplierQuotePrices()->latest()->first()->supplier->transactedCurrency->currencyRates()->latest()->first()->rate : null,
+                    ];
+                }
+                array_push($this->inventoryMovementItems, $childData);
+            }
+        }
 
         $this->inventoryMovementForm->total_amount = $this->calculateTotalAmount($this->inventoryMovementItems);
         $this->inventoryMovementForm->total_qty = $this->calculateTotalQty($this->inventoryMovementItems);
+        $this->syncBomItemQty($bomItem->id);
     }
 
     public function editSingleInventoryMovementItem($inventoryMovementItemId)

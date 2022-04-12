@@ -197,6 +197,9 @@
                             Base Price @if($profile->country) ({{$profile->country->currency_name}}) @endif
                         </th>
                         <th class="text-center text-dark">
+                            Parent
+                        </th>
+                        <th class="text-center text-dark">
                             Action
                         </th>
                         @if($showPlannerArea)
@@ -214,6 +217,7 @@
                                             ->whereHas('inventoryMovement', function($query) {
                                                 $query->where('action', array_search('Receiving', \App\Models\InventoryMovement::ACTIONS));
                                             })->latest()
+                                            ->limit(5)
                                             ->get();
 
                             $plannedQty = $bomItem
@@ -222,6 +226,7 @@
                                             ->whereHas('inventoryMovement', function($query) {
                                                 $query->where('action', array_search('Outgoing', \App\Models\InventoryMovement::ACTIONS));
                                             })->latest()
+                                            ->limit(5)
                                             ->get();
 
 
@@ -353,6 +358,9 @@
                                 {{ $supplierQuotePrice ? $supplierQuotePrice->base_price : null }}
                             </td>
                             <td class="text-center">
+                                @if($bomItem->parent) {{$bomItem->parent->code}} - {{$bomItem->parent->name}} @endif
+                            </td>
+                            <td class="text-center">
                                 <div class="btn-group">
                                     <button type="button" wire:click="edit({{$bomItem}})" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#edit-bom-item">
                                         <i class="fas fa-edit"></i>
@@ -408,6 +416,68 @@
                                 <label class="form-check-label" for="is_required">Is Inventory?</label>
                                 <input class="form-check-input ml-2" type="checkbox" name="is_inventory" wire:model="bomItemForm.is_inventory">
                             </div>
+
+                            @if($bomItemForm->is_inventory == false)
+                            <div class="bg-light pt-2 pb-2 pl-2 pr-2 mb-2">
+                            <div class="form-row">
+                                <div class="form-group col-md-12 col-xs-12">
+                                    <label class="form-check-label">Is the Children for</label>
+                                </div>
+                                <div class="form-group col-md-3 col-xs-12">
+                                    <label for="name">
+                                        Code Filter
+                                    </label>
+                                    <input type="text" wire:model.debounce.500ms="bomItemFormFilters.code" class="form-control" placeholder="Code">
+                                </div>
+                                <div class="form-group col-md-3 col-xs-12">
+                                    <label for="name">
+                                        Name Filter
+                                    </label>
+                                    <input type="text" wire:model.debounce.500ms="bomItemFormFilters.name" class="form-control" placeholder="Name">
+                                </div>
+                                <div class="form-group col-md-3 col-xs-12">
+                                    <label for="name">
+                                        Type Filter
+                                    </label>
+                                    <select class="select form-control" wire:model="bomItemFormFilters.bom_item_type_id">
+                                        <option value="">All</option>
+                                        @foreach($bomItemTypes as $bomItemType)
+                                            <option value="{{$bomItemType->id}}" {{isset($bomItemForm->bom_item_type_id) && ($bomItemType->id == $bomItemForm->bom_item_type_id) ? 'selected' : ''}}>
+                                                {{ $bomItemType->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-3 col-xs-12">
+                                    <label for="supplier_id">
+                                        Supplier Filter
+                                    </label>
+                                    <select class="select form-control" wire:model="bomItemFormFilters.supplier_id">
+                                        <option value="">All</option>
+                                        @foreach($suppliers as $supplierOption)
+                                            <option value="{{$supplierOption->id}}">
+                                                {{ $supplierOption->company_name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-12 col-xs-12">
+                                    <label for="bom_item_parent_id">
+                                        Part
+                                    </label>
+                                    <label for="*" class="text-danger">*</label>
+                                    <select wire:model.defer="bomItemForm.bom_item_parent_id" class="form-control select">
+                                        <option value="">Select..</option>
+                                        @foreach($bomItemsFilters as $bomItemsFilter)
+                                            <option value="{{ $bomItemsFilter->id }}" {{isset($bomItemForm->bom_item_parent_id) && ($bomItemsFilter->id == $bomItemForm->bom_item_parent_id) ? 'selected' : ''}}>
+                                                {{ $bomItemsFilter->code }} - {{ $bomItemsFilter->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            </div>
+                            @endif
                         </div>
                         <div class="form-group">
                             <label for="file">

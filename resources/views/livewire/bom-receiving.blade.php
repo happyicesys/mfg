@@ -185,6 +185,11 @@
                                         @else
                                             {{ $inventoryMovementItem->bomItem->code }}
                                         @endif
+                                        @if($inventoryMovementItem->bomItem->parent()->exists())
+                                            <span class="badge badge-info">
+                                                Child
+                                            </span>
+                                        @endif
                                     </td>
                                     <td class="text-left">
                                         {{ $inventoryMovementItem->bomItem->name }}
@@ -227,9 +232,11 @@
                                         <div class="btn-group">
                                             @if($inventoryMovement->status > array_search('Pending', \App\Models\InventoryMovement::STATUSES))
                                                 @if($inventoryMovement->status != array_search('Completed', \App\Models\InventoryMovement::STATUSES))
-                                                    <button class="btn btn-sm btn-success" wire:click.prevent="editReceiveInventoryMovementItem({{$inventoryMovementItem}})" data-toggle="modal" data-target="#inventory-movement-item-quantity-modal" title="Create Receiving" {{$inventoryMovementItem->status == array_search('Received', \App\Models\InventoryMovementItem::RECEIVING_STATUSES) ? 'disabled' : ''}}>
-                                                        <i class="fas fa-check-circle"></i>
-                                                    </button>
+                                                    @if(!$inventoryMovementItem->bomItem->parent()->exists())
+                                                        <button class="btn btn-sm btn-success" wire:click.prevent="editReceiveInventoryMovementItem({{$inventoryMovementItem}})" data-toggle="modal" data-target="#inventory-movement-item-quantity-modal" title="Create Receiving" {{$inventoryMovementItem->status == array_search('Received', \App\Models\InventoryMovementItem::RECEIVING_STATUSES) ? 'disabled' : ''}}>
+                                                            <i class="fas fa-check-circle"></i>
+                                                        </button>
+                                                    @endif
                                                     @role('admin')
                                                         <button class="btn btn-sm btn-danger" wire:click.prevent="deleteSingleInventoryMovementItem({{$inventoryMovementItem->id}})" {{$inventoryMovementItem['inventoryMovement']['status'] == array_search('Completed', \App\Models\InventoryMovement::STATUSES) ? 'disabled' : '' }}>
                                                             <i class="fas fa-times-circle"></i>
@@ -578,6 +585,11 @@
                                             </td>
                                             <td class="text-left">
                                                 {{ $inventoryMovementItem['bom_item_code'] }}
+                                                @if($inventoryMovementItem['is_children'])
+                                                    <span class="badge badge-info">
+                                                        Child
+                                                    </span>
+                                                @endif
                                             </td>
                                             <td class="text-left">
                                                 {{ $inventoryMovementItem['bom_item_name'] }}

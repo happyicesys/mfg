@@ -411,12 +411,12 @@
                                                     <i class="far fa-check-circle text-success"></i>
                                                 @else
                                                     <i class="far fa-times-circle text-danger"></i>
-{{--
-                                                    @if($bomContent->bom_item_parent_id)
+
+                                                    @if($bomContent->bomItem->bom_item_parent_id)
                                                         <span class="badge badge-info">
-                                                            {{ $bomContent->bomItemParent->code }}
+                                                            {{ $bomContent->bomItem->parent->code }}
                                                         </span>
-                                                    @endif --}}
+                                                    @endif
                                                 @endif
                                             @endif
                                         </th>
@@ -808,7 +808,7 @@
                         </div>
                     </div>
                 @endif
-{{--
+
                 @if($bomContentForm->is_inventory == false)
                     <div class="bg-light pt-2 pb-2 pl-2 pr-2 mb-2">
                     <div class="form-row">
@@ -854,14 +854,14 @@
                             </select>
                         </div>
                         <div class="form-group col-md-12 col-xs-12">
-                            <label for="bom_item_id">
+                            <label for="bom_item_parent_id">
                                 Part
                             </label>
                             <label for="*" class="text-danger">*</label>
                             <select wire:model.defer="bomContentForm.bom_item_parent_id" class="form-control select">
                                 <option value="">Select..</option>
                                 @foreach($bomItemsFilters as $bomItemsFilter)
-                                    <option value="{{ $bomItemsFilter->id }}" {{isset($bomContentForm->bom_item_parent_id) && ($bomItemsFilter->id == $bomContentForm->bom_item_parent_id) ? 'selected' : ''}}>
+                                    <option value="{{ $bomItemsFilter->id }}" {{isset($bomContentForm->bomItem->bom_item_parent_id) && ($bomItemsFilter->id == $bomContentForm->bomItem->bom_item_parent_id) ? 'selected' : ''}}>
                                         {{ $bomItemsFilter->code }} - {{ $bomItemsFilter->name }}
                                     </option>
                                 @endforeach
@@ -869,7 +869,7 @@
                         </div>
                     </div>
                     </div>
-                @endif --}}
+                @endif
                 <hr>
                 <div class="form-group">
                     <label for="file">
