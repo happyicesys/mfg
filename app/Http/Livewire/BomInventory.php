@@ -65,6 +65,7 @@ class BomInventory extends Component
     public $attachments;
     public $file;
     public $showPlannerArea = false;
+    public $showChildrenArea = false;
     public $bomItemsFilters;
 
     public BomItem $bomItemForm;
@@ -108,7 +109,9 @@ class BomInventory extends Component
             'bomContents',
             'supplierQuotePrices',
             'supplierQuotePrices.country',
-            'supplierQuotePrices.supplier'
+            'supplierQuotePrices.supplier',
+            'children',
+            'parent'
         ]);
 
         // advance search
@@ -253,8 +256,18 @@ class BomInventory extends Component
                 });
             }
 
-
             $this->bomItemsFilters = $bomItemsFilters->where('is_part', 1)->where('is_inventory', 1)->orderBy('code')->get();
+        }
+
+        if($name == 'filters.is_inventory') {
+            $this->showChildrenArea = false;
+            if($value == 1) {
+                $this->showChildrenArea = true;
+            }
+
+            if($value == '') {
+                $this->showChildrenArea = true;
+            }
         }
     }
 

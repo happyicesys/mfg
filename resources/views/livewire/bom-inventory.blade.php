@@ -158,7 +158,7 @@
             @endif
 
             <div class="table-responsive pt-3" style="font-size: 14px;">
-                <table class="table table-bordered table-hover">
+                <table class="table table-bordered table-hover table-sm">
                     <tr class="table-secondary">
                         {{-- <th class="text-center">
                             <input type="checkbox" name="" id="">
@@ -279,7 +279,7 @@
                             }
                         @endphp
 
-                        <tr class="row_edit" wire:loading.class.delay="opacity-2" wire:key="row-{{$index}}">
+                        <tr class="row_edit" wire:loading.class.delay="opacity-2" wire:key="row-{{$bomItem->id}}">
                             {{-- <th class="text-center">
                                 <input type="checkbox" wire:model="selected" value="{{$admin->id}}">
                             </th> --}}
@@ -373,6 +373,79 @@
                             </td>
                             @endif
                         </tr>
+                        @if($bomItem->children()->exists())
+                            @foreach($bomItem->children()->orderBy('code')->get() as $childIndex => $child)
+                            @php
+                                $planChildOutgoingQty = 0;
+                                if($planner['bom_id'] and $planner['qty']) {
+                                    $bomChildItemQty = $child
+                                                    ->bomContents()
+                                                    ->whereHas('bomHeader', function($query) use ($planner) {
+                                                        $query->where('bom_id', $planner['bom_id']);
+                                                    })
+                                                    ->sum('qty');
+                                    $planChildOutgoingQty = $bomChildItemQty * $planner['qty'];
+                                }
+                            @endphp
+                            <tr class="row_edit ml-2" wire:loading.class.delay="opacity-2" style="background-color: #daedf4; font-size: 13px;" wire:key="row-child-{{$child->id}}">
+                                {{-- <th class="text-center">
+                                    <input type="checkbox" wire:model="selected" value="{{$admin->id}}">
+                                </th> --}}
+                                <td class="text-center">
+                                    <span class="badge badge-info">
+                                        Child
+                                    </span>
+                                </td>
+                                <td class="text-left">
+                                    {{ $child->code }}
+                                </td>
+                                <td class="text-left">
+                                    {{ $child->name }}
+                                </td>
+                                <td class="text-center">
+                                    {{ $child->bomItemType ? $child->bomItemType->name : '' }}
+                                </td>
+                                <td class="text-center">
+                                    <b>{{ $child->ordered_qty }}</b>
+                                </td>
+                                <td class="text-center">
+                                    <b>{{ $child->available_qty }}</b>
+                                </td>
+                                <td class="text-center">
+                                    <b>{{ $child->planned_qty }}</b>
+                                </td>
+                                <td class="text-center">
+                                </td>
+                                @php
+                                    $childSupplierQuotePrice = $child->supplierQuotePrices()->latest()->first();
+                                @endphp
+                                <td class="text-left">
+                                    {{ $childSupplierQuotePrice ? $childSupplierQuotePrice->supplier->company_name : '' }}
+                                </td>
+                                <td class="text-right">
+                                    {{ $childSupplierQuotePrice ? $childSupplierQuotePrice->unit_price : '' }} @if(isset($childSupplierQuotePrice->country)) ({{ $childSupplierQuotePrice->country->currency_name }}) @endif
+                                </td>
+                                <td class="text-right">
+                                    {{ $childSupplierQuotePrice ? $childSupplierQuotePrice->base_price : null }}
+                                </td>
+                                <td class="text-center">
+                                    @if($child->parent) {{$child->parent->code}} - {{$child->parent->name}} @endif
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group">
+                                        <button type="button" wire:click="edit({{$child}})" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#edit-bom-item">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                                @if($showPlannerArea)
+                                <td class="text-right">
+                                    {{$planChildOutgoingQty}}
+                                </td>
+                                @endif
+                            </tr>
+                            @endforeach
+                        @endif
                     @empty
                     <tr>
                         <td colspan="18" class="text-center"> No Results Found </td>
