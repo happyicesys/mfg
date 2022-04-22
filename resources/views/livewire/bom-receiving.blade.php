@@ -162,7 +162,7 @@
                                                 {{ $inventoryMovement->batch }}
                                             </a>
                                             <br>
-                                            [{{$inventoryMovement->createdBy ? $inventoryMovement->createdBy->name : ''}} {{\Carbon\Carbon::parse($inventoryMovementForm->created_at)->format('ymd H:ia')}}]
+                                            [{{$inventoryMovement->createdBy ? $inventoryMovement->createdBy->name : ''}} {{\Carbon\Carbon::parse($inventoryMovement->created_at)->format('ymd H:ia')}}]
                                         @endif
                                     </td>
                                     <td class="text-center">
