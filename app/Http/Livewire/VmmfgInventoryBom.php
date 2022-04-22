@@ -520,7 +520,7 @@ class VmmfgInventoryBom extends Component
                     'name' => $this->bomContentForm->name,
                     'bom_item_type_id' => $this->bomContentForm->bom_item_type_id,
                     'is_inventory' => $this->bomContentForm->is_inventory ? $this->bomContentForm->is_inventory : false,
-                    'bom_item_parent_id' => $this->bomContentForm->bom_item_parent_id,
+                    'bom_item_parent_id' => $this->bomContentForm->is_inventory ? null : $this->bomContentForm->bom_item_parent_id,
                 ]);
             }
 
@@ -542,7 +542,7 @@ class VmmfgInventoryBom extends Component
                     'is_inventory' => $this->bomContentForm->is_inventory ? $this->bomContentForm->is_inventory : false,
                     'is_sub_header' => $this->bomContentForm->is_group ? true : false,
                     'is_part' => $this->bomContentForm->is_group ? false : true,
-                    'bom_item_parent_id' => $this->bomContentForm->bom_item_parent_id,
+                    'bom_item_parent_id' => $this->bomContentForm->is_inventory ? null : $this->bomContentForm->bom_item_parent_id,
                 ]);
                 $bomItemId = $bomContentItem->id;
             }

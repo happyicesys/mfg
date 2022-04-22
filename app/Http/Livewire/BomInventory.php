@@ -190,6 +190,10 @@ class BomInventory extends Component
     public function save()
     {
         $this->validate();
+        // dd($this->bomItemForm->toArray());
+        if($this->bomItemForm->is_inventory) {
+            $this->bomItemForm->bom_item_parent_id = null;
+        }
         $this->bomItemForm->save();
 
         if($this->file) {
