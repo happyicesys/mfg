@@ -128,7 +128,7 @@
                         <th class="text-center text-dark">
                             Part Name
                         </th>
-                        <th class="text-center text-dark">
+                        <th class="text-center text-dark" style="width: 8%;">
                             Remarks
                         </th>
                         <th class="text-center text-dark">
