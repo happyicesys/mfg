@@ -161,6 +161,8 @@
                                             <a href="#" wire:click="editInventoryMovement({{$inventoryMovement}})" data-toggle="modal" data-target="#inventory-movement-modal">
                                                 {{ $inventoryMovement->batch }}
                                             </a>
+                                            <br>
+                                            [{{$inventoryMovement->createdBy ? $inventoryMovement->createdBy->name : ''}} {{\Carbon\Carbon::parse($inventoryMovementForm->created_at)->format('ymd H:ia')}}]
                                         @endif
                                     </td>
                                     <td class="text-center">
@@ -177,7 +179,7 @@
                                             </button>
                                         @endif
                                     </td> --}}
-                                    <td class="text-left">
+                                    <td class="text-left" style="{{$inventoryMovementItem->bomItem->parent()->exists() ? 'text-size: 13px;background-color: #daedf4;' : ''}}">
                                         @if($inventoryMovementItem->bomItem->attachments()->exists())
                                             <a href="#" wire:click.prevent="viewBomItemAttachments({{$inventoryMovementItem->bomItem}})" data-toggle="modal" data-target="#attachment-modal-nonedit">
                                                 {{ $inventoryMovementItem->bomItem->code }}
@@ -191,20 +193,20 @@
                                             </span>
                                         @endif
                                     </td>
-                                    <td class="text-left">
+                                    <td class="text-left" style="{{$inventoryMovementItem->bomItem->parent()->exists() ? 'text-size: 13px;background-color: #daedf4;' : ''}}">
                                         {{ $inventoryMovementItem->bomItem->name }}
                                     </td>
-                                    <td class="text-left">
+                                    <td class="text-left" style="{{$inventoryMovementItem->bomItem->parent()->exists() ? 'text-size: 13px;background-color: #daedf4;' : ''}}">
                                         {{ $inventoryMovementItem->remarks }}
                                     </td>
-                                    <td class="text-center">
+                                    <td class="text-center" style="{{$inventoryMovementItem->bomItem->parent()->exists() ? 'text-size: 13px;background-color: #daedf4;' : ''}}">
                                         {{ $inventoryMovementItem->qty }}
                                     </td>
-                                    <td class="text-center @if(\Carbon\Carbon::createFromFormat('Y-m-d', $inventoryMovementItem->date) < \Carbon\Carbon::today()) text-danger @endif">
+                                    <td class="text-center @if(\Carbon\Carbon::createFromFormat('Y-m-d', $inventoryMovementItem->date) < \Carbon\Carbon::today()) text-danger @endif" style="{{$inventoryMovementItem->bomItem->parent()->exists() ? 'text-size: 13px;background-color: #daedf4;' : ''}}">
                                     {{-- <td class="text-center"> --}}
                                         {{ \Carbon\Carbon::parse($inventoryMovementItem->date)->format('ymd') }}
                                     </td>
-                                    <td class="text-center" style="{{($inventoryMovementItem->qty == $inventoryMovementItem->inventoryMovementItemQuantities()->sum('qty')) ? 'background-color: #90eeb0;' : ''}} {{$inventoryMovementItem->is_incomplete_qty ? 'background-color: #83B795;' : ''}}">
+                                    <td class="text-center" style="{{($inventoryMovementItem->qty == $inventoryMovementItem->inventoryMovementItemQuantities()->sum('qty')) ? 'background-color: #90eeb0;' : ''}} {{$inventoryMovementItem->is_incomplete_qty ? 'background-color: #83B795;' : ''}} {{$inventoryMovementItem->bomItem->parent()->exists() ? 'text-size: 13px;background-color: #daedf4;' : ''}}">
                                         {{$inventoryMovementItem->inventoryMovementItemQuantities()->sum('qty') + 0}}
                                     </td>
                                     @if($inventoryMovementItem->inventoryMovementItemQuantities()->exists())
@@ -220,15 +222,15 @@
                                             }
 
                                         @endphp
-                                        <td class="text-center {{$highlightDate ? 'bg-warning' : '' }}">
+                                        <td class="text-center {{$highlightDate ? 'bg-warning' : '' }}" style="{{$inventoryMovementItem->bomItem->parent()->exists() ? 'text-size: 13px;background-color: #daedf4;' : ''}}">
                                             <b>{{ $latestReceived->createdBy ? $latestReceived->createdBy->name : null }}</b> <br>
                                             {{ $latestReceived->created_at ? \Carbon\Carbon::parse($latestReceived->created_at)->format('ymd h:ia') : null }}
                                         </td>
                                     @else
-                                        <td></td>
+                                        <td style="{{$inventoryMovementItem->bomItem->parent()->exists() ? 'text-size: 13px;background-color: #daedf4;' : ''}}"></td>
                                     @endif
 
-                                    <td class="text-center">
+                                    <td class="text-center" style="{{$inventoryMovementItem->bomItem->parent()->exists() ? 'text-size: 13px;background-color: #daedf4;' : ''}}">
                                         <div class="btn-group">
                                             @if($inventoryMovement->status > array_search('Pending', \App\Models\InventoryMovement::STATUSES))
                                                 @if($inventoryMovement->status != array_search('Completed', \App\Models\InventoryMovement::STATUSES))
@@ -340,6 +342,10 @@
                             @endphp
                             <span class="{{$statusClass}}">{{ $statusStr }}</span>  Edit {{\App\Models\InventoryMovement::ACTIONS[$inventoryMovementForm->action]}} - {{ $inventoryMovementForm->batch }} @if($inventoryMovementForm->country) ({{$supplierForm->company_name}}) ({{ $inventoryMovementForm->country->currency_name }}) @endif
                         @endif
+                        <span class="ml-auto">
+                            <br>[Created: {{$inventoryMovementForm->createdBy ? $inventoryMovementForm->createdBy->name : ''}}
+                            {{\Carbon\Carbon::parse($inventoryMovementForm->created_at)->format('ymd H:ia')}}]
+                        </span>
                     </x-slot>
                     <x-slot name="content">
                         @if(!$inventoryMovementForm->id)
@@ -540,7 +546,7 @@
                             </div>
 
                             <div class="table-responsive">
-                                <table class="table table-bordered table-hover">
+                                <table class="table table-bordered table-hover table-sm">
                                     <tr class="table-primary">
                                         <th class="text-center text-dark">
                                             #
@@ -578,10 +584,15 @@
                                             Action
                                         </th>
                                     </tr>
+                                    @php
+                                        $itemLoop = 0;
+                                    @endphp
                                     @forelse($inventoryMovementItems as $inventoryMovementItemIndex => $inventoryMovementItem)
-                                        <tr wire:key="inventory-movement-item-{{ $inventoryMovementItemIndex }}">
+                                        <tr wire:key="inventory-movement-item-{{ $inventoryMovementItemIndex }}" style="{{$inventoryMovementItem['is_children'] ? 'text-size: 13px;background-color: #daedf4;' : ''}}">
                                             <td class="text-center">
-                                                {{ $inventoryMovementItemIndex + 1 }}
+                                                @if(!$inventoryMovementItem['is_children'])
+                                                    {{ ++ $itemLoop }}
+                                                @endif
                                             </td>
                                             <td class="text-left">
                                                 {{ $inventoryMovementItem['bom_item_code'] }}

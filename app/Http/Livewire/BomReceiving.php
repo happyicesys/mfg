@@ -1034,6 +1034,29 @@ class BomReceiving extends Component
         }
     }
 
+    // public function exportPdf()
+    // {
+    //     $tasks = $this->mainQuery();
+
+    //     $tasks = $this->queryFilter($tasks, $this->filters);
+
+    //     if($sortKey = $this->sortKey) {
+    //         $tasks = $tasks->orderBy($sortKey, $this->sortAscending ? 'asc' : 'desc');
+    //     }
+
+    //     $tasks = $tasks->get();
+
+    //     $pdf = PDF::loadView('pdf.vmmfg.dailyreport', [
+    //         'tasks' => $tasks,
+    //         'filtersData' => $this->getFilterInfo(),
+    //     ])->output();
+
+    //     return response()->streamDownload(
+    //         fn () => print($pdf),
+    //         "dailyreport_".Carbon::now()->format('ymdHis').".pdf"
+    //    );
+    // }
+
     private function calculateTotalAmount($inventoryMovementItemArr)
     {
         $totalAmount = 0.00;
