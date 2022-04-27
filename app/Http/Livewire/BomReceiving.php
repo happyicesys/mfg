@@ -38,6 +38,10 @@ class BomReceiving extends Component
         'created_at' => '',
         'supplier_id' => '',
         'date' => '',
+        'name' => '',
+        'bom_item_type_id' => '',
+        'is_consumable' => '',
+        'is_inventory' => '',
     ];
     public $inventoryMovementItemFormFilters = [
         'code' => '',
@@ -111,6 +115,8 @@ class BomReceiving extends Component
             'inventoryMovementItemFormFilters.code' => 'sometimes',
             'inventoryMovementItemFormFilters.name' => 'sometimes',
             'inventoryMovementItemFormFilters.bom_item_type_id' => 'sometimes',
+            'inventoryMovementItemFormFilters.is_consumable' => 'sometimes',
+            'inventoryMovementItemFormFilters.is_inventory' => 'sometimes',
         ];
     }
 
@@ -148,6 +154,36 @@ class BomReceiving extends Component
         if($date = $this->filters['date']) {
             $inventoryMovements = $inventoryMovements->whereHas('inventoryMovementItems.inventoryMovementItemQuantities', function($query) use ($date) {
                 $query->whereDate('date', $date);
+            });
+        }
+
+        if($filtersName = $this->filters['name']) {
+            $inventoryMovements = $inventoryMovements->whereHas('inventoryMovementItems.bomItem', function($query) use ($filtersName) {
+                $query->where('name', 'LIKE', '%'.$filtersName.'%');
+            });
+        }
+
+        if($filtersBomItemTypeId = $this->filters['bom_item_type_id']) {
+            $inventoryMovements = $inventoryMovements->whereHas('inventoryMovementItems.bomItem.bomItemType', function($query) use ($filtersBomItemTypeId) {
+                $query->where('id', $filtersBomItemTypeId);
+            });
+        }
+
+        if($this->filters['is_consumable'] != '') {
+            $filtersIsConsumable = $this->filters['is_consumable'];
+            $inventoryMovements = $inventoryMovements->whereHas('inventoryMovementItems.bomItem.bomItemType', function($query) use ($filtersIsConsumable) {
+                if($filtersIsConsumable) {
+                    $query->whereIn('name', ['C', 'CB']);
+                }else {
+                    $query->whereNotIn('name', ['C', 'CB']);
+                }
+            });
+        }
+
+        if($this->filters['is_inventory'] != '') {
+            $filtersIsInventory = $this->filters['is_inventory'];
+            $inventoryMovements = $inventoryMovements->whereHas('inventoryMovementItems.bomItem', function($query) use ($filtersIsInventory) {
+                $query->where('is_inventory', $filtersIsInventory);
             });
         }
 

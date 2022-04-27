@@ -176,6 +176,10 @@
                                             <a href="#" class="text-dark" wire:click="editInventoryMovement({{$inventoryMovement}})" data-toggle="modal" data-target="#inventory-movement-modal">
                                                 {{ $inventoryMovement->batch }}
                                             </a>
+                                            <br>
+                                            <span class="text-dark">
+                                                [{{$inventoryMovement->createdBy ? $inventoryMovement->createdBy->name : ''}} {{\Carbon\Carbon::parse($inventoryMovement->created_at)->format('ymd H:ia')}}]
+                                            </span>
                                         @endif
                                     </td>
                                     <td class="text-left">
@@ -804,6 +808,9 @@
                                 >
                                     Save
                                 </button>
+                                <a href="#" class="btn btn-outline-primary" onclick="return confirm('Are you sure you want to replicate this outgoing?') || event.stopImmediatePropagation()" wire:click.prevent="replicateInventoryMovementForm()" >
+                                    Replicate
+                                </a>
                             @endif
                         </div>
                     </x-slot>

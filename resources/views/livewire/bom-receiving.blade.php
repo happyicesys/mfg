@@ -65,6 +65,45 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="form-group col-md-3 col-xs-12">
+                                    <label>
+                                        Name
+                                    </label>
+                                    <input wire:model="filters.name" type="text" class="form-control" placeholder="Name">
+                                </div>
+                                <div class="form-group col-md-3 col-xs-12">
+                                    <label>
+                                        Type
+                                    </label>
+                                    <select name="bom_item_type_id" wire:model="filters.bom_item_type_id" class="select form-control">
+                                        <option value="">All</option>
+                                        @foreach($bomItemTypes as $bomItemType)
+                                            <option value="{{$bomItemType->id}}">
+                                                {{$bomItemType->name}}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-3 col-xs-12">
+                                    <label>
+                                        Is Consumable(C) or Cable(CB)?
+                                    </label>
+                                    <select name="is_consumable" wire:model="filters.is_consumable" class="select form-control">
+                                        <option value="">All</option>
+                                        <option value="1">Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-3 col-xs-12">
+                                    <label>
+                                        Is Inventory?
+                                    </label>
+                                    <select name="is_inventory" wire:model="filters.is_inventory" class="select form-control">
+                                        <option value="">All</option>
+                                        <option value="1">Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                </div>
                             </div>
                             <div class="form-row d-flex justify-content-end">
                                 <div class="btn-group">
@@ -170,6 +209,51 @@
                                             {{ $inventoryMovement->supplier->company_name }}
                                         @endif
                                     </td>
+
+                                    @php
+                                        $bgColor = '';
+                                        $bgColorBoolean = false;
+
+                                        if($filters['name']) {
+                                            if(str_contains(strtolower($inventoryMovementItem->bomItem->name), strtolower($filters['name']))) {
+                                                $bgColorBoolean = true;
+                                            }
+                                        }
+
+                                        if($filters['bom_item_type_id']) {
+                                            if($filters['bom_item_type_id'] == $inventoryMovementItem->bomItem->bomItemType->id) {
+                                                $bgColorBoolean = true;
+                                            }
+                                        }
+
+                                        if($filters['is_consumable'] != '') {
+                                            if($filters['is_consumable']) {
+                                                if($inventoryMovementItem->bomItem->bomItemType->name == 'C' or $inventoryMovementItem->bomItem->bomItemType->name == 'CB') {
+                                                    $bgColorBoolean = true;
+                                                }
+                                            }else {
+                                                if($inventoryMovementItem->bomItem->bomItemType->name != 'C' or $inventoryMovementItem->bomItem->bomItemType->name != 'CB') {
+                                                    $bgColorBoolean = true;
+                                                }
+                                            }
+                                        }
+
+                                        if($filters['is_inventory'] != '') {
+                                            if($filters['is_inventory'] == $inventoryMovementItem->bomItem->is_inventory) {
+                                                $bgColorBoolean = true;
+                                            }
+                                        }
+
+                                        if($filters['supplier_id']) {
+                                            if($inventoryMovementItem->bomItem->supplierQuotePrices()->where('supplier_id', $filters['supplier_id'])->exists()) {
+                                                $bgColorBoolean = true;
+                                            }
+                                        }
+
+                                        if($bgColorBoolean) {
+                                            $bgColor = 'bg-info';
+                                        }
+                                    @endphp
 {{--
                                     <td class="text-center" colspan="2">
                                         ({{ $inventoryMovementItemIndex + 1 }})
@@ -179,7 +263,7 @@
                                             </button>
                                         @endif
                                     </td> --}}
-                                    <td class="text-left" style="{{$inventoryMovementItem->bomItem->parent()->exists() ? 'text-size: 13px;background-color: #daedf4;' : ''}}">
+                                    <td class="text-left {{$bgColor}}" style="{{$inventoryMovementItem->bomItem->parent()->exists() ? 'text-size: 13px;background-color: #daedf4;' : ''}}">
                                         @if($inventoryMovementItem->bomItem->attachments()->exists())
                                             <a href="#" wire:click.prevent="viewBomItemAttachments({{$inventoryMovementItem->bomItem}})" data-toggle="modal" data-target="#attachment-modal-nonedit">
                                                 {{ $inventoryMovementItem->bomItem->code }}
@@ -193,20 +277,20 @@
                                             </span>
                                         @endif
                                     </td>
-                                    <td class="text-left" style="{{$inventoryMovementItem->bomItem->parent()->exists() ? 'text-size: 13px;background-color: #daedf4;' : ''}}">
+                                    <td class="text-left {{$bgColor}}" style="{{$inventoryMovementItem->bomItem->parent()->exists() ? 'text-size: 13px;background-color: #daedf4;' : ''}}">
                                         {{ $inventoryMovementItem->bomItem->name }}
                                     </td>
-                                    <td class="text-left" style="{{$inventoryMovementItem->bomItem->parent()->exists() ? 'text-size: 13px;background-color: #daedf4;' : ''}}">
+                                    <td class="text-left {{$bgColor}}" style="{{$inventoryMovementItem->bomItem->parent()->exists() ? 'text-size: 13px;background-color: #daedf4;' : ''}}">
                                         {{ $inventoryMovementItem->remarks }}
                                     </td>
-                                    <td class="text-center" style="{{$inventoryMovementItem->bomItem->parent()->exists() ? 'text-size: 13px;background-color: #daedf4;' : ''}}">
+                                    <td class="text-center {{$bgColor}}" style="{{$inventoryMovementItem->bomItem->parent()->exists() ? 'text-size: 13px;background-color: #daedf4;' : ''}}">
                                         {{ $inventoryMovementItem->qty }}
                                     </td>
-                                    <td class="text-center @if(\Carbon\Carbon::createFromFormat('Y-m-d', $inventoryMovementItem->date) < \Carbon\Carbon::today()) text-danger @endif" style="{{$inventoryMovementItem->bomItem->parent()->exists() ? 'text-size: 13px;background-color: #daedf4;' : ''}}">
+                                    <td class="text-center {{$bgColor}} @if(\Carbon\Carbon::createFromFormat('Y-m-d', $inventoryMovementItem->date) < \Carbon\Carbon::today()) text-danger @endif" style="{{$inventoryMovementItem->bomItem->parent()->exists() ? 'text-size: 13px;background-color: #daedf4;' : ''}}">
                                     {{-- <td class="text-center"> --}}
                                         {{ \Carbon\Carbon::parse($inventoryMovementItem->date)->format('ymd') }}
                                     </td>
-                                    <td class="text-center" style="{{($inventoryMovementItem->qty == $inventoryMovementItem->inventoryMovementItemQuantities()->sum('qty')) ? 'background-color: #90eeb0;' : ''}} {{$inventoryMovementItem->is_incomplete_qty ? 'background-color: #83B795;' : ''}} {{$inventoryMovementItem->bomItem->parent()->exists() ? 'text-size: 13px;background-color: #daedf4;' : ''}}">
+                                    <td class="text-center {{$bgColor}}" style="{{($inventoryMovementItem->qty == $inventoryMovementItem->inventoryMovementItemQuantities()->sum('qty')) ? 'background-color: #90eeb0;' : ''}} {{$inventoryMovementItem->is_incomplete_qty ? 'background-color: #83B795;' : ''}} {{$inventoryMovementItem->bomItem->parent()->exists() ? 'text-size: 13px;background-color: #daedf4;' : ''}}">
                                         {{$inventoryMovementItem->inventoryMovementItemQuantities()->sum('qty') + 0}}
                                     </td>
                                     @if($inventoryMovementItem->inventoryMovementItemQuantities()->exists())
@@ -222,12 +306,12 @@
                                             }
 
                                         @endphp
-                                        <td class="text-center {{$highlightDate ? 'bg-warning' : '' }}" style="{{$inventoryMovementItem->bomItem->parent()->exists() ? 'text-size: 13px;background-color: #daedf4;' : ''}}">
+                                        <td class="text-center {{$bgColor}} {{$highlightDate ? 'bg-warning' : '' }}" style="{{$inventoryMovementItem->bomItem->parent()->exists() ? 'text-size: 13px;background-color: #daedf4;' : ''}}">
                                             <b>{{ $latestReceived->createdBy ? $latestReceived->createdBy->name : null }}</b> <br>
                                             {{ $latestReceived->created_at ? \Carbon\Carbon::parse($latestReceived->created_at)->format('ymd h:ia') : null }}
                                         </td>
                                     @else
-                                        <td style="{{$inventoryMovementItem->bomItem->parent()->exists() ? 'text-size: 13px;background-color: #daedf4;' : ''}}"></td>
+                                        <td class="{{$bgColor}}" style="{{$inventoryMovementItem->bomItem->parent()->exists() ? 'text-size: 13px;background-color: #daedf4;' : ''}}"></td>
                                     @endif
 
                                     <td class="text-center" style="{{$inventoryMovementItem->bomItem->parent()->exists() ? 'text-size: 13px;background-color: #daedf4;' : ''}}">
