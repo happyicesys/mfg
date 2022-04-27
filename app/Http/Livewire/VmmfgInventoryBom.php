@@ -508,7 +508,7 @@ class VmmfgInventoryBom extends Component
 
                 $this->bomContent->update([
                     'sequence' => $this->bomContentForm->sequence,
-                    'bom_sub_category_id' => $this->bomContentForm->bom_sub_category_id,
+                    'bom_sub_category_id' => $this->bomContentForm->bom_sub_category_id ? $this->bomContentForm->bom_sub_category_id : null,
                     'bom_header_id' => $this->bomHeader->id,
                     'is_group' => $this->bomContentForm->is_group,
                     'vmmfg_item_id' => $this->bomContentForm->vmmfg_item_id,
@@ -549,7 +549,7 @@ class VmmfgInventoryBom extends Component
             $currentBomContent = $this->bomContent->create([
                 'sequence' => $this->bomContentForm->sequence,
                 'bom_header_id' => $this->bomHeader->id,
-                'bom_sub_category_id' => $this->bomContentForm->bom_sub_category_id,
+                'bom_sub_category_id' => $this->bomContentForm->bom_sub_category_id ? $this->bomContentForm->bom_sub_category_id : null,
                 'bom_item_id' => $bomItemId,
                 'is_group' => $this->bomContentForm->is_group,
                 'vmmfg_item_id' => $this->bomContentForm->vmmfg_item_id,
