@@ -467,7 +467,7 @@
                                                     </th>
                                                 </tr>
                                             </table>
-                                            @if($bomForm->bomHeaders()->exists())
+                                            @if(isset($bomForm->bomHeaders) and $bomForm->bomHeaders()->exists())
                                                 @foreach($bomForm->bomHeaders as $bomHeaderIndex => $bomHeader)
                                                 <table class="table table-borderless table-sm" wire:key="header-table-{{$bomHeaderIndex}}">
                                                     <tr class="d-flex border border-secondary">
@@ -514,6 +514,9 @@
                                                                         $sequenceStyle = 'pl-3 text-dark';
                                                                         break;
                                                                     case 3:
+                                                                        $sequenceStyle = 'pl-5 text-secondary';
+                                                                        break;
+                                                                    case 4:
                                                                         $sequenceStyle = 'pl-5 text-secondary';
                                                                         break;
                                                                     default:

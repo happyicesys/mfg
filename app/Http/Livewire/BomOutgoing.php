@@ -319,6 +319,7 @@ class BomOutgoing extends Component
         $this->inventoryMovementItemForm = new InventoryMovementItem();
         $this->reloadInventoryItems($inventoryMovement);
         $this->bomItems = BomItem::where('is_part', 1)->where('is_inventory', 1)->orderBy('code')->get();
+        $this->bomForm = Bom::findOrFail($inventoryMovement->bom_id);
     }
 
     public function editSingleInventoryMovementItem($inventoryMovementItemId)
