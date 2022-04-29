@@ -125,7 +125,9 @@ class BomOutgoing extends Component
     public function render()
     {
         $inventoryMovements = InventoryMovement::with([
-                                    'inventoryMovementItems',
+                                    'inventoryMovementItems' => function($query) {
+                                        $query->leftJoin('bom_items', 'bom_items.id', '=', 'inventory_movement_items.bom_item_id')->orderBy('bom_items.code', 'asc');
+                                    },
                                     'inventoryMovementItems.bomItem',
                                     'inventoryMovementItems.bomItem.bomItemType',
                                     'inventoryMovementItems.bomItem.supplierQuotePrices',
@@ -527,7 +529,12 @@ class BomOutgoing extends Component
     {
         $this->inventoryMovementItems = [];
         if($inventoryMovement->inventoryMovementItems) {
-            foreach($inventoryMovement->inventoryMovementItems as $inventoryMovementItem) {
+            // foreach($inventoryMovement->inventoryMovementItems as $inventoryMovementItem) {
+            foreach($inventoryMovement->inventoryMovementItems()->leftJoin('bom_items', 'bom_items.id', '=', 'inventory_movement_items.bom_item_id')->orderBy('bom_items.code', 'asc')->get() as $inventoryMovementItem) {
+
+            // foreach($inventoryMovement->inventoryMovementItems()->with(['bomItem' => function($query) {
+            //     $query->orderBy('code', 'asc');
+            // }])->get() as $inventoryMovementItem) {
                 $data = [
                     'id' => $inventoryMovementItem->id,
                     'bom_item_id' => $inventoryMovementItem->bomItem->id,

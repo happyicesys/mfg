@@ -432,11 +432,12 @@
                                             </label>
                                             <input type="text" wire:model="inventoryMovementItemForm.bom_qty" class="form-control">
                                         </div>
+{{--
                                         <div class="form-group">
                                             <button class="btn btn-success" wire:click.prevent="onGenerateOutgoingClicked()" {{ $inventoryMovementItemForm->bom_qty && is_numeric($inventoryMovementItemForm->bom_qty) && $this->selectBomContent ? '' : 'disabled' }}>
                                                 Generate Outgoing(s)
                                             </button>
-                                        </div>
+                                        </div> --}}
 
                                         <div class="table-responsive">
                                             <table class="table table-bordered table-sm">
@@ -779,6 +780,11 @@
                     </x-slot>
                     <x-slot name="footer" >
                         <div class="btn-group">
+                            @if($showGenerateByBomArea)
+                                <button class="btn btn-success" wire:click.prevent="onGenerateOutgoingClicked()" {{ $inventoryMovementItemForm->bom_qty && is_numeric($inventoryMovementItemForm->bom_qty) && $this->selectBomContent ? '' : 'disabled' }}>
+                                    Generate Outgoing(s)
+                                </button>
+                            @endif
                             @if(isset($inventoryMovementForm->id))
                                 <a href="#" class="btn btn-xs-block btn-danger" onclick="return confirm('Are you sure you want to delete this outgoing?') || event.stopImmediatePropagation()" wire:click.prevent="deleteInventoryMovement()" >
                                     Delete
