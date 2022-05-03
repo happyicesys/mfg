@@ -437,7 +437,7 @@
                                                     </video>
                                                 </div>
                                             @else
-                                                <img class="img-fluid border border-dark" src="{{$attachment->full_url}}" alt="" wire:click.prevent="onZoomPictureClicked({{$attachment}})"  data-toggle="modal" data-target="#zoom-picture-modal">
+                                                <img class="img-fluid border border-dark" style="max-height: 600px;" src="{{$attachment->full_url}}" alt="" wire:click.prevent="onZoomPictureClicked({{$attachment}})"  data-toggle="modal" data-target="#zoom-picture-modal">
                                             @endif
                                             </div>
                                         @endforeach
@@ -476,7 +476,7 @@
                                                                     </video>
                                                                 </div>
                                                             @else
-                                                                <img class="card-img-top" src="{{$attachment->full_url}}" alt="" wire:click.prevent="onZoomPictureClicked({{$attachment}})"  data-toggle="modal" data-target="#zoom-picture-modal">
+                                                                <img class="card-img-top" src="{{$attachment->full_url}}" style="max-height: 600px;" alt="" wire:click.prevent="onZoomPictureClicked({{$attachment}})"  data-toggle="modal" data-target="#zoom-picture-modal">
                                                             @endif
                                                             <div class="card-body">
                                                                 <div class="btn-group">
@@ -643,7 +643,7 @@
             @endif
             <x-zoom-modal id="zoom-picture-modal">
                 <x-slot name="content">
-                    <img class="img-fluid border border-dark" src="{{$zoomPictureUrl}}" alt="">
+                    <img class="img-fluid border border-dark" style="max-height: 600px;" src="{{$zoomPictureUrl}}" alt="">
                 </x-slot>
             </x-zoom-modal>
         </div>
