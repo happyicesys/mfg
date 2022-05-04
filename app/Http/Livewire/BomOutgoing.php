@@ -326,7 +326,9 @@ class BomOutgoing extends Component
 
     public function editSingleInventoryMovementItem($inventoryMovementItemId)
     {
+        $data = InventoryMovementItem::findOrFail($inventoryMovementItemId);
         $this->inventoryMovementItemForm = InventoryMovementItem::findOrFail($inventoryMovementItemId);
+        // dd($inventoryMovementItemId, $data->toArray(), $this->inventoryMovementItemForm->toArray());
         $this->attachments = $this->inventoryMovementItemForm->attachments;
         $this->bomItems = BomItem::where('is_part', 1)->where('is_inventory', 1)->orderBy('code')->get();
     }
@@ -530,7 +532,7 @@ class BomOutgoing extends Component
         $this->inventoryMovementItems = [];
         if($inventoryMovement->inventoryMovementItems) {
             // foreach($inventoryMovement->inventoryMovementItems as $inventoryMovementItem) {
-            foreach($inventoryMovement->inventoryMovementItems()->leftJoin('bom_items', 'bom_items.id', '=', 'inventory_movement_items.bom_item_id')->orderBy('bom_items.code', 'asc')->get() as $inventoryMovementItem) {
+            foreach($inventoryMovement->inventoryMovementItems()->leftJoin('bom_items', 'bom_items.id', '=', 'inventory_movement_items.bom_item_id')->orderBy('bom_items.code', 'asc')->select('*', 'inventory_movement_items.id AS id')->get() as $inventoryMovementItem) {
 
             // foreach($inventoryMovement->inventoryMovementItems()->with(['bomItem' => function($query) {
             //     $query->orderBy('code', 'asc');
