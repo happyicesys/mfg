@@ -14,6 +14,7 @@ use App\Models\InventoryMovementItem;
 use App\Models\InventoryMovementItemQuantity;
 use App\Models\Supplier;
 use App\Models\SupplierQuotePrice;
+use App\Traits\HasIncrement;
 use DB;
 use Carbon\Carbon;
 use Livewire\Component;
@@ -23,7 +24,7 @@ use Storage;
 
 class BomReceiving extends Component
 {
-    use WithFileUploads, WithPagination;
+    use HasIncrement, WithFileUploads, WithPagination;
 
     protected $paginationTheme = 'bootstrap';
     public $itemPerPage = 100;
@@ -439,6 +440,7 @@ class BomReceiving extends Component
 
         if(!$this->inventoryMovementForm->id) {
             $inventoryMovement = InventoryMovement::create([
+                'sequence' => $this->getReceivingIncrement(),
                 'batch' => $this->inventoryMovementForm->batch,
                 'remarks' => $this->inventoryMovementForm->remarks,
                 'action' => $action,
@@ -1005,6 +1007,10 @@ class BomReceiving extends Component
     {
         $inventoryMovementItem = InventoryMovementItem::findOrFail($this->inventoryMovementItemForm->id);
 
+        // if($this->inventoryMovementItemForm->qty > $inventoryMovementItem->qty) {
+
+        // }
+
         $inventoryMovementItem->update([
             'qty' => $this->inventoryMovementItemForm->qty,
             'amount' => $this->inventoryMovementItemForm->amount,
@@ -1223,5 +1229,14 @@ class BomReceiving extends Component
             $inventoryMovementItem->status = array_search('Ordered', InventoryMovementItem::RECEIVING_STATUSES);
         }
         $inventoryMovementItem->save();
+    }
+
+    private function getReceivingIncrement()
+    {
+        $inventoryMovementSequence = InventoryMovement::where('action', array_search('Receiving', InventoryMovement::ACTIONS))->max('sequence');
+
+        $nextSequence = $this->getIncrementByYearMonth($inventoryMovementSequence);
+
+        return $nextSequence;
     }
 }

@@ -15,6 +15,7 @@ use App\Models\InventoryMovementItem;
 use App\Models\InventoryMovementItemQuantity;
 use App\Models\Supplier;
 use App\Models\SupplierQuotePrice;
+use App\Traits\HasIncrement;
 use DB;
 use Carbon\Carbon;
 use Livewire\Component;
@@ -24,6 +25,8 @@ use Storage;
 
 class BomOutgoing extends Component
 {
+    use HasIncrement;
+
     protected $paginationTheme = 'bootstrap';
     public $itemPerPage = 100;
     public $sortKey = '';
@@ -396,6 +399,7 @@ class BomOutgoing extends Component
 
         if(!$this->inventoryMovementForm->id) {
             $inventoryMovement = InventoryMovement::create([
+                'sequence' => $this->getOutgoingIncrement(),
                 'batch' => $this->inventoryMovementForm->batch,
                 'remarks' => $this->inventoryMovementForm->remarks,
                 'action' => $action,
@@ -677,5 +681,13 @@ class BomOutgoing extends Component
         $bomItem->available_qty -= $qty;
         $bomItem->save();
         $this->syncBomItemQty($bomItemId);
+    }
+
+    private function getOutgoingIncrement()
+    {
+        $inventoryMovementSequence = InventoryMovement::where('action', array_search('Outgoing', InventoryMovement::ACTIONS))->max('sequence');
+        $nextSequence = $this->getIncrementByYearMonth($inventoryMovementSequence);
+
+        return $nextSequence;
     }
 }

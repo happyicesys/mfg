@@ -38,6 +38,7 @@ class InventoryMovement extends Model
         'order_date',
         'supplier_id',
         'delivery_date',
+        'sequence',
     ];
 
     // getter
