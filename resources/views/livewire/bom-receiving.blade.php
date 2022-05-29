@@ -155,6 +155,9 @@
                         <th class="text-center">
                             #
                         </th>
+                        <x-th-data model="sequence" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
+                            ID
+                        </x-th-data>
                         <x-th-data model="batch" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Batch
                         </x-th-data>
@@ -195,11 +198,18 @@
                                             </b>
                                         @endif
                                     </td>
+                                    <td class="text-center">
+                                        @if($loop->first)
+                                            <b>
+                                                <a href="#" wire:click="editInventoryMovement({{$inventoryMovement}})" data-toggle="modal" data-target="#inventory-movement-modal">
+                                                    {{ $inventoryMovement->sequence }}
+                                                </a>
+                                            </b>
+                                        @endif
+                                    </td>
                                     <td class="text-left">
                                         @if($loop->first)
-                                            <a href="#" wire:click="editInventoryMovement({{$inventoryMovement}})" data-toggle="modal" data-target="#inventory-movement-modal">
-                                                {{ $inventoryMovement->batch }}
-                                            </a>
+                                            {{ $inventoryMovement->batch }}
                                             <br>
                                             [{{$inventoryMovement->createdBy ? $inventoryMovement->createdBy->name : ''}} {{\Carbon\Carbon::parse($inventoryMovement->created_at)->format('ymd H:ia')}}]
                                         @endif
@@ -353,6 +363,11 @@
                                         {{ $index + $from}}
                                     </b>
                                 </td>
+                                <td class="text-center">
+                                    <b>
+                                        {{ $inventoryMovement->sequence}}
+                                    </b>
+                                </td>
                                 <td class="text-left">
                                     <a href="#" wire:click="editInventoryMovement({{$inventoryMovement}})" data-toggle="modal" data-target="#inventory-movement-modal">
                                         {{ $inventoryMovement->batch }}
@@ -424,7 +439,7 @@
                                         break;
                                 }
                             @endphp
-                            <span class="{{$statusClass}}">{{ $statusStr }}</span>  Edit {{\App\Models\InventoryMovement::ACTIONS[$inventoryMovementForm->action]}} - {{ $inventoryMovementForm->batch }} @if($inventoryMovementForm->country) ({{$supplierForm->company_name}}) ({{ $inventoryMovementForm->country->currency_name }}) @endif
+                            <span class="{{$statusClass}}">{{ $statusStr }}</span>  Edit {{\App\Models\InventoryMovement::ACTIONS[$inventoryMovementForm->action]}} - {{$inventoryMovementForm->sequence}} {{ $inventoryMovementForm->batch }} @if($inventoryMovementForm->country) ({{$supplierForm->company_name}}) ({{ $inventoryMovementForm->country->currency_name }}) @endif
                         @endif
                         <span class="ml-auto">
                             <br>[Created: {{$inventoryMovementForm->createdBy ? $inventoryMovementForm->createdBy->name : ''}}

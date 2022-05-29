@@ -129,6 +129,9 @@
                         <th class="text-center">
                             #
                         </th>
+                        <x-th-data model="sequence" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
+                            ID
+                        </x-th-data>
                         <x-th-data model="batch" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Batch
                         </x-th-data>
@@ -163,6 +166,15 @@
                                             </b>
                                         @endif
                                     </td>
+                                    <td class="text-center">
+                                        @if($loop->first)
+                                            <a href="#" wire:click="editInventoryMovement({{$inventoryMovement}})" data-toggle="modal" data-target="#inventory-movement-modal">
+                                                <b>
+                                                    {{ $inventoryMovement->sequence}}
+                                                </b>
+                                            </a>
+                                        @endif
+                                    </td>
                                     @php
                                         $bgColor = '';
                                         if($inventoryMovement->status == array_search('Confirmed', \App\Models\InventoryMovement::STATUSES)) {
@@ -173,9 +185,7 @@
                                     @endphp
                                     <td class="text-left @if($loop->first) {{$bgColor}} @endif">
                                         @if($loop->first)
-                                            <a href="#" class="text-dark" wire:click="editInventoryMovement({{$inventoryMovement}})" data-toggle="modal" data-target="#inventory-movement-modal">
-                                                {{ $inventoryMovement->batch }}
-                                            </a>
+                                            {{ $inventoryMovement->batch }}
                                             <br>
                                             <span class="text-dark">
                                                 [{{$inventoryMovement->createdBy ? $inventoryMovement->createdBy->name : ''}} {{\Carbon\Carbon::parse($inventoryMovement->created_at)->format('ymd H:ia')}}]
@@ -347,7 +357,7 @@
                                         break;
                                 }
                             @endphp
-                            <span class="{{$statusClass}}">{{ $statusStr }}</span>  Edit {{\App\Models\InventoryMovement::ACTIONS[$inventoryMovementForm->action]}} - {{ $inventoryMovementForm->batch }} @if($inventoryMovementForm->country) ({{ $inventoryMovementForm->country->currency_name }}) @endif
+                            <span class="{{$statusClass}}">{{ $statusStr }}</span>  Edit {{\App\Models\InventoryMovement::ACTIONS[$inventoryMovementForm->action]}} - {{$inventoryMovementForm->sequence}} {{ $inventoryMovementForm->batch }} @if($inventoryMovementForm->country) ({{ $inventoryMovementForm->country->currency_name }}) @endif
                         @endif
                     </x-slot>
                     <x-slot name="content">
