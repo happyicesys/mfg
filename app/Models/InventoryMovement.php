@@ -54,12 +54,16 @@ class InventoryMovement extends Model
 
     public function getOrderDateAttribute($value)
     {
-        return Carbon::parse($value)->format('Y-m-d');
+        if($value) {
+            return Carbon::parse($value)->format('Y-m-d');
+        }
     }
 
     public function getDeliveryDateAttribute($value)
     {
-        return Carbon::parse($value)->format('Y-m-d');
+        if($value) {
+            return Carbon::parse($value)->format('Y-m-d');
+        }
     }
 
     // setter
