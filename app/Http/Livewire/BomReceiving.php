@@ -44,6 +44,7 @@ class BomReceiving extends Component
         'bom_item_type_id' => '',
         'is_consumable' => '',
         'is_inventory' => '',
+        'sequence' => '',
     ];
     public $inventoryMovementItemFormFilters = [
         'code' => '',
@@ -79,9 +80,15 @@ class BomReceiving extends Component
     public InventoryMovementItemQuantity $inventoryMovementItemQuantityForm;
     public InventoryMovementItemQuantity $inventoryMovementItemQuantity;
     public Supplier $supplierForm;
+    public $sequence = '';
+    public $status = '';
 
     protected $listeners = [
         'refresh' => '$refresh',
+    ];
+
+    protected $queryString = [
+        'sequence', 'status'
     ];
 
     public function rules()
@@ -97,6 +104,7 @@ class BomReceiving extends Component
             'inventoryMovementForm.bom_id' => 'sometimes',
             'inventoryMovementForm.order_date' => 'sometimes',
             'inventoryMovementForm.supplier_id' => 'sometimes',
+            'inventoryMovementForm.sequence' => 'sometimes',
             'inventoryMovementItemForm.bom_item_id' => 'sometimes',
             'inventoryMovementItemForm.unit_price' => 'sometimes|numeric',
             'inventoryMovementItemForm.qty' => 'sometimes|numeric',
@@ -138,6 +146,11 @@ class BomReceiving extends Component
 
     public function render()
     {
+        if($sequence = $this->sequence) {
+            $this->filters['sequence'] = $sequence;
+            $this->filters['status'] = '';
+        }
+
         $inventoryMovements = InventoryMovement::with([
                                     'inventoryMovementItems',
                                     'inventoryMovementItems.inventoryMovementItemQuantities',
@@ -151,7 +164,9 @@ class BomReceiving extends Component
                 ->when($this->filters['batch'], fn($query, $input) => $query->searchLike('batch', $input))
                 ->when($this->filters['status'], fn($query, $input) => $query->search('status', $input))
                 ->when($this->filters['created_at'], fn($query, $input) => $query->searchDate('created_at', $input))
-                ->when($this->filters['supplier_id'], fn($query, $input) => $query->search('supplier_id', $input));
+                ->when($this->filters['supplier_id'], fn($query, $input) => $query->search('supplier_id', $input))
+                ->when($this->filters['sequence'], fn($query, $input) => $query->searchLike('sequence', $input));
+
 
         if($date = $this->filters['date']) {
             $inventoryMovements = $inventoryMovements->whereHas('inventoryMovementItems.inventoryMovementItemQuantities', function($query) use ($date) {
@@ -370,7 +385,7 @@ class BomReceiving extends Component
 
     public function resetFilters()
     {
-        $this->reset('filters');
+        $this->reset(['filters', 'sequence', 'status']);
     }
 
     public function updatedFilters()

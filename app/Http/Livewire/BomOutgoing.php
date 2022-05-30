@@ -44,6 +44,7 @@ class BomOutgoing extends Component
         'is_consumable' => '',
         'is_inventory' => '',
         'supplier_id' => '',
+        'sequence' => '',
     ];
     public $inventoryMovementItemFormFilters = [
         'code' => '',
@@ -78,9 +79,15 @@ class BomOutgoing extends Component
     public $selectedContentValue;
     public $bomItemTypes = [];
     public $suppliers = [];
+    public $sequence = '';
+    public $status = '';
 
     protected $listeners = [
         'refresh' => '$refresh',
+    ];
+
+    protected $queryString = [
+        'sequence', 'status'
     ];
 
     public function rules()
@@ -128,6 +135,11 @@ class BomOutgoing extends Component
 
     public function render()
     {
+        if($sequence = $this->sequence) {
+            $this->filters['sequence'] = $sequence;
+            $this->filters['status'] = '';
+        }
+
         $inventoryMovements = InventoryMovement::with([
                                     'inventoryMovementItems' => function($query) {
                                         $query->leftJoin('bom_items', 'bom_items.id', '=', 'inventory_movement_items.bom_item_id')->orderBy('bom_items.code', 'asc');
@@ -143,7 +155,8 @@ class BomOutgoing extends Component
         $inventoryMovements = $inventoryMovements
                 ->when($this->filters['batch'], fn($query, $input) => $query->searchLike('batch', $input))
                 ->when($this->filters['status'], fn($query, $input) => $query->search('status', $input))
-                ->when($this->filters['created_at'], fn($query, $input) => $query->searchDate('created_at', $input));
+                ->when($this->filters['created_at'], fn($query, $input) => $query->searchDate('created_at', $input))
+                ->when($this->filters['sequence'], fn($query, $input) => $query->searchLike('sequence', $input));
 
         if($filtersName = $this->filters['name']) {
             $inventoryMovements = $inventoryMovements->whereHas('inventoryMovementItems.bomItem', function($query) use ($filtersName) {

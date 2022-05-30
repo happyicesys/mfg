@@ -223,7 +223,7 @@
                             {{ $task->vmmfgUnit->vmmfgJob->batch_no }}
                         </td>
                         <td class="text-center">
-                            <a href="/vmmfg-ops?unit_id={{$task->vmmfgUnit->id}}">
+                            <a href="/vmmfg-ops?unit_id={{$task->vmmfgUnit->id}}&status=''">
                                 {{ $task->vmmfgUnit->unit_no }}
                             </a>
                         </td>

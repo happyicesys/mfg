@@ -676,11 +676,32 @@
                             </table>
                         </div>
 
+                        @php
+                            $inQtyQuery = \App\Models\InventoryMovementItemQuantity::query()
+                                            ->leftJoin('inventory_movement_items', 'inventory_movement_items.id', '=', 'inventory_movement_item_quantities.inventory_movement_item_id')
+                                            ->leftJoin('bom_items', 'bom_items.id', '=', 'inventory_movement_items.bom_item_id')
+                                            ->leftJoin('inventory_movements', 'inventory_movements.id', '=', 'inventory_movement_items.inventory_movement_id')
+                                            ->select('inventory_movement_item_quantities.date', 'inventory_movement_item_quantities.qty', 'inventory_movements.action', 'bom_items.id AS bom_item_id', 'inventory_movements.sequence', 'inventory_movements.id AS inventory_movement_id')
+                                            ->where('bom_items.id', $bomItemForm->id)
+                                            ->latest('inventory_movement_item_quantities.date');
+
+                            $outQtyQuery = \App\Models\InventoryMovementItem::query()
+                                            ->leftjoin('inventory_movements', 'inventory_movements.id', '=', 'inventory_movement_items.inventory_movement_id')
+                                            ->select('inventory_movement_items.date', 'inventory_movement_items.qty', 'inventory_movements.action', 'inventory_movement_items.bom_item_id AS bom_item_id',  'inventory_movements.sequence', 'inventory_movements.id AS inventory_movement_id')
+                                            ->where('inventory_movement_items.status', array_search('Delivered', \App\Models\InventoryMovementItem::OUTGOING_STATUSES))
+                                            ->whereHas('inventoryMovement', function($query) {
+                                                $query->where('action', array_search('Outgoing', \App\Models\InventoryMovement::ACTIONS));
+                                            })
+                                            ->where('inventory_movement_items.bom_item_id', $bomItemForm->id)
+                                            ->latest('inventory_movement_items.date');
+
+                            $movementsArr = $inQtyQuery->union($outQtyQuery)->latest('date')->limit(20)->get();
+                        @endphp
                         <div class="table-responsive pt-2">
                             <table class="table table-bordered table-hover">
                                 <tr class="table-primary">
                                     <th class="text-center text-dark" colspan="18">
-                                        Movement History
+                                        Movement History (Latest 20 records)
                                     </th>
                                 </tr>
                                 <tr class="table-primary">
@@ -700,32 +721,25 @@
                                         Qty
                                     </th>
                                 </tr>
-                                @forelse($bomItemForm->inventoryMovementItems as $inventoryMovementItemIndex => $inventoryMovementItem)
+                                {{-- @dd($movementsArr) --}}
+                                @forelse($movementsArr as $movementsArrIndex => $movementArr)
                                 <tr>
                                     <td class="text-center">
-                                        {{ $inventoryMovementItemIndex + 1 }}
-                                    </td>
-                                    <td class="text-left">
-                                        {{ $supplierQuotePrice->supplier->company_name }}
-                                    </td>
-                                    <td class="text-right">
-                                        {{ $supplierQuotePrice->unit_price }} @if($supplierQuotePrice->country) ({{ $supplierQuotePrice->country->currency_name }}) @endif
-                                    </td>
-                                    <td class="text-right">
-                                        {{ $supplierQuotePrice->base_price }}
+                                        {{ $movementsArrIndex + 1 }}
                                     </td>
                                     <td class="text-center">
-                                        {{ \Carbon\Carbon::parse($supplierQuotePrice->created_at)->format('Y-m-d H:ia') }}
+                                        {{ \Carbon\Carbon::parse($movementArr->date)->format('Y-m-d') }}
                                     </td>
                                     <td class="text-center">
-                                        @role('admin')
-                                        <button class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete the price?') || event.stopImmediatePropagation()" wire:click.prevent="deleteSingleSupplierQuotePrice({{$supplierQuotePrice}})" {{$supplierQuotePrice->inventoryMovementItems()->exists() ? 'disabled' : ''}}>
-                                            <i class="fas fa-times-circle"></i>
-                                            @if($supplierQuotePrice->inventoryMovementItems()->exists())
-                                                This Pricing is in Used in Receiving
-                                            @endif
-                                        </button>
-                                        @endrole
+                                        {{ $movementArr->action == 1 ? 'Receiving' : 'Outgoing' }}
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="/{{$movementArr->action == 1 ? 'bom-receiving' : 'bom-outgoing'}}?sequence={{$movementArr->sequence}}">
+                                            {{ $movementArr->sequence }}
+                                        </a>
+                                    </td>
+                                    <td class="text-right">
+                                        {{ $movementArr->qty }}
                                     </td>
                                 </tr>
                                 @empty

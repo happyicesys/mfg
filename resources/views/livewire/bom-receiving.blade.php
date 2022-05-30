@@ -17,6 +17,12 @@
                             <div class="form-row">
                                 <div class="form-group col-md-3 col-xs-12">
                                     <label>
+                                        ID
+                                    </label>
+                                    <input wire:model="filters.sequence" type="text" class="form-control" placeholder="ID">
+                                </div>
+                                <div class="form-group col-md-3 col-xs-12">
+                                    <label>
                                         Batch
                                     </label>
                                     <input wire:model="filters.batch" type="text" class="form-control" placeholder="Batch">
