@@ -20,6 +20,7 @@ use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
+use Log;
 use Storage;
 
 class BomReceiving extends Component
@@ -654,16 +655,26 @@ class BomReceiving extends Component
         }
 
         $this->inventoryMovementItemQuantityForm->created_by = auth()->user()->id;
-        $inventoryMovementItemQuantity = $this->inventoryMovementItemForm->inventoryMovementItemQuantities()->save($this->inventoryMovementItemQuantityForm);
+        // $inventoryMovementItemQuantity = $this->inventoryMovementItemForm->inventoryMovementItemQuantities()->save($this->inventoryMovementItemQuantityForm);
+        $qtyObj = InventoryMovementItemQuantity::create([
+            'inventory_movement_item_id' => $this->inventoryMovementItemForm->id,
+            'date' => $this->inventoryMovementItemQuantityForm->date,
+            'qty' => $this->inventoryMovementItemQuantityForm->qty,
+            'remarks' => $this->inventoryMovementItemQuantityForm->remarks,
+            'is_incomplete_qty' => $this->inventoryMovementItemQuantityForm->is_incomplete_qty ? true : false,
+            'created_by' => auth()->user()->id,
+        ]);
+        $this->logTransaction($qtyObj, 1, 'C', $this->inventoryMovementItemForm->bomItem);
+
         if($this->file) {
             $url = $this->file->storePublicly('receiving', 'digitaloceanspaces');
             $fullUrl = Storage::url($url);
-            $inventoryMovementItemQuantity->attachments()->create([
+            $qtyObj->attachments()->create([
                 'url' => $url,
                 'full_url' => $fullUrl,
             ]);
         }
-        $this->addBomItemQtyAvailable($this->inventoryMovementItemForm->bomItem->id, $inventoryMovementItemQuantity->qty);
+        $this->addBomItemQtyAvailable($this->inventoryMovementItemForm->bomItem->id, $qtyObj->qty);
         $this->syncBomItemQty($this->inventoryMovementItemForm->bomItem->id);
 
 
@@ -683,6 +694,8 @@ class BomReceiving extends Component
                         'is_incomplete_qty' => $this->inventoryMovementItemQuantityForm->is_incomplete_qty ? true : false,
                         'created_by' => auth()->user()->id,
                     ]);
+
+                    $this->logTransaction($qtyObj, 1, 'C', $itemObj->bomItem);
                     // $itemQty = $itemObj->inventoryMovementItemQuantities()->save($this->inventoryMovementItemQuantityForm);
                     // dd($itemQty->toArray());
                     $this->addBomItemQtyAvailable($itemObj->bom_item_id, $qtyObj->qty);
@@ -728,6 +741,7 @@ class BomReceiving extends Component
                 $this->deleteAttachment($attachment);
             }
         }
+        $this->logTransaction($inventoryMovementItemQuantityCollection, 1, 'D', $inventoryMovementItem->bomItem);
         $inventoryMovementItemQuantityCollection->delete();
         $this->reloadInventoryItems($inventoryMovement);
         $this->syncInventoryMovementItemStatus($inventoryMovementItem);
@@ -1076,6 +1090,19 @@ class BomReceiving extends Component
         }
     }
 
+    public function onPrevNextDateinventoryMovementFormClicked($direction, $model)
+    {
+        $date = Carbon::now();
+        if($model) {
+            $date = Carbon::parse($this->inventoryMovementForm[$model]);
+        }
+        if($direction > 0) {
+            $this->inventoryMovementForm[$model] = $date->addDay()->toDateString();
+        }else {
+            $this->inventoryMovementForm[$model] = $date->subDay()->toDateString();
+        }
+    }
+
     // public function exportPdf()
     // {
     //     $tasks = $this->mainQuery();
@@ -1238,5 +1265,10 @@ class BomReceiving extends Component
         $nextSequence = $this->getIncrementByYearMonth($inventoryMovementSequence);
 
         return $nextSequence;
+    }
+
+    private function logTransaction($model, $action, $type, $bomItem)
+    {
+        Log::info('model_id:'. $model->id. ', action:'. $action. ', type:'. $type.', by:'. auth()->user()->name. ', at:'. Carbon::now()->format('ymd H:i a').', item:'.$bomItem->code.$bomItem->name.', qty:'.$model->qty);
     }
 }

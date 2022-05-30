@@ -21,6 +21,7 @@ use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
+use Log;
 use Storage;
 
 class BomOutgoing extends Component
@@ -329,7 +330,6 @@ class BomOutgoing extends Component
 
     public function editSingleInventoryMovementItem($inventoryMovementItemId)
     {
-        $data = InventoryMovementItem::findOrFail($inventoryMovementItemId);
         $this->inventoryMovementItemForm = InventoryMovementItem::findOrFail($inventoryMovementItemId);
         // dd($inventoryMovementItemId, $data->toArray(), $this->inventoryMovementItemForm->toArray());
         $this->attachments = $this->inventoryMovementItemForm->attachments;
@@ -457,6 +457,8 @@ class BomOutgoing extends Component
                         'date' => $inventoryMovement->order_date,
                     ]);
 
+                    $this->logTransaction($createdInventoryMovementItem, 2, 'C', $bomItem);
+
                     if(($inventoryMovement->status == array_search('Completed', InventoryMovement::STATUSES)) or (isset($statusStr) and $statusStr == 'Completed')) {
                         $this->reduceBomItemQtyAvailable($createdInventoryMovementItem->bom_item_id, $createdInventoryMovementItem->qty);
                     }
@@ -512,6 +514,7 @@ class BomOutgoing extends Component
             'unit_price' => 0,
             'updated_by' => auth()->user()->id,
         ]);
+        $this->logTransaction($inventoryMovementItem, 2, 'U', $inventoryMovementItem->bomItem);
         $this->syncInventoryMovementItemStatus($inventoryMovementItem);
         $this->emit('refresh');
         $this->emit('updated');
@@ -594,6 +597,7 @@ class BomOutgoing extends Component
                 $this->deleteAttachment($attachment);
             }
         }
+        $this->logTransaction($inventoryMovementItem, 2, 'D', $inventoryMovementItem->bomItem);
         $inventoryMovementItem->delete();
         $this->syncBomItemQty($bomItemId);
         $this->reloadInventoryItems($inventoryMovementItem->inventoryMovement);
@@ -689,5 +693,10 @@ class BomOutgoing extends Component
         $nextSequence = $this->getIncrementByYearMonth($inventoryMovementSequence);
 
         return $nextSequence;
+    }
+
+    private function logTransaction($model, $action, $type, $bomItem)
+    {
+        Log::info('model_id:'. $model->id. ', action:'. $action. ', type:'. $type.', by:'. auth()->user()->name. ', at:'. Carbon::now()->format('ymd H:i a').', item:'.$bomItem->code.$bomItem->name.', qty:'.$model->qty);
     }
 }

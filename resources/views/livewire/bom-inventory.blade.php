@@ -675,6 +675,66 @@
                                 @endforelse
                             </table>
                         </div>
+
+                        <div class="table-responsive pt-2">
+                            <table class="table table-bordered table-hover">
+                                <tr class="table-primary">
+                                    <th class="text-center text-dark" colspan="18">
+                                        Movement History
+                                    </th>
+                                </tr>
+                                <tr class="table-primary">
+                                    <th class="text-center text-dark">
+                                        #
+                                    </th>
+                                    <th class="text-center text-dark">
+                                        Date
+                                    </th>
+                                    <th class="text-center text-dark">
+                                        Action
+                                    </th>
+                                    <th class="text-center text-dark">
+                                        ID
+                                    </th>
+                                    <th class="text-center text-dark">
+                                        Qty
+                                    </th>
+                                </tr>
+                                @forelse($bomItemForm->inventoryMovementItems as $inventoryMovementItemIndex => $inventoryMovementItem)
+                                <tr>
+                                    <td class="text-center">
+                                        {{ $inventoryMovementItemIndex + 1 }}
+                                    </td>
+                                    <td class="text-left">
+                                        {{ $supplierQuotePrice->supplier->company_name }}
+                                    </td>
+                                    <td class="text-right">
+                                        {{ $supplierQuotePrice->unit_price }} @if($supplierQuotePrice->country) ({{ $supplierQuotePrice->country->currency_name }}) @endif
+                                    </td>
+                                    <td class="text-right">
+                                        {{ $supplierQuotePrice->base_price }}
+                                    </td>
+                                    <td class="text-center">
+                                        {{ \Carbon\Carbon::parse($supplierQuotePrice->created_at)->format('Y-m-d H:ia') }}
+                                    </td>
+                                    <td class="text-center">
+                                        @role('admin')
+                                        <button class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete the price?') || event.stopImmediatePropagation()" wire:click.prevent="deleteSingleSupplierQuotePrice({{$supplierQuotePrice}})" {{$supplierQuotePrice->inventoryMovementItems()->exists() ? 'disabled' : ''}}>
+                                            <i class="fas fa-times-circle"></i>
+                                            @if($supplierQuotePrice->inventoryMovementItems()->exists())
+                                                This Pricing is in Used in Receiving
+                                            @endif
+                                        </button>
+                                        @endrole
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="18" class="text-center"> No Results Found </td>
+                                </tr>
+                                @endforelse
+                            </table>
+                        </div>
                     </x-slot>
                     <x-slot name="footer">
 
