@@ -176,7 +176,7 @@
                             Type
                         </x-th-data>
                         <x-th-data model="ordered_qty" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
-                            Ordered Qty
+                            Plan Receiving Qty
                         </x-th-data>
                         <x-th-data model="available_qty" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Available Qty
@@ -220,6 +220,24 @@
                                             ->limit(5)
                                             ->get();
 
+                            $remainOrderedQty = $bomItem
+                                            ->inventoryMovementItems()
+                                            ->where('status', array_search('Ordered', \App\Models\InventoryMovementItem::RECEIVING_STATUSES))
+                                            ->whereHas('inventoryMovement', function($query) {
+                                                $query->where('action', array_search('Receiving', \App\Models\InventoryMovement::ACTIONS));
+                                            })->sum('qty')
+                                            -
+                                            \App\Models\InventoryMovementItemQuantity::query()
+                                            ->whereHas('inventoryMovementItem', function($query) use ($bomItem) {
+                                                $query
+                                                        ->where('status', array_search('Ordered', \App\Models\InventoryMovementItem::RECEIVING_STATUSES))
+                                                        ->where('bom_item_id', $bomItem->id);
+                                            })
+                                            ->whereHas('inventoryMovementItem.inventoryMovement', function($query) {
+                                                $query->where('action', array_search('Receiving', \App\Models\InventoryMovement::ACTIONS));
+                                            })
+                                            ->sum('qty');
+
                             $plannedQty = $bomItem
                                             ->inventoryMovementItems()
                                             ->where('status', array_search('Planned', \App\Models\InventoryMovementItem::OUTGOING_STATUSES))
@@ -228,13 +246,6 @@
                                             })->latest()
                                             ->limit(5)
                                             ->get();
-
-
-                            // $inQty = InventoryMovementItemQuantity::whereHas('inventoryMovementItem.bomItem', function($query) use ($bomItem) {
-                            //                 $query->where('id', $bomItem->id);
-                            //             })->latest()
-                            //             ->limit(3)
-                            //             ->get();
 
                             $inQtyQuery = \App\Models\InventoryMovementItemQuantity::query()
                                             ->leftJoin('inventory_movement_items', 'inventory_movement_items.id', '=', 'inventory_movement_item_quantities.inventory_movement_item_id')
@@ -255,8 +266,6 @@
                                             ->latest('inventory_movement_items.date');
 
                             $qtyArr = $inQtyQuery->union($outQtyQuery)->latest('date')->limit(3)->get();
-
-                            // dd($qtyArr->toArray());
 
                             $outQty = $bomItem
                                             ->inventoryMovementItems()
@@ -296,11 +305,11 @@
                                 {{ $bomItem->bomItemType ? $bomItem->bomItemType->name : '' }}
                             </td>
                             <td class="text-center">
-                                <b>{{ $bomItem->ordered_qty }}</b>
+                                <b>{{$remainOrderedQty}}</b>
                                 @foreach($orderedQty as $ordered)
                                     @if($ordered->date)
                                         <br> <small class="{{\Carbon\Carbon::createFromFormat('Y-m-d', $ordered->date) < \Carbon\Carbon::today() ? 'text-danger' : ''}}">
-                                        {{\Carbon\Carbon::parse($ordered->date)->format('ymd')}}(<b>{{$ordered->qty}}</b>)
+                                        {{\Carbon\Carbon::parse($ordered->date)->format('ymd')}}(<b>{{$ordered->qty - $ordered->inventoryMovementItemQuantities()->sum('qty')}}</b>)
                                          </small>
                                     @endif
                                 @endforeach
@@ -695,13 +704,14 @@
                                             ->where('inventory_movement_items.bom_item_id', $bomItemForm->id)
                                             ->latest('inventory_movement_items.date');
 
-                            $movementsArr = $inQtyQuery->union($outQtyQuery)->latest('date')->limit(20)->get();
+                            $movementsArr = $inQtyQuery->union($outQtyQuery)->latest('date')->get();
+                            $totalQty = 0;
                         @endphp
                         <div class="table-responsive pt-2">
                             <table class="table table-bordered table-hover">
                                 <tr class="table-primary">
                                     <th class="text-center text-dark" colspan="18">
-                                        Movement History (Latest 20 records)
+                                        Movement History
                                     </th>
                                 </tr>
                                 <tr class="table-primary">
@@ -734,11 +744,19 @@
                                         {{ $movementArr->action == 1 ? 'Receiving' : 'Outgoing' }}
                                     </td>
                                     <td class="text-center">
-                                        <a href="/{{$movementArr->action == 1 ? 'bom-receiving' : 'bom-outgoing'}}?sequence={{$movementArr->sequence}}">
+                                        <a href="/{{$movementArr->action == 1 ? 'bom-receiving' : 'bom-outgoing'}}?sequence={{$movementArr->sequence}}" target="_blank">
                                             {{ $movementArr->sequence }}
                                         </a>
                                     </td>
                                     <td class="text-right">
+                                        @php
+                                            if($movementArr->action == 1) {
+                                                $totalQty +=  $movementArr->qty;
+                                            }else {
+                                                $totalQty -=  $movementArr->qty;
+                                            }
+                                        @endphp
+                                        {{ $movementArr->action == 1 ? '+' : '-' }}
                                         {{ $movementArr->qty }}
                                     </td>
                                 </tr>
@@ -747,6 +765,20 @@
                                     <td colspan="18" class="text-center"> No Results Found </td>
                                 </tr>
                                 @endforelse
+                                @if(count($movementsArr) > 0)
+                                    <tr>
+                                        <td class="text-center" colspan="4">
+                                            <strong>
+                                                Total
+                                            </strong>
+                                        </td>
+                                        <td class="text-right">
+                                            <strong>
+                                                {{$totalQty}}
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                @endif
                             </table>
                         </div>
                     </x-slot>
