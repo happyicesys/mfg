@@ -16,6 +16,7 @@ use App\Models\InventoryMovementItemQuantity;
 use App\Models\Supplier;
 use App\Models\SupplierQuotePrice;
 use App\Traits\HasIncrement;
+use App\Traits\HasInventoryQty;
 use DB;
 use Carbon\Carbon;
 use Livewire\Component;
@@ -26,7 +27,7 @@ use Storage;
 
 class BomOutgoing extends Component
 {
-    use HasIncrement;
+    use HasIncrement, HasInventoryQty;
 
     protected $paginationTheme = 'bootstrap';
     public $itemPerPage = 100;
@@ -450,7 +451,8 @@ class BomOutgoing extends Component
                 // if(($inventoryMovement->status == array_search('Completed', InventoryMovement::STATUSES))) {
                 if($inventoryMovement->status == array_search('Completed', InventoryMovement::STATUSES) and $statusStr == null) {
                     foreach($inventoryMovement->inventoryMovementItems as $inventoryMovementItem) {
-                        $this->addBomItemQtyAvailable($inventoryMovementItem->bomItem->id, $inventoryMovementItem['qty']);
+                        // $this->addBomItemQtyAvailable($inventoryMovementItem->bomItem->id, $inventoryMovementItem['qty']);
+                        $this->syncQtyAvailable($inventoryMovementItem->bomItem->id);
                     }
                 }
                 $inventoryMovement->inventoryMovementItems()->delete();
@@ -473,10 +475,12 @@ class BomOutgoing extends Component
                     $this->logTransaction($createdInventoryMovementItem, 2, 'C', $bomItem);
 
                     if(($inventoryMovement->status == array_search('Completed', InventoryMovement::STATUSES)) or (isset($statusStr) and $statusStr == 'Completed')) {
-                        $this->reduceBomItemQtyAvailable($createdInventoryMovementItem->bom_item_id, $createdInventoryMovementItem->qty);
+                        // $this->reduceBomItemQtyAvailable($createdInventoryMovementItem->bom_item_id, $createdInventoryMovementItem->qty);
+                        $this->syncQtyAvailable($createdInventoryMovementItem->bom_item_id);
                     }
 
-                    $this->syncBomItemQty($bomItem->id);
+                    // $this->syncBomItemQty($bomItem->id);
+                    $this->syncQtyPlanned($bomItem->id);
                 }
             }
         }
@@ -508,7 +512,8 @@ class BomOutgoing extends Component
                 ]);
                 $replicatedInventoryMovementItem->save();
 
-                $this->syncBomItemQty($replicatedInventoryMovementItem->bomItem->id);
+                // $this->syncBomItemQty($replicatedInventoryMovementItem->bomItem->id);
+                $this->syncQtyPlanned($replicatedInventoryMovementItem->bomItem->id);
             }
         }
 
@@ -603,7 +608,8 @@ class BomOutgoing extends Component
         $inventoryMovement = $inventoryMovementItem->inventoryMovement;
         $bomItemId = $inventoryMovementItem->bomItem->id;
         if($inventoryMovement->status == array_search('Completed', InventoryMovement::STATUSES)) {
-            $this->addBomItemQtyAvailable($bomItemId, $inventoryMovementItem->qty);
+            // $this->addBomItemQtyAvailable($bomItemId, $inventoryMovementItem->qty);
+            $this->syncQtyAvailable($bomItemId);
         }
         if($inventoryMovementItem->attachments()->exists()) {
             foreach($inventoryMovementItem->attachments as $attachment) {
@@ -612,7 +618,8 @@ class BomOutgoing extends Component
         }
         $this->logTransaction($inventoryMovementItem, 2, 'D', $inventoryMovementItem->bomItem);
         $inventoryMovementItem->delete();
-        $this->syncBomItemQty($bomItemId);
+        // $this->syncBomItemQty($bomItemId);
+        $this->syncQtyPlanned($bomItemId);
         $this->reloadInventoryItems($inventoryMovementItem->inventoryMovement);
         $this->inventoryMovement = new InventoryMovement();
         $this->inventoryMovementItem = new InventoryMovementItem();
@@ -626,10 +633,12 @@ class BomOutgoing extends Component
             foreach($this->inventoryMovementForm->inventoryMovementItems as $inventoryMovementItem) {
                 $bomItemId = $inventoryMovementItem->bomItem->id;
                 if($inventoryMovementItem->inventoryMovement->status == array_search('Completed', InventoryMovement::STATUSES)) {
-                    $this->addBomItemQtyAvailable($bomItemId, $inventoryMovementItem->qty);
+                    // $this->addBomItemQtyAvailable($bomItemId, $inventoryMovementItem->qty);
+                    $this->syncQtyAvailable($bomItemId);
                 }
                 $inventoryMovementItem->delete();
-                $this->syncBomItemQty($bomItemId);
+                // $this->syncBomItemQty($bomItemId);
+                $this->syncQtyPlanned($bomItemId);
             }
         }
         if($this->inventoryMovementForm->exists()) {
@@ -703,7 +712,7 @@ class BomOutgoing extends Component
     private function getOutgoingIncrement()
     {
         $inventoryMovementSequence = InventoryMovement::where('action', array_search('Outgoing', InventoryMovement::ACTIONS))->max('sequence');
-        $nextSequence = $this->getIncrementByYearMonth($inventoryMovementSequence);
+        $nextSequence = $this->getIncrementByYearMonth($inventoryMovementSequence, '700');
 
         return $nextSequence;
     }

@@ -15,6 +15,7 @@ use App\Models\InventoryMovementItemQuantity;
 use App\Models\Supplier;
 use App\Models\SupplierQuotePrice;
 use App\Traits\HasIncrement;
+use App\Traits\HasInventoryQty;
 use DB;
 use Carbon\Carbon;
 use Livewire\Component;
@@ -25,7 +26,7 @@ use Storage;
 
 class BomReceiving extends Component
 {
-    use HasIncrement, WithFileUploads, WithPagination;
+    use HasIncrement, HasInventoryQty, WithFileUploads, WithPagination;
 
     protected $paginationTheme = 'bootstrap';
     public $itemPerPage = 100;
@@ -348,7 +349,8 @@ class BomReceiving extends Component
                 $bomItemId = $inventoryMovementItem->bomItem->id;
                 if($inventoryMovementItem->inventoryMovementItemQuantities()->exists()) {
                     foreach($inventoryMovementItem->inventoryMovementItemQuantities as $inventoryMovementItemQuantity) {
-                        $this->reduceBomItemQtyAvailable($inventoryMovementItemQuantity->inventoryMovementItem->bomItem->id, $inventoryMovementItemQuantity->qty);
+                        // $this->reduceBomItemQtyAvailable($inventoryMovementItemQuantity->inventoryMovementItem->bomItem->id, $inventoryMovementItemQuantity->qty);
+                        $this->syncQtyAvailable($inventoryMovementItemQuantity->inventoryMovementItem->bomItem->id);
                         if($inventoryMovementItemQuantity->attachments()->exists()) {
                             foreach($inventoryMovementItemQuantity->attachments as $attachment) {
                                 $this->deleteAttachment($attachment);
@@ -363,7 +365,8 @@ class BomReceiving extends Component
                     }
                 }
                 $inventoryMovementItem->delete();
-                $this->syncBomItemQty($bomItemId);
+                // $this->syncBomItemQty($bomItemId);
+                $this->syncQtyOrdered($bomItemId);
             }
         }
         if($this->inventoryMovementForm->exists()) {
@@ -572,7 +575,8 @@ class BomReceiving extends Component
                         }
                     }
 
-                    $this->syncBomItemQty($bomItem->id);
+                    // $this->syncBomItemQty($bomItem->id);
+                    $this->syncQtyOrdered($bomItem->id);
                 }
             }
         }
@@ -607,7 +611,8 @@ class BomReceiving extends Component
         $bomItemId = $inventoryMovementItem->bomItem->id;
         if($inventoryMovementItem->inventoryMovementItemQuantities()->exists()) {
             foreach($inventoryMovementItem->inventoryMovementItemQuantities as $inventoryMovementItemQuantity) {
-                $this->reduceBomItemQtyAvailable($inventoryMovementItem->bom_item_id, $inventoryMovementItemQuantity->qty);
+                // $this->reduceBomItemQtyAvailable($inventoryMovementItem->bom_item_id, $inventoryMovementItemQuantity->qty);
+                $this->syncQtyAvailable($inventoryMovementItem->bom_item_id);
                 if($inventoryMovementItemQuantity->attachments()->exists()) {
                     foreach($inventoryMovementItemQuantity->attachments as $attachment) {
                         $this->deleteAttachment($attachment);
@@ -622,7 +627,8 @@ class BomReceiving extends Component
             }
         }
         $inventoryMovementItem->delete();
-        $this->syncBomItemQty($bomItemId);
+        // $this->syncBomItemQty($bomItemId);
+        $this->syncQtyOrdered($bomItemId);
         $this->syncTotalAmount($inventoryMovement->id);
         $this->syncTotalQty($inventoryMovement->id);
         $this->reloadInventoryItems($inventoryMovementItem->inventoryMovement);
@@ -679,7 +685,8 @@ class BomReceiving extends Component
             'is_incomplete_qty' => $this->inventoryMovementItemQuantityForm->is_incomplete_qty ? true : false,
             'created_by' => auth()->user()->id,
         ]);
-        $this->logTransaction($qtyObj, 1, 'C', $this->inventoryMovementItemForm->bomItem);
+        // $this->logTransaction($qtyObj, 1, 'C', $this->inventoryMovementItemForm->bomItem);
+        $this->syncQtyAvailable($this->inventoryMovementItemForm->bomItem->id);
 
         if($this->file) {
             $url = $this->file->storePublicly('receiving', 'digitaloceanspaces');
@@ -689,8 +696,9 @@ class BomReceiving extends Component
                 'full_url' => $fullUrl,
             ]);
         }
-        $this->addBomItemQtyAvailable($this->inventoryMovementItemForm->bomItem->id, $qtyObj->qty);
-        $this->syncBomItemQty($this->inventoryMovementItemForm->bomItem->id);
+        // $this->addBomItemQtyAvailable($this->inventoryMovementItemForm->bomItem->id, $qtyObj->qty);
+        // $this->syncBomItemQty($this->inventoryMovementItemForm->bomItem->id);
+        $this->syncQtyOrdered($this->inventoryMovementItemForm->bomItem->id);
 
 
         if($this->inventoryMovementItemForm->bomItem->children()->exists()) {
@@ -710,11 +718,12 @@ class BomReceiving extends Component
                         'created_by' => auth()->user()->id,
                     ]);
 
-                    $this->logTransaction($qtyObj, 1, 'C', $itemObj->bomItem);
-                    // $itemQty = $itemObj->inventoryMovementItemQuantities()->save($this->inventoryMovementItemQuantityForm);
+                    // $this->logTransaction($qtyObj, 1, 'C', $itemObj->bomItem);
+                    $this->syncQtyAvailable($itemObj->bomItem->id);
                     // dd($itemQty->toArray());
-                    $this->addBomItemQtyAvailable($itemObj->bom_item_id, $qtyObj->qty);
-                    $this->syncBomItemQty($itemObj->bom_item_id);
+                    // $this->addBomItemQtyAvailable($itemObj->bom_item_id, $qtyObj->qty);
+                    // $this->syncBomItemQty($itemObj->bom_item_id);
+                    $this->syncQtyOrdered($itemObj->bom_item_id);
                 }
             }
         }
@@ -728,7 +737,8 @@ class BomReceiving extends Component
     public function removeQuantity(InventoryMovementItemQuantity $inventoryMovementItemQuantity)
     {
         $inventoryMovement = $inventoryMovementItemQuantity->inventoryMovementItem->inventoryMovement;
-        $this->reduceBomItemQtyAvailable($inventoryMovementItemQuantity->inventoryMovementItem->bomItem->id, $inventoryMovementItemQuantity->qty);
+        // $this->reduceBomItemQtyAvailable($inventoryMovementItemQuantity->inventoryMovementItem->bomItem->id, $inventoryMovementItemQuantity->qty);
+        $this->syncQtyAvailable($inventoryMovementItemQuantity->inventoryMovementItem->bomItem->id);
         if($inventoryMovementItemQuantity->attachments()->exists()) {
             foreach($inventoryMovementItemQuantity->attachments as $attachment) {
                 $this->deleteAttachment($attachment);
@@ -750,7 +760,8 @@ class BomReceiving extends Component
         $inventoryMovementItemQuantityCollection = InventoryMovementItemQuantity::findOrFail($id);
         $inventoryMovement = $inventoryMovementItemQuantityCollection->inventoryMovementItem->inventoryMovement;
         $inventoryMovementItem = $inventoryMovementItemQuantityCollection->inventoryMovementItem;
-        $this->reduceBomItemQtyAvailable($inventoryMovementItemQuantityCollection->inventoryMovementItem->bomItem->id, $inventoryMovementItemQuantityCollection->qty);
+        // $this->reduceBomItemQtyAvailable($inventoryMovementItemQuantityCollection->inventoryMovementItem->bomItem->id, $inventoryMovementItemQuantityCollection->qty);
+        $this->syncQtyAvailable($inventoryMovementItemQuantityCollection->inventoryMovementItem->bomItem->id);
         if($inventoryMovementItemQuantityCollection->attachments()->exists()) {
             foreach($inventoryMovementItemQuantityCollection->attachments as $attachment) {
                 $this->deleteAttachment($attachment);
@@ -1014,7 +1025,8 @@ class BomReceiving extends Component
 
         $this->inventoryMovementForm->total_amount = $this->calculateTotalAmount($this->inventoryMovementItems);
         $this->inventoryMovementForm->total_qty = $this->calculateTotalQty($this->inventoryMovementItems);
-        $this->syncBomItemQty($bomItem->id);
+        // $this->syncBomItemQty($bomItem->id);
+        $this->syncQtyOrdered($bomItem->id);
     }
 
     public function editSingleInventoryMovementItem($inventoryMovementItemId)
@@ -1207,7 +1219,8 @@ class BomReceiving extends Component
         $bomItem = BomItem::findOrFail($bomItemId);
         $bomItem->available_qty -= $qty;
         $bomItem->save();
-        $this->syncBomItemQty($bomItemId);
+        $this->syncQtyOrdered($bomItemId);
+        // $this->syncBomItemQty($bomItemId);
     }
 
     private function syncBomItemQty($bomItemId)
