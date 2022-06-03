@@ -115,7 +115,9 @@ class VmmfgOps extends Component
         if($vmmfgUnit) {
             if($vmmfgUnit->first()->vmmfgTasks) {
                 foreach($vmmfgUnit->first()->vmmfgTasks as $task) {
-                    $this->form['remarks'][$task->vmmfgItem->id] = $task->remarks;
+                    if($task->vmmfgItem) {
+                        $this->form['remarks'][$task->vmmfgItem->id] = $task->remarks;
+                    }
                 }
             }
             $this->form['completion_date'] = $vmmfgUnit->first()->completion_date;
