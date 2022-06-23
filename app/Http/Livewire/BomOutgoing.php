@@ -496,6 +496,7 @@ class BomOutgoing extends Component
 
         $replicatedInventoryMovement = $this->inventoryMovementForm->replicate()->fill([
             'batch' => $this->inventoryMovementForm->batch.'-replicated',
+            'sequence' => $this->getOutgoingIncrement(),
             'status' => $replicationStatus,
             'created_by' => auth()->user()->id,
             'updated_by' => null,

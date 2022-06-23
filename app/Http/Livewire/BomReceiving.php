@@ -1130,6 +1130,39 @@ class BomReceiving extends Component
         }
     }
 
+    public function replicateInventoryMovementForm()
+    {
+        $replicationStatus = array_search('Confirmed', \App\Models\InventoryMovement::STATUSES);
+
+        $replicatedInventoryMovement = $this->inventoryMovementForm->replicate()->fill([
+            'batch' => $this->inventoryMovementForm->batch.'-replicated',
+            'sequence' => $this->getReceivingIncrement(),
+            'status' => $replicationStatus,
+            'created_by' => auth()->user()->id,
+            'updated_by' => null,
+            'created_at' => Carbon::now(),
+            'updated_at' => null,
+        ]);
+        $replicatedInventoryMovement->save();
+
+        if($this->inventoryMovementForm->inventoryMovementItems()->exists()) {
+            foreach($this->inventoryMovementForm->inventoryMovementItems as $inventoryMovementItem) {
+                $replicatedInventoryMovementItem = $inventoryMovementItem->replicate()->fill([
+                    'inventory_movement_id' => $replicatedInventoryMovement->id,
+                    'status' => $replicationStatus,
+                ]);
+                $replicatedInventoryMovementItem->save();
+
+                // $this->syncBomItemQty($replicatedInventoryMovementItem->bomItem->id);
+                $this->syncQtyOrdered($replicatedInventoryMovementItem->bomItem->id);
+            }
+        }
+
+        $this->emit('refresh');
+        $this->emit('updated');
+        session()->flash('success', 'Entry has been created');
+    }
+
     // public function exportPdf()
     // {
     //     $tasks = $this->mainQuery();

@@ -892,6 +892,9 @@
                                 >
                                     Save
                                 </button>
+                                <a href="#" class="btn btn-outline-primary" onclick="return confirm('Are you sure you want to replicate this receiving?') || event.stopImmediatePropagation()" wire:click.prevent="replicateInventoryMovementForm()" >
+                                    Replicate
+                                </a>
                             @endif
                         </div>
                     </x-slot>
