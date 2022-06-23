@@ -822,6 +822,9 @@
                                                                     if($status == array_search('Completed', \App\Models\InventoryMovement::STATUSES)) {
                                                                         $disabled = true;
                                                                     }
+                                                                    if(auth()->user()->hasRole('superadmin')) {
+                                                                        $disabled = false;
+                                                                    }
                                                                 }
                                                             @endphp
                                                             <button type="button" class="btn btn-danger btn-sm" onclick="confirm('Are you sure you want to delete this received part?') || event.stopImmediatePropagation()" wire:click="removeQuantityByInventoryMovementItemQuantityId({{$inventoryMovementItemQuantity['id']}})" wire:key="inventory-movement-item-quantity-delete-{{$inventoryMovementItemQuantity['id']}}" {{$disabled ? 'disabled' : ''}}>
