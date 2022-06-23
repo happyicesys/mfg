@@ -472,8 +472,6 @@ class BomOutgoing extends Component
                         'date' => $inventoryMovement->order_date,
                     ]);
 
-                    $this->logTransaction($createdInventoryMovementItem, 2, 'C', $bomItem);
-
                     if(($inventoryMovement->status == array_search('Completed', InventoryMovement::STATUSES)) or (isset($statusStr) and $statusStr == 'Completed')) {
                         // $this->reduceBomItemQtyAvailable($createdInventoryMovementItem->bom_item_id, $createdInventoryMovementItem->qty);
                         $this->syncQtyAvailable($createdInventoryMovementItem->bom_item_id);
@@ -608,18 +606,13 @@ class BomOutgoing extends Component
         $inventoryMovementItem = InventoryMovementItem::findOrFail($inventoryMovementItemId);
         $inventoryMovement = $inventoryMovementItem->inventoryMovement;
         $bomItemId = $inventoryMovementItem->bomItem->id;
-        if($inventoryMovement->status == array_search('Completed', InventoryMovement::STATUSES)) {
-            // $this->addBomItemQtyAvailable($bomItemId, $inventoryMovementItem->qty);
-            $this->syncQtyAvailable($bomItemId);
-        }
         if($inventoryMovementItem->attachments()->exists()) {
             foreach($inventoryMovementItem->attachments as $attachment) {
                 $this->deleteAttachment($attachment);
             }
         }
-        $this->logTransaction($inventoryMovementItem, 2, 'D', $inventoryMovementItem->bomItem);
         $inventoryMovementItem->delete();
-        // $this->syncBomItemQty($bomItemId);
+        $this->syncQtyAvailable($bomItemId);
         $this->syncQtyPlanned($bomItemId);
         $this->reloadInventoryItems($inventoryMovementItem->inventoryMovement);
         $this->inventoryMovement = new InventoryMovement();
@@ -633,12 +626,8 @@ class BomOutgoing extends Component
         if($this->inventoryMovementForm->inventoryMovementItems()->exists()) {
             foreach($this->inventoryMovementForm->inventoryMovementItems as $inventoryMovementItem) {
                 $bomItemId = $inventoryMovementItem->bomItem->id;
-                if($inventoryMovementItem->inventoryMovement->status == array_search('Completed', InventoryMovement::STATUSES)) {
-                    // $this->addBomItemQtyAvailable($bomItemId, $inventoryMovementItem->qty);
-                    $this->syncQtyAvailable($bomItemId);
-                }
                 $inventoryMovementItem->delete();
-                // $this->syncBomItemQty($bomItemId);
+                $this->syncQtyAvailable($bomItemId);
                 $this->syncQtyPlanned($bomItemId);
             }
         }
