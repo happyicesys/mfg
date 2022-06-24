@@ -720,6 +720,7 @@
                                                 @php
                                                     $indexCount = 0;
                                                 @endphp
+                                                {{-- @dd($inventoryMovementItems); --}}
                                                 @forelse($inventoryMovementItems as $inventoryMovementItemIndex => $inventoryMovementItem)
                                                 @php
                                                     if(!isset($inventoryMovementItem['available_qty'])) {

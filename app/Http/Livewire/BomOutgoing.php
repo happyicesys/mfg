@@ -357,25 +357,36 @@ class BomOutgoing extends Component
         $bomContents = BomContent::whereIn('id', $this->selectBomContent)->where('is_group', false)->get();
 
         $inventoryMovementItemArr = [];
-        foreach($bomContents as $bomContent) {
+        foreach($bomContents->sortBy('sequence', SORT_NATURAL) as $bomContentIndex => $bomContent) {
             if($bomContent->qty > 0) {
+                $qty = isset($inventoryMovementItemArr[$bomContent->bom_item_id]['qty'])
+                            ? $inventoryMovementItemArr[$bomContent->bom_item_id]['qty'] + $bomContent->qty * $bomQty
+                            : $bomContent->qty * $bomQty;
+                $balanceQty = $bomContent->bomItem->available_qty - $qty;
+
                 $inventoryMovementItemArr[$bomContent->bom_item_id] = [
+                    'sequence' => $bomContent->sequence,
                     'bom_item_id' => $bomContent->bomItem->id,
                     'bom_item_code' => $bomContent->bomItem->code,
                     'bom_item_name' => $bomContent->bomItem->name,
                     'unit_price' => 0,
                     'amount' => 0,
                     'available_qty' => $bomContent->bomItem->available_qty,
+                    'qty' => $qty,
+                    'balance_qty' => $balanceQty,
                 ];
-                if(isset($inventoryMovementItemArr[$bomContent->bom_item_id]['qty'])) {
-                    $inventoryMovementItemArr[$bomContent->bom_item_id]['qty'] += $bomContent->qty * $bomQty;
-                }else {
-                    $inventoryMovementItemArr[$bomContent->bom_item_id]['qty'] = $bomContent->qty * $bomQty;
-                }
-                $inventoryMovementItemArr[$bomContent->bom_item_id]['balance_qty'] = $inventoryMovementItemArr[$bomContent->bom_item_id]['available_qty'] - $inventoryMovementItemArr[$bomContent->bom_item_id]['qty'];
             }
         }
-        $this->inventoryMovementItems = $inventoryMovementItemArr;
+
+        $sequenceArr = [];
+        if($inventoryMovementItemArr) {
+            foreach($inventoryMovementItemArr as $inventoryMovementItemArrIndex => $inventoryMovementItemArrObj) {
+                array_push($sequenceArr, $inventoryMovementItemArrObj);
+            }
+        }
+
+        // dd($inventoryMovementItemArr, $sequenceArr);
+        $this->inventoryMovementItems = $sequenceArr;
         $this->showGenerateByBomArea = false;
         $this->showGenerateLooseArea = false;
     }
