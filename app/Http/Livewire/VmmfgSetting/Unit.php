@@ -30,6 +30,7 @@ class Unit extends Component
         'is_completed' => '0',
     ];
     public $scopes;
+    public $unitSelections;
 
     public VmmfgUnit $unitForm;
 
@@ -46,16 +47,36 @@ class Unit extends Component
             'unitForm.model' => 'sometimes',
             'unitForm.vmmfg_scope_id' => 'sometimes',
             'unitForm.order_date' => 'sometimes',
+            'unitForm.refer_completion_unit_id' => 'sometimes',
         ];
     }
 
     public function mount()
     {
         $this->scopes = VmmfgScope::latest()->get();
+        $this->unitSelections = [];
     }
 
     public function render()
     {
+        // $units = VmmfgUnit::query()
+        //                 ->leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')
+        //                 ->leftJoin('vmmfg_scopes', 'vmmfg_scopes.id', '=', 'vmmfg_units.vmmfg_scope_id')
+        //                 ->leftJoin('vmmfg_units AS refer_completion_units', 'refer_completion_units.id', '=', 'vmmfg_units.refer_completion_unit_id')
+        //                 ->leftJoin('vmmfg_jobs AS refer_completion_unit_jobs', 'refer_completion_unit_jobs.id', '=', 'refer_completion_units.vmmfg_job_id')
+        //                 ->select(
+        //                     '*',
+        //                     'vmmfg_units.id AS id',
+        //                     'vmmfg_units.completion_date',
+        //                     'vmmfg_units.model AS model',
+        //                     'vmmfg_units.order_date AS order_date',
+        //                     'vmmfg_units.unit_no',
+        //                     'vmmfg_units.vend_id',
+        //                     'vmmfg_jobs.batch_no',
+        //                     'vmmfg_scopes.name AS scope_name',
+        //                     'refer_completion_units.'
+        //                 );
+
         $units = VmmfgUnit::with('vmmfgJob')
                         ->leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')
                         ->select(
@@ -67,9 +88,10 @@ class Unit extends Component
                         );
 
         // advance search
+        // dd($units->get()->toArray());
         $units = $units
-                ->when($this->filters['unit_no'], fn($query, $input) => $query->searchLike('unit_no', $input))
-                ->when($this->filters['vend_id'], fn($query, $input) => $query->searchLike('vend_id', $input));
+                ->when($this->filters['unit_no'], fn($query, $input) => $query->searchLike('vmmfg_units.unit_no', $input))
+                ->when($this->filters['vend_id'], fn($query, $input) => $query->searchLike('vmmfg_units.vend_id', $input));
 
         if($input = $this->filters['batch_no']) {
             $units = $units->whereHas('vmmfgJob', function($query) use ($input) {
@@ -102,10 +124,12 @@ class Unit extends Component
         if($sortKey = $this->sortKey) {
             $units = $units->orderBy($sortKey, $this->sortAscending ? 'asc' : 'desc');
         }else {
-            $units = $units->orderBy('vmmfg_units.order_date')->orderBy('batch_no')->orderBy('unit_no');
+            $units = $units->orderBy('vmmfg_units.order_date')->orderBy('batch_no')->orderBy('vmmfg_units.unit_no');
         }
 
         $units = $units->paginate($this->itemPerPage);
+
+
 
         return view('livewire.vmmfg-setting.unit', ['units' => $units]);
     }
@@ -124,7 +148,7 @@ class Unit extends Component
     public function edit(VmmfgUnit $unit)
     {
         $this->unitForm = $unit;
-
+        $this->unitSelections = VmmfgUnit::leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')->where('vmmfg_units.id', '<>', $unit->id)->orderBy('vmmfg_units.order_date')->orderBy('batch_no')->orderBy('unit_no')->get();
     }
 
     public function save()

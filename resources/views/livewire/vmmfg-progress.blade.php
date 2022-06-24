@@ -15,6 +15,7 @@
                 <div>
                     <div class="bg-light pt-2 pb-2 pl-2 pr-2 mb-2">
                         <div class="form-row">
+{{--
                             <div class="form-group col-md-4 col-xs-12">
                                 <label>
                                     Unit No
@@ -26,6 +27,30 @@
                                     Batch No
                                 </label>
                                 <input wire:model="filters.batch_no" type="text" class="form-control" placeholder="Batch No">
+                            </div>
+                            <div class="form-group col-md-4 col-xs-12">
+                                <label>
+                                    Model
+                                </label>
+                                <input wire:model="filters.model" type="text" class="form-control" placeholder="Model">
+                            </div> --}}
+                            <div class="form-group col-md-4 col-xs-12">
+                                <label>
+                                    Unit No
+                                </label>
+                                <input wire:model="filters.unit_no" type="text" class="form-control" placeholder="Unit No">
+                            </div>
+                            <div class="form-group col-md-4 col-xs-12">
+                                <label>
+                                    {{$profile->profileSetting ? $profile->profileSetting->vmmfg_job_batch_no_title : 'Batch No'}}
+                                </label>
+                                <input wire:model="filters.batch_no" type="text" class="form-control" placeholder="{{$profile->profileSetting ? $profile->profileSetting->vmmfg_job_batch_no_title : 'Batch No'}}">
+                            </div>
+                            <div class="form-group col-md-4 col-xs-12">
+                                <label>
+                                    {{$profile->profileSetting ? $profile->profileSetting->vmmfg_unit_vend_id_title : 'Vend ID'}}
+                                </label>
+                                <input wire:model="filters.vend_id" type="text" class="form-control" placeholder="{{$profile->profileSetting ? $profile->profileSetting->vmmfg_unit_vend_id_title : 'Vend ID'}}">
                             </div>
                             <div class="form-group col-md-4 col-xs-12">
                                 <label>

@@ -20,6 +20,7 @@ class VmmfgUnit extends Model
         'completion_date',
         'model',
         'order_date',
+        'refer_completion_unit_id',
     ];
 
     //relationships
@@ -36,6 +37,11 @@ class VmmfgUnit extends Model
     public function vmmfgTasks()
     {
         return $this->hasMany(VmmfgTask::class);
+    }
+
+    public function referCompletionUnit()
+    {
+        return $this->belongsTo(VmmfgUnit::class, 'refer_completion_unit_id');
     }
 
     // getter

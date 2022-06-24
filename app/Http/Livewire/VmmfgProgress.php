@@ -24,6 +24,7 @@ class VmmfgProgress extends Component
         'unit_no' => '',
         'batch_no' => '',
         'model' => '',
+        'vend_id' => '',
         'is_completed' => '0',
     ];
     public $vmmfgTitleCategories;
@@ -56,16 +57,28 @@ class VmmfgProgress extends Component
 
         // advance search
         $units = $units
-                ->when($this->filters['unit_no'], fn($query, $input) => $query->searchLike('unit_no', $input));
+                ->when($this->filters['unit_no'], fn($query, $input) => $query->searchLike('vmmfg_units.unit_no', $input))
+                ->when($this->filters['vend_id'], fn($query, $input) => $query->searchLike('vmmfg_units.vend_id', $input));
 
-        if($batchNo = $this->filters['batch_no']) {
-            $units = $units->whereHas('vmmfgJob', function($query) use ($batchNo) {
-                $query->searchLike('batch_no', $batchNo);
+        if($input = $this->filters['batch_no']) {
+            $units = $units->whereHas('vmmfgJob', function($query) use ($input) {
+                $query->searchLike('batch_no', $input);
             });
         }
 
+
+
+        // $units = $units
+        //         ->when($this->filters['unit_no'], fn($query, $input) => $query->searchLike('unit_no', $input));
+
+        // if($batchNo = $this->filters['batch_no']) {
+        //     $units = $units->whereHas('vmmfgJob', function($query) use ($batchNo) {
+        //         $query->searchLike('batch_no', $batchNo);
+        //     });
+        // }
+
         if($model = $this->filters['model']) {
-            $units = $units->searchLike('model', $model);
+            $units = $units->searchLike('vmmfg_units.model', $model);
             // $units = $units->whereHas('vmmfgJob', function($query) use ($model) {
             //     $query->searchLike('model', $model);
             // });

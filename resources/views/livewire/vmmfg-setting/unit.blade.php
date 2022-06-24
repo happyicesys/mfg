@@ -25,7 +25,7 @@
                                     <label>
                                         {{$profile->profileSetting ? $profile->profileSetting->vmmfg_job_batch_no_title : 'Batch No'}}
                                     </label>
-                                    <input wire:model="filters.batch_no" type="text" class="form-control" placeholder="Batch No">
+                                    <input wire:model="filters.batch_no" type="text" class="form-control" placeholder="{{$profile->profileSetting ? $profile->profileSetting->vmmfg_job_batch_no_title : 'Batch No'}}">
                                 </div>
                                 <div class="form-group col-md-4 col-xs-12">
                                     <label>
@@ -180,6 +180,52 @@
                             </button>
                         </td>
                     </tr>
+                    {{-- <tr class="row_edit" wire:loading.class.delay="opacity-2" wire:key="row-{{$unit->id}}">
+                        <th class="text-center">
+                            <input type="checkbox" wire:model="selected" value="{{$admin->id}}">
+                        </th>
+                        <td class="text-center">
+                            {{ $index + $from}}
+                        </td>
+                        <td class="text-center">
+                            {{ $unit->batch_no }}
+                        </td>
+                        <td class="text-center">
+                            <a href="/vmmfg-ops?unit_id={{$unit->id}}">
+                                {{ $unit->unit_no }}
+                            </a>
+                        </td>
+                        <td class="text-center">
+                            {{ $unit->vend_id }}
+                        </td>
+                        <td class="text-center">
+                            {{ $unit->model }}
+                        </td>
+                        <td class="text-center">
+                            {{ $unit->scope_name }}
+                        </td>
+                        <td class="text-center">
+                            {{ $unit->order_date }}
+                        </td>
+                        <td class="text-center">
+                            {{$unit}}
+                            @if($unit->referCompletionUnit)
+                                <span class="badge badge-success">
+                                    Refer to {{$unit->referCompletionUnit->unit_no}} @if($unit->referCompletionUnit->vend_id) - {{$unit->referCompletionUnit->vend_id}} @endif
+                                    @if($unit->referCompletionUnit->vmmfgJob)
+                                        <br>{{$unit->referCompletionUnit->vmmfgJob->model}}
+                                    @endif
+
+                                </span>
+                            @endif
+                            {{ $unit->completion_date }}
+                        </td>
+                        <td class="text-center">
+                            <button type="button" wire:click="edit({{$unit->id}})" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#edit-unit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </td>
+                    </tr> --}}
                     @empty
                     <tr>
                         <td colspan="18" class="text-center"> No Results Found </td>
@@ -220,7 +266,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="completion_date">
+                            <label for="start_date">
                                 Start Date
                             </label>
                             <input type="date" class="form-control" wire:model.defer="unitForm.order_date">
@@ -229,8 +275,23 @@
                             <label for="completion_date">
                                 Completion Date
                             </label>
-                            <input type="date" class="form-control" wire:model.defer="unitForm.completion_date">
+                            <input type="date" class="form-control" wire:model.defer="unitForm.completion_date" {{isset($unitForm['refer_completion_unit_id']) ? 'disabled' : ''}}>
                         </div>
+{{--
+                        <hr>
+                        <div class="form-group">
+                            <label for="refer_completion_unit_id">
+                                Refer to Completion Unit
+                            </label>
+                            <select name="refer_completion_unit_id" wire:model.defer="unitForm.refer_completion_unit_id" class="select form-control">
+                                <option value="">Select..</option>
+                                @foreach($unitSelections as $unitSelection)
+                                    <option value="{{$unitSelection->id}}">
+                                        Unit No: {{$unitSelection->unit_no}} @if($unitSelection->vend_id)({{$profile->profileSetting ? $profile->profileSetting->vmmfg_unit_vend_id_title : 'Vend ID'}}: {{$unitSelection->vend_id}})@endif @if($unitSelection->model) Model: {{$unitSelection->model}}@endif
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div> --}}
                     </x-slot>
                     <x-slot name="footer">
                         <div class="btn-group">
