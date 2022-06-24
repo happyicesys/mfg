@@ -359,7 +359,7 @@ class BomOutgoing extends Component
         $inventoryMovementItemArr = [];
         foreach($bomContents->sortBy('sequence', SORT_NATURAL) as $bomContentIndex => $bomContent) {
             if($bomContent->qty > 0) {
-                $qty = isset($inventoryMovementItemArr[$bomContent->bom_item_id]['qty'])
+                $qty = isset($inventoryMovementItemArr[$bomContent->bom_item_id]['qty']) && !$bomContent->bomItem->is_inventory
                             ? $inventoryMovementItemArr[$bomContent->bom_item_id]['qty'] + $bomContent->qty * $bomQty
                             : $bomContent->qty * $bomQty;
                 $balanceQty = $bomContent->bomItem->available_qty - $qty;
@@ -377,6 +377,7 @@ class BomOutgoing extends Component
                 ];
             }
         }
+        // dd($inventoryMovementItemArr);
 
         $sequenceArr = [];
         if($inventoryMovementItemArr) {
