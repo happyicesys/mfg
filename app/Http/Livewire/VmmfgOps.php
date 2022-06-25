@@ -393,9 +393,24 @@ class VmmfgOps extends Component
                             'vmmfgScope.vmmfgTitles',
                             'vmmfgScope.vmmfgTitles.vmmfgItems',
                             'vmmfgScope.vmmfgTitles.vmmfgItems.attachments',
-                            'vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks',
+                            'vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks'
+                                => function($query) use ($unitId){
+                                    $query->when($unitId, fn($query, $input) => $query->search('vmmfg_unit_id', $input));
+                                },
                             'vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks.attachments',
                         ])
+                        // ->with([
+                        //     'referCompletionUnit',
+                        //     'bindedCompletionUnit',
+                        //     'vmmfgJob',
+                        //     'vmmfgTasks',
+                        //     'vmmfgScope',
+                        //     'vmmfgScope.vmmfgTitles',
+                        //     'vmmfgScope.vmmfgTitles.vmmfgItems',
+                        //     'vmmfgScope.vmmfgTitles.vmmfgItems.attachments',
+                        //     'vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks',
+                        //     'vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks.attachments',
+                        // ])
                         // ->whereHas('vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks', function($query) use ($userId, $dateFrom, $dateTo){
                         //     $query->when($userId, fn($query, $input) =>
                         //             $query->search('done_by', $input)
