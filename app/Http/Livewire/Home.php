@@ -42,9 +42,11 @@ class Home extends Component
                             DB::raw('MONTH(completion_date) AS completion_month'),
                             DB::raw('YEAR(order_date) AS order_year'),
                             DB::raw('YEAR(completion_date) AS completion_year'),
+                            'refer_completion_unit_id'
                         )
                         ->where(function($query) use ($year) {
-                            $query->whereYear('order_date', '=', $year)->orWhereYear('completion_date', '=', $year);
+                            $query->whereYear('order_date', '=', $year)
+                                    ->orWhereYear('completion_date', '=', $year);
                         })
                         ->get();
 
@@ -59,7 +61,7 @@ class Home extends Component
                     if($job->order_month === $index and $job->order_year === $year) {
                         $dataArr[$year][$index]['order'] += 1;
                     }
-                    if($job->completion_month === $index and $job->completion_year === $year) {
+                    if($job->completion_month === $index and $job->refer_completion_unit_id === null and $job->completion_year === $year) {
                         $dataArr[$year][$index]['completion'] += 1;
                     }
                 }

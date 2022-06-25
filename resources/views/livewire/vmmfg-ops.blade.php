@@ -62,6 +62,19 @@
             </div>
 
             @if($vmmfgUnit)
+
+            @if($vmmfgUnit->first()->bindedCompletionUnit)
+            <div style="padding: 5px 0px 10px 0px;">
+                This binded Unit depends on the current unit completion date
+                <br>
+                <a class="btn btn-success btn-block" href="/vmmfg-ops?unit_id={{$vmmfgUnit->first()->bindedCompletionUnit->id}}">
+                    {{$vmmfgUnit->first()->bindedCompletionUnit->vmmfgJob->batch_no}} ({{$vmmfgUnit->first()->bindedCompletionUnit->unit_no}})
+                    <br> {{$vmmfgUnit->first()->bindedCompletionUnit->vend_id}}
+                    <br> {{$vmmfgUnit->first()->bindedCompletionUnit->model}}
+                </a>
+            </div>
+            @endif
+
             <div class="table-responsive">
                 <table class="table table-bordered table-hover">
                     <tr class="table-secondary">
@@ -619,15 +632,38 @@
                         </li>
                     @endforelse
                 </ul>
+                {{-- {{$vmmfgUnit}} --}}
+                {{-- @dd($vmmfgUnit->first()->referCompletionUnit->toArray()); --}}
+                @if($vmmfgUnit->first()->referCompletionUnit)
                 <div class="form-group pt-3">
                     <label for="completion_date">
-                        Completion Date
+                        This Partial Completion Date
                     </label>
                     <input type="date" wire:model.defer="form.completion_date" class="form-control">
                 </div>
                 <button type="button" class="btn btn-success btn-xs-block" wire:click.prevent="saveCompletionDate({{$vmmfgUnit}})">
-                    Save Completion Date
+                    Save Partial Completion Date
                 </button>
+                <div style="padding: 10px 0px 3px 6px;">
+                    Please refer to this unit for final completion
+                    <br>
+                    <a class="btn btn-success btn-block" href="/vmmfg-ops?unit_id={{$vmmfgUnit->first()->referCompletionUnit->id}}">
+                        {{$vmmfgUnit->first()->referCompletionUnit->vmmfgJob->batch_no}} ({{$vmmfgUnit->first()->referCompletionUnit->unit_no}})
+                        <br> {{$vmmfgUnit->first()->referCompletionUnit->vend_id}}
+                        <br> {{$vmmfgUnit->first()->referCompletionUnit->model}}
+                    </a>
+                </div>
+                @else
+                    <div class="form-group pt-3">
+                        <label for="completion_date">
+                            Completion Date
+                        </label>
+                        <input type="date" wire:model.defer="form.completion_date" class="form-control">
+                    </div>
+                    <button type="button" class="btn btn-success btn-xs-block" wire:click.prevent="saveCompletionDate({{$vmmfgUnit}})">
+                        Save Completion Date
+                    </button>
+                @endif
             @else
                 @if($vmmfgUnit)
                     <ul class="list-group">

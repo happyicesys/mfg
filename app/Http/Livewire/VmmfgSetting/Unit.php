@@ -73,11 +73,10 @@ class Unit extends Component
         //                     'vmmfg_units.unit_no',
         //                     'vmmfg_units.vend_id',
         //                     'vmmfg_jobs.batch_no',
-        //                     'vmmfg_scopes.name AS scope_name',
-        //                     'refer_completion_units.'
+        //                     'vmmfg_scopes.name AS scope_name'
         //                 );
 
-        $units = VmmfgUnit::with('vmmfgJob')
+        $units = VmmfgUnit::with('vmmfgJob', 'referCompletionUnit')
                         ->leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')
                         ->select(
                             '*',
@@ -88,7 +87,6 @@ class Unit extends Component
                         );
 
         // advance search
-        // dd($units->get()->toArray());
         $units = $units
                 ->when($this->filters['unit_no'], fn($query, $input) => $query->searchLike('vmmfg_units.unit_no', $input))
                 ->when($this->filters['vend_id'], fn($query, $input) => $query->searchLike('vmmfg_units.vend_id', $input));
@@ -130,7 +128,7 @@ class Unit extends Component
         $units = $units->paginate($this->itemPerPage);
 
 
-
+        // dd($units->toArray());
         return view('livewire.vmmfg-setting.unit', ['units' => $units]);
     }
 
@@ -148,7 +146,17 @@ class Unit extends Component
     public function edit(VmmfgUnit $unit)
     {
         $this->unitForm = $unit;
-        $this->unitSelections = VmmfgUnit::leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')->where('vmmfg_units.id', '<>', $unit->id)->orderBy('vmmfg_units.order_date')->orderBy('batch_no')->orderBy('unit_no')->get();
+        $this->unitSelections = VmmfgUnit::query()
+                                        ->leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')
+                                        ->where('vmmfg_units.id', '<>', $unit->id)
+                                        ->select(
+                                            '*',
+                                            'vmmfg_units.id'
+                                            )
+                                        ->orderBy('vmmfg_units.order_date')
+                                        ->orderBy('batch_no')
+                                        ->orderBy('unit_no')
+                                        ->get();
     }
 
     public function save()

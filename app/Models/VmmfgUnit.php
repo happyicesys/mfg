@@ -44,6 +44,11 @@ class VmmfgUnit extends Model
         return $this->belongsTo(VmmfgUnit::class, 'refer_completion_unit_id');
     }
 
+    public function bindedCompletionUnit()
+    {
+        return $this->hasOne(VmmfgUnit::class, 'refer_completion_unit_id');
+    }
+
     // getter
     public function getCompletionDateAttribute($value)
     {
@@ -57,5 +62,16 @@ class VmmfgUnit extends Model
         if($value) {
             return Carbon::parse($value)->format('Y-m-d');
         }
+    }
+
+    // setter
+    public function setReferCompletionUnitIdAttribute($value)
+    {
+        $this->attributes['refer_completion_unit_id'] = $value ? $value : null;
+    }
+
+    public function setCompletionDateAttribute($value)
+    {
+        $this->attributes['completion_date'] = $value ? $value : null;
     }
 }

@@ -172,6 +172,14 @@
                             {{ $unit->order_date }}
                         </td>
                         <td class="text-center">
+                            @if($unit->referCompletionUnit)
+                                <span class="badge badge-success">
+                                    Refer: {{$unit->referCompletionUnit->vmmfgJob->batch_no}} ({{$unit->referCompletionUnit->unit_no}})
+                                    <br> {{$unit->referCompletionUnit->vend_id}}
+                                    <br> {{$unit->referCompletionUnit->model}}
+                                </span>
+                                <br>
+                            @endif
                             {{ $unit->completion_date }}
                         </td>
                         <td class="text-center">
@@ -277,21 +285,27 @@
                             </label>
                             <input type="date" class="form-control" wire:model.defer="unitForm.completion_date" {{isset($unitForm['refer_completion_unit_id']) ? 'disabled' : ''}}>
                         </div>
-{{--
+
                         <hr>
                         <div class="form-group">
                             <label for="refer_completion_unit_id">
                                 Refer to Completion Unit
                             </label>
                             <select name="refer_completion_unit_id" wire:model.defer="unitForm.refer_completion_unit_id" class="select form-control">
-                                <option value="">Select..</option>
+                                <option value="">
+                                    @if(isset($unitForm['refer_completion_unit_id']))
+                                    ----- Clear -----
+                                    @else
+                                        Select..
+                                    @endif
+                                </option>
                                 @foreach($unitSelections as $unitSelection)
                                     <option value="{{$unitSelection->id}}">
                                         Unit No: {{$unitSelection->unit_no}} @if($unitSelection->vend_id)({{$profile->profileSetting ? $profile->profileSetting->vmmfg_unit_vend_id_title : 'Vend ID'}}: {{$unitSelection->vend_id}})@endif @if($unitSelection->model) Model: {{$unitSelection->model}}@endif
                                     </option>
                                 @endforeach
                             </select>
-                        </div> --}}
+                        </div>
                     </x-slot>
                     <x-slot name="footer">
                         <div class="btn-group">
