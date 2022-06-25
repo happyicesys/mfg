@@ -9,7 +9,19 @@
             <h2>QA/QC</h2>
             <hr>
 
-            <div class="bg-light p-3">
+            <div class="p-3 bg-light">
+                <div class="row p-1 bg-white">
+                    <div class="form-group col-xs-12 col-md-6 col-sm-6">
+                        <label>
+                            [Filter] Is Completed?
+                        </label>
+                        <select name="is_completed" wire:model="is_completed" class="select form-control">
+                            <option value="">All</option>
+                            <option value="1">Yes</option>
+                            <option value="2">No</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="form-group">
                     <label>
                         {{$profile->profileSetting ? $profile->profileSetting->vmmfg_job_batch_no_title : 'Batch No'}} -
@@ -20,10 +32,10 @@
                         (Start Date)
                         (Completion Date)
                     </label>
-                    <select name="unit_id" wire:model="unit_id" wire:ignore class="select form-control">
+                    <select name="unit_id" wire:model="unit_id"  class="select form-control">
                         <option value="">Select..</option>
                         @foreach($units as $unit)
-                            @if(!$unit->completion_date)
+                            {{-- @if(!$unit->completion_date) --}}
                             <option value="{{$unit->id}}">
                                 {{$unit->vmmfgJob->batch_no}}
                                 @if($unit->vend_id)
@@ -45,7 +57,7 @@
                                     (Complete: {{$unit->completion_date}})
                                 @endif
                             </option>
-                            @endif
+                            {{-- @endif --}}
                         @endforeach
                     </select>
                 </div>
@@ -67,7 +79,8 @@
             <div style="padding: 5px 0px 10px 0px;">
                 This binded Unit depends on the current unit completion date
                 <br>
-                <a class="btn btn-success btn-block" href="/vmmfg-ops?unit_id={{$vmmfgUnit->first()->bindedCompletionUnit->id}}">
+                {{-- <a class="btn btn-success btn-block" href="/vmmfg-ops?unit_id={{$vmmfgUnit->first()->bindedCompletionUnit->id}}"> --}}
+                <a class="btn btn-success btn-block" href="/vmmfg-ops?unit_id={{$vmmfgUnit->first()->bindedCompletionUnit->id}}&is_completed=''">
                     {{$vmmfgUnit->first()->bindedCompletionUnit->vmmfgJob->batch_no}} ({{$vmmfgUnit->first()->bindedCompletionUnit->unit_no}})
                     <br> {{$vmmfgUnit->first()->bindedCompletionUnit->vend_id}}
                     <br> {{$vmmfgUnit->first()->bindedCompletionUnit->model}}
@@ -647,7 +660,8 @@
                 <div style="padding: 10px 0px 3px 6px;">
                     Please refer to this unit for final completion
                     <br>
-                    <a class="btn btn-success btn-block" href="/vmmfg-ops?unit_id={{$vmmfgUnit->first()->referCompletionUnit->id}}">
+                    {{-- <a class="btn btn-success btn-block" href="/vmmfg-ops?unit_id={{$vmmfgUnit->first()->referCompletionUnit->id}}"> --}}
+                    <a class="btn btn-success btn-block" href="/vmmfg-ops?unit_id={{$vmmfgUnit->first()->referCompletionUnit->id}}&is_completed=''">
                         {{$vmmfgUnit->first()->referCompletionUnit->vmmfgJob->batch_no}} ({{$vmmfgUnit->first()->referCompletionUnit->unit_no}})
                         <br> {{$vmmfgUnit->first()->referCompletionUnit->vend_id}}
                         <br> {{$vmmfgUnit->first()->referCompletionUnit->model}}

@@ -28,7 +28,7 @@ class VmmfgOps extends Component
     public $showEditModal = false;
     public $selected = [];
     public $unit_id = '';
-    public $is_incomplete = false;
+    public $is_completed = 2;
     public $job;
     // public $unit;
     public $form = [
@@ -38,7 +38,7 @@ class VmmfgOps extends Component
         'date_from' => '',
         'date_to' => '',
         'user_id' => '',
-        'is_incomplete' => '',
+        'is_completed' => 2,
         'remarks' => [],
         'completion_date' => '',
     ];
@@ -56,6 +56,7 @@ class VmmfgOps extends Component
 
     protected $queryString = [
         'unit_id',
+        'is_completed',
     ];
 
     public function mount()
@@ -64,7 +65,12 @@ class VmmfgOps extends Component
             $query->whereNotIn('name', ['superadmin']);
         })->orderBy('name', 'asc')->get();
 
-        $this->units = VmmfgUnit::with('vmmfgJob')->leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')->select('*', 'vmmfg_units.id AS id', 'vmmfg_units.model AS model', 'vmmfg_units.order_date AS order_date')->orderBy('vmmfg_units.order_date')->orderBy('batch_no')->orderBy('unit_no')->get();
+        $this->units = $this->getDefaultUnitsOption($this->is_completed);
+    }
+
+    public function updatedIsCompleted($value)
+    {
+        $this->units = $this->getDefaultUnitsOption($value);
     }
 
     // public function updatedJobId($value)
@@ -103,15 +109,22 @@ class VmmfgOps extends Component
         return [
             'form.job_id' => 'sometimes',
             'form.unit_id' => 'sometimes',
+            'form.is_completed' => 'sometimes',
             'form.remarks.*' => 'sometimes',
-            'form.completion_date' => 'sometimes',
+            'is_completed' => 'sometimes',
         ];
     }
 
 
     public function render()
     {
-        $vmmfgUnit = $this->mainCollections($this->form, $this->unit_id);
+        $filters = [
+            'unit_id' => $this->unit_id,
+            'is_completed' => $this->is_completed,
+            'form' => $this->form
+        ];
+
+        $vmmfgUnit = $this->mainCollections($filters);
 
         if($vmmfgUnit) {
             if($vmmfgUnit->first()->vmmfgTasks) {
@@ -121,7 +134,7 @@ class VmmfgOps extends Component
                     }
                 }
             }
-            $this->form['completion_date'] = $vmmfgUnit->first()->completion_date;
+            // $this->form['completion_date'] = $vmmfgUnit->first()->completion_date;
         }
 
         return view('livewire.vmmfg-ops', ['vmmfgUnit' => $vmmfgUnit]);
@@ -149,13 +162,17 @@ class VmmfgOps extends Component
 
     public function resetFilters()
     {
-        $this->reset(['unit_id', 'form']);
+        $this->reset(['form']);
+        $this->unit_id = '';
+        $this->is_completed = 2;
+        $this->units = $this->getDefaultUnitsOption($this->form['is_completed']);
+        $this->emit('refresh');
     }
 
-    public function updatedFilters()
-    {
-        $this->resetPage();
-    }
+    // public function updatedFilters()
+    // {
+    //     $this->resetPage();
+    // }
 
     public function showEditArea($itemId)
     {
@@ -319,7 +336,13 @@ class VmmfgOps extends Component
 
     public function exportPdf()
     {
-        $vmmfgUnit = $this->mainCollections($this->form, $this->unit_id);
+        $filters = [
+            'unit_id' => $this->unit_id,
+            'is_completed' => $this->is_completed,
+            'form' => $this->form
+        ];
+
+        $vmmfgUnit = $this->mainCollections($filters);
 
         $pdf = PDF::loadView('pdf.vmmfg.ops', [
             'vmmfgUnit' => $vmmfgUnit,
@@ -349,12 +372,13 @@ class VmmfgOps extends Component
         session()->flash('success', 'Your entry has been updated');
     }
 
-    private function mainCollections($filters, $unitId)
+    private function mainCollections($filters)
     {
-        $userId = $filters['user_id'];
-        $dateFrom = $filters['date_from'];
-        $dateTo = $filters['date_to'];
-        $isIncomplete = $filters['is_incomplete'] ? true : false;
+        // $userId = $filters['user_id'];
+        // $dateFrom = $filters['date_from'];
+        // $dateTo = $filters['date_to'];
+        $isCompleted = $filters['is_completed'];
+        $unitId = $filters['unit_id'];
         $vmmfgUnit = '';
 
         if($unitId) {
@@ -367,22 +391,9 @@ class VmmfgOps extends Component
                             'vmmfgTasks',
                             'vmmfgScope',
                             'vmmfgScope.vmmfgTitles',
-                            'vmmfgScope.vmmfgTitles.vmmfgItems'
-                                => function($query) use ($isIncomplete){
-                                    if($isIncomplete === true) {
-                                        $query->whereHas('vmmfgTasks', function($query) use ($isIncomplete) {
-                                            $query->where('is_done', '!=', 1);
-                                        });
-                                    }
-                                },
+                            'vmmfgScope.vmmfgTitles.vmmfgItems',
                             'vmmfgScope.vmmfgTitles.vmmfgItems.attachments',
-                            'vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks'
-                                => function($query) use ($unitId, $isIncomplete){
-                                    $query->when($unitId, fn($query, $input) => $query->search('vmmfg_unit_id', $input));
-                                    if($isIncomplete === true) {
-                                        $query->where('is_done', '!=', 1);
-                                    }
-                                },
+                            'vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks',
                             'vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks.attachments',
                         ])
                         // ->whereHas('vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks', function($query) use ($userId, $dateFrom, $dateTo){
@@ -400,10 +411,32 @@ class VmmfgOps extends Component
                         //                 ->orSearchToDate('undo_done_time', $input)
                         //     );
                         // })
-                        ->when($unitId, fn($query, $input) => $query->search('id', $input))
-                        ->get();
+                        ->when($unitId, fn($query, $input) => $query->search('id', $input));
+
+                        $vmmfgUnit = $vmmfgUnit->get();
         }
 
         return $vmmfgUnit;
+    }
+
+    private function getDefaultUnitsOption($isCompleted)
+    {
+
+        $vmmfgUnitsObj = VmmfgUnit::with('vmmfgJob')
+                                ->leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')
+                                ->select('*', 'vmmfg_units.id AS id', 'vmmfg_units.model AS model', 'vmmfg_units.order_date AS order_date', 'vmmfg_units.completion_date');
+
+            if($isCompleted == 1) {
+                $vmmfgUnitsObj = $vmmfgUnitsObj->whereNotNull('vmmfg_units.completion_date');
+            }elseif ($isCompleted == 2) {
+                $vmmfgUnitsObj = $vmmfgUnitsObj->whereNull('vmmfg_units.completion_date');
+            }
+
+        $vmmfgUnitsObj = $vmmfgUnitsObj->orderBy('vmmfg_units.order_date')
+                            ->orderBy('batch_no')
+                            ->orderBy('unit_no')
+                            ->get();
+
+        return $vmmfgUnitsObj;
     }
 }

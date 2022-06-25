@@ -159,7 +159,7 @@
                                 {{ $unit->vend_id }}
                             </td>
                             <td class="text-center">
-                                <a href="/vmmfg-ops?unit_id={{$unit->id}}">
+                                <a href="/vmmfg-ops?unit_id={{$unit->id}}&is_completed=''">
                                     {{ $unit->unit_no }}
                                 </a>
                             </td>
