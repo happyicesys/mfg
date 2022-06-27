@@ -134,7 +134,7 @@ class VmmfgOps extends Component
                     }
                 }
             }
-            // $this->form['completion_date'] = $vmmfgUnit->first()->completion_date;
+            $this->form['completion_date'] = $vmmfgUnit->first()->completion_date;
         }
 
         return view('livewire.vmmfg-ops', ['vmmfgUnit' => $vmmfgUnit]);
@@ -143,6 +143,7 @@ class VmmfgOps extends Component
     public function edit(VmmfgJob $job)
     {
         $this->form = $job;
+        // $this->form->completion_date = $job->vmmfgUnits()->first()->completion_date;
         $this->units = $job->vmmfgUnits->with('referCompletionUnit');
         // $this->form->completion_date
     }

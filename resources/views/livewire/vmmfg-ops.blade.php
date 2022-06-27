@@ -652,7 +652,7 @@
                     <label for="completion_date">
                         This Partial Completion Date
                     </label>
-                    <input type="date" wire:model.defer="form.completion_date" class="form-control">
+                    <input type="date" wire:model.defer="form.completion_date" class="form-control" value="{{$vmmfgUnit->first()->completion_date}}">
                 </div>
                 <button type="button" class="btn btn-success btn-xs-block" wire:click.prevent="saveCompletionDate({{$vmmfgUnit}})">
                     Save Partial Completion Date
@@ -672,7 +672,7 @@
                         <label for="completion_date">
                             Completion Date
                         </label>
-                        <input type="date" wire:model.defer="form.completion_date" class="form-control">
+                        <input type="date" wire:model.defer="form.completion_date" class="form-control" value="{{$vmmfgUnit->first()->completion_date}}">
                     </div>
                     <button type="button" class="btn btn-success btn-xs-block" wire:click.prevent="saveCompletionDate({{$vmmfgUnit}})">
                         Save Completion Date

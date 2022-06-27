@@ -153,9 +153,9 @@ class Unit extends Component
                                             '*',
                                             'vmmfg_units.id'
                                             )
-                                        ->orderBy('vmmfg_units.order_date')
-                                        ->orderBy('batch_no')
-                                        ->orderBy('unit_no')
+                                        ->orderBy('vmmfg_units.order_date', 'desc')
+                                        ->orderBy('batch_no', 'desc')
+                                        ->orderBy('unit_no', 'desc')
                                         ->get();
     }
 
