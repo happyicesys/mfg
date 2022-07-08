@@ -48,7 +48,9 @@ class Home extends Component
                             $query->whereYear('order_date', '=', $year)
                                     ->orWhereYear('completion_date', '=', $year);
                         })
+                        // dd($jobs->toSql());
                         ->get();
+
 
             foreach($months as $index => $month) {
                 $dataArr[$year][$index] = [

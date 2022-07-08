@@ -288,7 +288,7 @@
                             {{ $job->order_date }}
                         </td>
                         <td class="text-left">
-                            {{ $job->remarks }}
+                            {!!  nl2br($job->remarks) !!}
                         </td>
                         <td class="text-center">
                             {{ $job->vmmfgUnits->count() }}
