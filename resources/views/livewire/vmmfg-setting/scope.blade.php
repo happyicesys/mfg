@@ -205,7 +205,7 @@
                             {{ $scope->name }}
                         </td>
                         <td class="text-left">
-                            {{ $scope->remarks }}
+                            {!!  nl2br($scope->remarks) !!}
                         </td>
                         <td class="text-center">
                             <div class="btn-group">
