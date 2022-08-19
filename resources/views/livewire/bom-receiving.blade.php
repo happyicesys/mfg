@@ -5,9 +5,9 @@
             <h2>Receiving</h2>
             <hr>
             @php
-                $inventoryMovementsArr = $inventoryMovements->toArray();
-                $from = $inventoryMovementsArr['from'];
-                $total = $inventoryMovementsArr['total'];
+                // $inventoryMovementsArr = $inventoryMovements->toArray();
+                // $from = $inventoryMovementsArr['from'];
+                // $total = $inventoryMovementsArr['total'];
                 $profile = \App\Models\Profile::where('is_primary', 1)->first();
             @endphp
             <div class="">
@@ -145,7 +145,7 @@
                         </div>
                         <div>
                             <label style="padding-right:18px; font-weight: bold;">
-                                Showing {{ count($inventoryMovements) }} of {{$total}}
+                                Showing {{ count($inventoryMovements) }} of {{$inventoryMovements->total()}}
                             </label>
                         </div>
                     </div>
@@ -200,7 +200,7 @@
                                     <td class="text-center">
                                         @if($loop->first)
                                             <b>
-                                                {{ $index + $from}}
+                                                {{ $index + $inventoryMovements->firstItem() }}
                                             </b>
                                         @endif
                                     </td>
@@ -366,7 +366,7 @@
                                 </th> --}}
                                 <td class="text-center">
                                     <b>
-                                        {{ $index + $from}}
+                                        {{ $index + $inventoryMovements->firstItem()}}
                                     </b>
                                 </td>
                                 <td class="text-center">

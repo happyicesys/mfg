@@ -5,11 +5,11 @@
             <h2>VM MFG Scopes Settings</h2>
             <hr>
             @inject('vmmfgUnits', 'App\Models\VmmfgUnit')
-            @php
+            {{-- @php
                 $scopesArr = $scopes->toArray();
                 $from = $scopesArr['from'];
                 $total = $scopesArr['total'];
-            @endphp
+            @endphp --}}
             <div class="d-none d-sm-block">
                 <div class="form-group form-inline">
                     <label for="name">
@@ -92,7 +92,7 @@
                         </div>
                         <div>
                             <label style="padding-right:18px; font-weight: bold;">
-                                Showing {{ count($scopes) }} of {{$total}}
+                                Showing {{ count($scopes) }} of {{$scopes->total()}}
                             </label>
                         </div>
                     </div>
@@ -172,7 +172,7 @@
                         </select>
                         <label class="mt-1" for="display_num2" style="padding-right: 20px"> per Page</label>
                         <label class="ml-auto">
-                            Showing {{ count($scopes) }} of {{$total}}
+                            Showing {{ count($scopes) }} of {{$scopes->total()}}
                         </label>
                     </div>
             </div>
@@ -199,7 +199,7 @@
                             <input type="checkbox" wire:model="selected" value="{{$admin->id}}">
                         </th> --}}
                         <td class="text-center">
-                            {{ $index + $from}}
+                            {{ $scopes->firstItem() + $index}}
                         </td>
                         <td class="text-left">
                             {{ $scope->name }}
