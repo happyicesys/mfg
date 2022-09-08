@@ -5,10 +5,7 @@
         {{$slot}}
     </a>
     @if(isset($sortKey) and isset($sortAscending))
-    @php
 
-    // dd((bool)$sortKey == $model, (bool)$sortAscending);
-@endphp
         @if($sortKey == "{{$model}}" and $sortAscending)
             <span class="fa fa-caret-down"></span>
         @endif
