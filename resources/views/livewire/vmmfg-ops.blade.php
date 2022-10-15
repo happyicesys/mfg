@@ -1,7 +1,7 @@
 <div>
     @inject('vmmfgTask', 'App\Models\VmmfgTask')
     @php
-        $profile = \App\Models\Profile::where('is_primary', 1)->first();
+        $profile = \App\Models\Profile::with('profileSetting')->where('is_primary', 1)->first();
     @endphp
     <div>
         <div>

@@ -9,7 +9,7 @@
                 $from = $unitsArr['from'];
                 $total = $unitsArr['total'];
 
-                $profile = \App\Models\Profile::where('is_primary', 1)->first();
+                $profile = \App\Models\Profile::with('profileSetting')->where('is_primary', 1)->first();
             @endphp
             <div class="">
                 <div>
@@ -184,6 +184,7 @@
 
                                     $taskCount = $unit
                                         ->vmmfgTasks()
+                                        ->with(['vmmfgItem', 'vmmfgItem.vmmfgTitle'])
                                         ->whereHas('vmmfgItem', function($query) use ($vmmfgTitleCategory) {
                                             $query->whereHas('vmmfgTitle', function($query) use ($vmmfgTitleCategory) {
                                                 $query->where('vmmfg_title_category_id', $vmmfgTitleCategory->id);
@@ -193,6 +194,7 @@
 
                                     $checkedTaskCount = $unit
                                                         ->vmmfgTasks()
+                                                        ->with(['vmmfgItem', 'vmmfgItem.vmmfgTitle'])
                                                         ->whereHas('vmmfgItem', function($query) use ($vmmfgTitleCategory) {
                                                             $query->whereHas('vmmfgTitle', function($query) use ($vmmfgTitleCategory) {
                                                                 $query->where('vmmfg_title_category_id', $vmmfgTitleCategory->id);
@@ -224,6 +226,14 @@
                                 <td class="text-center text-dark {{$eachColor}}">
                                     {{ $taskCount }} /
                                     {{ $itemCount }}
+                                    <br>
+                                    @if($vmmfgTitleCategory->id == 2 and
+                                        $unit->vmmfgTasks()->whereHas('vmmfgItem', function($query) {
+                                                $query->where('sequence', 'SG-8003-01');
+                                        })->where('is_done', true)->where('is_checked', true)->first()
+                                    )
+                                        <i class="fas fa-check-circle" style="color: green;"></i>
+                                    @endif
                                 </td>
                             @endforeach
                             @php

@@ -392,7 +392,12 @@ class VmmfgOps extends Component
                             'vmmfgTasks',
                             'vmmfgScope',
                             'vmmfgScope.vmmfgTitles',
+                            'vmmfgScope.vmmfgTitles.vmmfgTitleCategory',
                             'vmmfgScope.vmmfgTitles.vmmfgItems',
+                            'vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks.doneBy',
+                            'vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks.checkedBy',
+                            'vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks.undoDoneBy',
+                            'vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks.cancelledBy',
                             'vmmfgScope.vmmfgTitles.vmmfgItems.attachments',
                             'vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTasks'
                                 => function($query) use ($unitId){
@@ -438,7 +443,7 @@ class VmmfgOps extends Component
     private function getDefaultUnitsOption($isCompleted)
     {
 
-        $vmmfgUnitsObj = VmmfgUnit::with('vmmfgJob')
+        $vmmfgUnitsObj = VmmfgUnit::with(['vmmfgJob', 'vmmfgScope'])
                                 ->leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')
                                 ->select('*', 'vmmfg_units.id AS id', 'vmmfg_units.model AS model', 'vmmfg_units.order_date AS order_date', 'vmmfg_units.completion_date');
 
