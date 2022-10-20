@@ -131,13 +131,15 @@ class Job extends Component
         ]);
 
         for($i = 0; $i < $this->unitForm['unit_quantity']; $i++) {
-            VmmfgUnit::create([
+            $vmmfgUnit = VmmfgUnit::create([
                 'unit_no' => $this->unitForm['unit_number'] + $i,
                 'vmmfg_job_id' => $this->form->id,
                 'vmmfg_scope_id' => $this->unitForm['vmmfg_scope_id'],
                 'model' => $this->form->model,
                 'order_date' => $this->unitForm['order_date'],
             ]);
+
+            $vmmfgUnit->update(['code' => $vmmfgUnit->vmmfgJob->batch_no.'-'.$vmmfgUnit->unit_no]);
         }
 
         $this->reset('unitForm');

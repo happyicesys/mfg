@@ -22,6 +22,7 @@ class Unit extends Component
     public $selected = [];
     public $filters = [
         'search' => '',
+        'code' => '',
         'unit_no' => '',
         'batch_no' => '',
         'vend_id' => '',
@@ -88,6 +89,7 @@ class Unit extends Component
 
         // advance search
         $units = $units
+                ->when($this->filters['code'], fn($query, $input) => $query->searchLike('vmmfg_units.code', $input))
                 ->when($this->filters['unit_no'], fn($query, $input) => $query->searchLike('vmmfg_units.unit_no', $input))
                 ->when($this->filters['vend_id'], fn($query, $input) => $query->searchLike('vmmfg_units.vend_id', $input));
 
@@ -164,6 +166,7 @@ class Unit extends Component
         // dd($this->unitForm->toArray());
         $this->validate();
         $this->unitForm->save();
+        $this->unitForm->update(['code' => $this->unitForm->vmmfgJob->batch_no.'-'.$this->unitForm->unit_no]);
         $this->emit('refresh');
         $this->emit('updated');
         session()->flash('success', 'Your entry has been updated');

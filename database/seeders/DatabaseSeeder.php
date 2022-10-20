@@ -36,7 +36,8 @@ class DatabaseSeeder extends Seeder
             // SupplierAccessSeeder::class,
             // CurrencyRateSeeder::class,
             // PermissionVmmfgInventoryAccessSeeder::class,
-            SupervisorRoleSeeder::class,
+            // SupervisorRoleSeeder::class,
+            VmmfgUnitCodeSeeder::class,
        ]);
     //    \App\Models\User::factory(150)->create();
     }

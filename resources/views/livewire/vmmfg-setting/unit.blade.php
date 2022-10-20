@@ -17,6 +17,12 @@
                             <div class="form-row">
                                 <div class="form-group col-md-4 col-xs-12">
                                     <label>
+                                        Serial
+                                    </label>
+                                    <input wire:model="filters.code" type="text" class="form-control" placeholder="Serial">
+                                </div>
+                                <div class="form-group col-md-4 col-xs-12">
+                                    <label>
                                         Unit No
                                     </label>
                                     <input wire:model="filters.unit_no" type="text" class="form-control" placeholder="Unit No">
@@ -120,6 +126,9 @@
                         <th class="text-center">
                             #
                         </th>
+                        <x-th-data model="code" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
+                            Serial
+                        </x-th-data>
                         <x-th-data model="batch_no" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             {{$profile->profileSetting ? $profile->profileSetting->vmmfg_job_batch_no_title : 'Batch No'}}
                         </x-th-data>
@@ -148,8 +157,12 @@
                         {{-- <th class="text-center">
                             <input type="checkbox" wire:model="selected" value="{{$admin->id}}">
                         </th> --}}
+
                         <td class="text-center">
                             {{ $index + $from}}
+                        </td>
+                        <td class="text-center">
+                            {{ $unit->code }}
                         </td>
                         <td class="text-center">
                             {{ $unit->vmmfgJob->batch_no }}

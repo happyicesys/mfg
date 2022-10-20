@@ -21,6 +21,7 @@ class VmmfgUnit extends Model
         'model',
         'order_date',
         'refer_completion_unit_id',
+        'code'
     ];
 
     //relationships
