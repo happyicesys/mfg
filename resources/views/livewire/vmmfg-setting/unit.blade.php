@@ -17,9 +17,9 @@
                             <div class="form-row">
                                 <div class="form-group col-md-4 col-xs-12">
                                     <label>
-                                        Serial
+                                        Serial No
                                     </label>
-                                    <input wire:model="filters.code" type="text" class="form-control" placeholder="Serial">
+                                    <input wire:model="filters.code" type="text" class="form-control" placeholder="Serial No">
                                 </div>
                                 <div class="form-group col-md-4 col-xs-12">
                                     <label>
@@ -44,7 +44,7 @@
                                         Date From
                                     </label>
                                     <div class="input-group">
-                                        <input type="date" class="form-control" wire:model.defer="filters.date_from">
+                                        <input type="date" class="form-control" wire:model="filters.date_from">
                                         <div class="input-group-append">
                                             <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateClicked(-1, 'date_from')">
                                                 <i class="fas fa-caret-left"></i>
@@ -60,7 +60,7 @@
                                         Date To
                                     </label>
                                     <div class="input-group">
-                                        <input type="date" class="form-control" wire:model.defer="filters.date_to">
+                                        <input type="date" class="form-control" wire:model="filters.date_to">
                                         <div class="input-group-append">
                                             <button class="btn btn-outline-secondary" wire:click.prevent="onPrevNextDateClicked(-1, 'date_to')">
                                                 <i class="fas fa-caret-left"></i>
@@ -127,7 +127,7 @@
                             #
                         </th>
                         <x-th-data model="code" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
-                            Serial
+                            Serial No
                         </x-th-data>
                         <x-th-data model="batch_no" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             {{$profile->profileSetting ? $profile->profileSetting->vmmfg_job_batch_no_title : 'Batch No'}}
@@ -162,13 +162,14 @@
                             {{ $index + $from}}
                         </td>
                         <td class="text-center">
-                            {{ $unit->code }}
+                            <a href="/vmmfg-ops?unit_id={{$unit->id}}&is_completed=''">
+                                {{ $unit->code }}
+                            </a>
                         </td>
                         <td class="text-center">
                             {{ $unit->vmmfgJob->batch_no }}
                         </td>
                         <td class="text-center">
-                            {{-- <a href="/vmmfg-ops?unit_id={{$unit->id}}"> --}}
                             <a href="/vmmfg-ops?unit_id={{$unit->id}}&is_completed=''">
                                 {{ $unit->unit_no }}
                             </a>

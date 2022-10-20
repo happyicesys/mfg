@@ -98,7 +98,6 @@ class Unit extends Component
                 $query->searchLike('batch_no', $input);
             });
         }
-
         if($dateFrom = $this->filters['date_from']) {
             $units = $units->where(function($query) use ($dateFrom) {
                 $query->searchFromDate('vmmfg_units.order_date', $dateFrom);
