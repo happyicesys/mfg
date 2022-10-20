@@ -144,10 +144,10 @@
                         <x-th-data model="vmmfg_units.vmmfg_scope_id" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Scope
                         </x-th-data>
-                        <x-th-data model="order_date" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
+                        <x-th-data model="vmmfg_units.order_date" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Start Date
                         </x-th-data>
-                        <x-th-data model="completion_date" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
+                        <x-th-data model="vmmfg_units.completion_date" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Completion Date
                         </x-th-data>
                         <th></th>
