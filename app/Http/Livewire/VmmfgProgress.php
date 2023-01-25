@@ -55,6 +55,7 @@ class VmmfgProgress extends Component
             'vmmfgTasks',
             'vmmfgTasks.vmmfgItem',
             'vmmfgTasks.vmmfgItem.vmmfgTitle',
+            'vmmfgTasks.vmmfgItem.vmmfgTitle.vmmfgItems',
             ])
             ->withCount('vmmfgTasks')
             ->leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')

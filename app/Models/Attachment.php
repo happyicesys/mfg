@@ -16,6 +16,7 @@ class Attachment extends Model
         'sequence',
         'modelable_id',
         'modelable_type',
+        'filename',
     ];
 
     // relationships

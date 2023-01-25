@@ -2,6 +2,10 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             @foreach($years as $year)
+                @php
+                    $totalOrder = 0;
+                    $totalComplete = 0;
+                @endphp
                 <div class="card mt-2">
                     <div class="card-header">
                         For Year {{$year}}
@@ -24,7 +28,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($dataArr[$year] as $data)
+                                    @foreach($dataArr[$year] as $index => $data)
                                         <tr>
                                             <td scope="row" align="center">
                                                 {{$data['name']}}
@@ -36,6 +40,29 @@
                                                 {{$data['completion']}}
                                             </td>
                                         </tr>
+                                        @php
+                                            $totalOrder += $data['order'];
+                                            $totalComplete += $data['completion'];
+                                        @endphp
+                                        @if($index == count($dataArr[$year]))
+                                            <tr>
+                                                <td scope="row" align="center">
+                                                    <strong>
+                                                        Total
+                                                    </strong>
+                                                </td>
+                                                <td class="text-center">
+                                                    <strong>
+                                                        {{$totalOrder}}
+                                                    </strong>
+                                                </td>
+                                                <td class="text-center">
+                                                    <strong>
+                                                        {{$totalComplete}}
+                                                    </strong>
+                                                </td>
+                                            </tr>
+                                        @endif
                                     @endforeach
                                 </tbody>
 

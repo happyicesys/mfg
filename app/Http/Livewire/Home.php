@@ -37,6 +37,10 @@ class Home extends Component
         $dataArr = [];
 
         foreach($years as $year) {
+            // $dataArr[$year] = [
+            //     'totalOrder' => 0,
+            //     'totalComplete' => 0,
+            // ];
             $jobs = VmmfgUnit::select(
                             DB::raw('MONTH(order_date) AS order_month'),
                             DB::raw('MONTH(completion_date) AS completion_month'),
@@ -62,9 +66,11 @@ class Home extends Component
                 foreach($jobs as $job) {
                     if($job->order_month === $index and $job->order_year === $year) {
                         $dataArr[$year][$index]['order'] += 1;
+                        // $dataArr[$year]['totalOrder'] += 1;
                     }
                     if($job->completion_month === $index and $job->refer_completion_unit_id === null and $job->completion_year === $year) {
                         $dataArr[$year][$index]['completion'] += 1;
+                        // $dataArr[$year]['totalComplete'] += 1;
                     }
                 }
             }

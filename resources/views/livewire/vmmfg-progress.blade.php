@@ -209,6 +209,7 @@
                                             $itemCount += $title->vmmfgItems()->count();
                                         }
                                     }
+                                    // $itemCount = $unit->vmmfgScope->vmmfgTitles->where('vmmfg_title_category_id', $vmmfgTitleCategory->id)->count('vmmfgItems');
 
                                     $eachProgressPercent = round($taskCount/($itemCount ? $itemCount : 1) * 100);
 
@@ -217,7 +218,6 @@
                                     }else if($eachProgressPercent >= 80 and $eachProgressPercent < 100) {
                                         $eachColor = 'bg-warning';
                                     }
-//
                                     $totalItemCount += $itemCount;
                                     $totalTaskCount += $taskCount;
                                     $totalCheckedTaskCount += $checkedTaskCount;
