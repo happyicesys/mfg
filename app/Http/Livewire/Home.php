@@ -41,7 +41,12 @@ class Home extends Component
             //     'totalOrder' => 0,
             //     'totalComplete' => 0,
             // ];
-            $jobs = VmmfgUnit::select(
+            $jobs = VmmfgUnit::with([
+                            'bindedCompletionUnit',
+                            'referCompletionUnit',
+                        ])
+                        ->select(
+                            '*',
                             DB::raw('MONTH(order_date) AS order_month'),
                             DB::raw('MONTH(completion_date) AS completion_month'),
                             DB::raw('YEAR(order_date) AS order_year'),
@@ -52,7 +57,6 @@ class Home extends Component
                             $query->whereYear('order_date', '=', $year)
                                     ->orWhereYear('completion_date', '=', $year);
                         })
-                        // dd($jobs->toSql());
                         ->get();
 
 
@@ -65,12 +69,14 @@ class Home extends Component
                 ];
                 foreach($jobs as $job) {
                     if($job->order_month === $index and $job->order_year === $year) {
-                        $dataArr[$year][$index]['order'] += 1;
-                        // $dataArr[$year]['totalOrder'] += 1;
+                        if(!$job->bindedCompletionUnit()->exists()) {
+                            $dataArr[$year][$index]['order'] += 1;
+                        }
                     }
                     if($job->completion_month === $index and $job->refer_completion_unit_id === null and $job->completion_year === $year) {
-                        $dataArr[$year][$index]['completion'] += 1;
-                        // $dataArr[$year]['totalComplete'] += 1;
+                        if(!$job->referCompletionUnit()->exists()) {
+                            $dataArr[$year][$index]['completion'] += 1;
+                        }
                     }
                 }
             }
