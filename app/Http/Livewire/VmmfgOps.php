@@ -257,19 +257,10 @@ class VmmfgOps extends Component
 
         $url = $this->file->storePublicly('tasks', 'digitaloceanspaces');
         $name = $this->file->getClientOriginalName();
-        $attachmentHasSameName = Attachment::whereHasMorph(
-            'modelable',
-            VmmfgTask::class,
-            function(Builder $query) {
-                $query->where('name', '=', $name);
-            }
-        )->get();
         $fullUrl = Storage::url($url);
         $task->attachments()->create([
             'url' => $url,
             'full_url' => $fullUrl,
-            'filename' => $name,
-            'is_replicated' => count($attachmentHasSameName) > 0 ? true : false,
         ]);
     }
 
