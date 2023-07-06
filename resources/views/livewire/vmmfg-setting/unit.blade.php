@@ -266,6 +266,9 @@
                         Edit Unit
                     </x-slot>
                     <x-slot name="content">
+                        <x-input type="text" model="unitForm.code">
+                            Serial No
+                        </x-input>
                         <x-input type="text" model="unitForm.unit_no">
                             Unit No
                         </x-input>

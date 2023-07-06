@@ -165,7 +165,9 @@ class Unit extends Component
         // dd($this->unitForm->toArray());
         $this->validate();
         $this->unitForm->save();
-        $this->unitForm->update(['code' => $this->unitForm->vmmfgJob->batch_no.'-'.$this->unitForm->unit_no]);
+        $this->unitForm->update([
+            'code' => $this->unitForm->code ? $this->unitForm->code : $this->unitForm->vmmfgJob->batch_no.'-'.$this->unitForm->unit_no
+        ]);
         $this->emit('refresh');
         $this->emit('updated');
         session()->flash('success', 'Your entry has been updated');
