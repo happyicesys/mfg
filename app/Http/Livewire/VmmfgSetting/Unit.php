@@ -42,6 +42,7 @@ class Unit extends Component
     public function rules()
     {
         return [
+            'unitForm.code' => 'sometimes',
             'unitForm.unit_no' => 'required',
             'unitForm.vend_id' => 'sometimes',
             'unitForm.completion_date' => 'sometimes',
