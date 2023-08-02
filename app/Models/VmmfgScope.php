@@ -19,7 +19,7 @@ class VmmfgScope extends Model
     //relationships
     public function vmmfgTitles()
     {
-        return $this->hasMany(VmmfgTitle::class)->orderBy('sequence', 'asc')->orderBy('created_at', 'desc');
+        return $this->hasMany(VmmfgTitle::class)->orderBy('sequence', 'asc')->orderBy('created_at', 'desc')->with('vmmfgItems');
     }
 
     public function vmmfgUnits()

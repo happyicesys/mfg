@@ -210,7 +210,7 @@
                                                         })
                                                         ->count();
 
-                                    foreach($unit->vmmfgScope->vmmfgTitles as $title) {
+                                    foreach($unit->vmmfgScope->vmmfgTitles() as $title) {
                                         if($title->vmmfg_title_category_id === $vmmfgTitleCategory->id) {
                                             $itemCount += $title->vmmfgItems()->count();
                                         }
