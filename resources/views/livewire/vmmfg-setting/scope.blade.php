@@ -529,7 +529,7 @@
                         <div class="form-group">
                             @if($this->item->attachments)
                                 @foreach($this->item->attachments as $attachmentIndex => $attachment)
-                                <div class="card" style="max-width:600px;width:100%;" wire:key="attachment-{{$attachmentIndex}}">
+                                <div class="card" style="max-width:600px;width:100%;" wire:key="attachment-{{$attachment->id}}">
                                         @php
                                             $ext = pathinfo($attachment->full_url, PATHINFO_EXTENSION);
                                         @endphp

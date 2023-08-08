@@ -50,11 +50,7 @@ class VmmfgProgress extends Component
             'vmmfgScope.vmmfgTitles' => function($query) {
                 $query->withCount('vmmfgItems');
             },
-            'vmmfgScope.vmmfgTitles.vmmfgItems',
             'vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTitle',
-            'vmmfgTasks',
-            'vmmfgTasks.vmmfgItem',
-            'vmmfgTasks.vmmfgItem.vmmfgTitle',
             'vmmfgTasks.vmmfgItem.vmmfgTitle.vmmfgItems',
             ])
             ->withCount('vmmfgTasks')

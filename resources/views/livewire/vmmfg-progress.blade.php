@@ -210,13 +210,25 @@
                                                         })
                                                         ->count();
 
-                                    foreach($unit->vmmfgScope->vmmfgTitles as $title) {
-                                        if($title->vmmfg_title_category_id === $vmmfgTitleCategory->id) {
-                                            $itemCount += $title->vmmfgItems()->count();
-                                        }
-                                    }
-                                    // $itemCount = $unit->vmmfgScope->vmmfgTitles->where('vmmfg_title_category_id', $vmmfgTitleCategory->id)->count('vmmfgItems');
 
+                                    // foreach($unit->vmmfgScope->vmmfgTitles as $title) {
+                                    //     if($title->vmmfg_title_category_id === $vmmfgTitleCategory->id) {
+                                    //         $itemCount += $title->vmmfgItems()->count();
+                                    //     }
+                                    // }
+                                    // $itemCount = $unit->vmmfgScope->vmmfgTitles()
+                                    //     ->where('vmmfg_title_category_id', $vmmfgTitleCategory->id)
+                                    //     ->withCount('vmmfgItems')
+                                    //     ->get()
+                                    //     ->map(function($title) {
+                                    //         return $title->vmmfg_items_count;
+                                    //     })
+                                    //     ->reduce(function($carry, $value) {
+                                    //         return $carry + $value;
+                                    //     });
+                                       $itemCount  = 0;
+                                    // count('vmmfgItems');
+                                    // dd($itemCount);
                                     $eachProgressPercent = round($taskCount/($itemCount ? $itemCount : 1) * 100);
 
                                     if($eachProgressPercent == 100) {
