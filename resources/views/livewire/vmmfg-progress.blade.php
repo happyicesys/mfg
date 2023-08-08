@@ -216,17 +216,17 @@
                                     //         $itemCount += $title->vmmfgItems()->count();
                                     //     }
                                     // }
-                                    // $itemCount = $unit->vmmfgScope->vmmfgTitles()
-                                    //     ->where('vmmfg_title_category_id', $vmmfgTitleCategory->id)
-                                    //     ->withCount('vmmfgItems')
-                                    //     ->get()
-                                    //     ->map(function($title) {
-                                    //         return $title->vmmfg_items_count;
-                                    //     })
-                                    //     ->reduce(function($carry, $value) {
-                                    //         return $carry + $value;
-                                    //     });
-                                       $itemCount  = 0;
+                                    $itemCount = $unit->vmmfgScope->vmmfgTitles()
+                                        ->where('vmmfg_title_category_id', $vmmfgTitleCategory->id)
+                                        ->withCount('vmmfgItems')
+                                        ->get()
+                                        ->map(function($title) {
+                                            return $title->vmmfg_items_count;
+                                        })
+                                        ->reduce(function($carry, $value) {
+                                            return $carry + $value;
+                                        });
+                                    //    $itemCount  = 0;
                                     // count('vmmfgItems');
                                     // dd($itemCount);
                                     $eachProgressPercent = round($taskCount/($itemCount ? $itemCount : 1) * 100);
