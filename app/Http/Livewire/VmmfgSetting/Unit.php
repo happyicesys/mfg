@@ -150,6 +150,7 @@ class Unit extends Component
         $this->unitForm = $unit;
         $this->unitSelections = VmmfgUnit::query()
                                         ->leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')
+                                        ->doesntHave('bindedCompletionUnit')
                                         ->where('vmmfg_units.id', '<>', $unit->id)
                                         ->select(
                                             '*',
