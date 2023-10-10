@@ -150,6 +150,9 @@
                         <x-th-data model="vmmfg_units.completion_date" sortKey="{{$sortKey}}" sortAscending="{{$sortAscending}}">
                             Completion Date
                         </x-th-data>
+                        <th class="text-center" style="color: black;">
+                            Status
+                        </th>
                         <th></th>
                     </tr>
                     @forelse($units as $index => $unit)
@@ -196,6 +199,18 @@
                                 <br>
                             @endif
                             {{ $unit->completion_date }}
+                        </td>
+                        <td class="text-center">
+                            @if($unit->origin)
+                                <span class="badge badge-success">
+                                    From: {{$unit->origin}}
+                                </span>
+                            @endif
+                            @if($unit->destination)
+                                <span class="badge badge-success">
+                                    To: {{$unit->destination}}
+                                </span>
+                            @endif
                         </td>
                         <td class="text-center">
                             <button type="button" wire:click="edit({{$unit->id}})" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#edit-unit">
@@ -264,6 +279,16 @@
                 <x-modal id="edit-unit">
                     <x-slot name="title">
                         Edit Unit
+                        @if(isset($unitForm['origin']))
+                            <span class="badge badge-success">
+                                From: {{$unitForm['origin']}}
+                            </span>
+                        @endif
+                        @if(isset($unitForm['destination']))
+                            <span class="badge badge-success">
+                                To: {{$unitForm['destination']}}
+                            </span>
+                        @endif
                     </x-slot>
                     <x-slot name="content">
                         <x-input type="text" model="unitForm.code">
@@ -324,6 +349,23 @@
                                 @endforeach
                             </select>
                         </div>
+                        <hr>
+                        <div class="form-group">
+                            <label for="destination">
+                                Transfer Unit to
+                            </label>
+                            <select name="destination" wire:model.defer="unitForm.destination" class="select form-control">
+                                <option value="">
+                                    Select...
+                                </option>
+                                @foreach($unitTransferDestinationOptions as $unitTransferDestinationOptionIndex => $unitTransferDestinationOption)
+                                    <option value="{{$unitTransferDestinationOptionIndex}}">
+                                        {{$unitTransferDestinationOptionIndex . ' - ' . $unitTransferDestinationOption}}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
                     </x-slot>
                     <x-slot name="footer">
                         <div class="btn-group">

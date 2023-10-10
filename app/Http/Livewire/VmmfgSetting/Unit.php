@@ -3,12 +3,14 @@
 namespace App\Http\Livewire\VmmfgSetting;
 
 use App\Models\Attachment;
+use App\Models\UnitTransferDestination;
 use App\Models\VmmfgScope;
 use App\Models\VmmfgUnit;
 use DB;
 use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Illuminate\Support\Facades\Http;
 
 class Unit extends Component
 {
@@ -32,7 +34,9 @@ class Unit extends Component
     ];
     public $scopes;
     public $unitSelections;
+    public $unitTransferDestinationOptions;
 
+    public VmmfgUnit $previousUnitForm;
     public VmmfgUnit $unitForm;
 
     protected $listeners = [
@@ -50,6 +54,8 @@ class Unit extends Component
             'unitForm.vmmfg_scope_id' => 'sometimes',
             'unitForm.order_date' => 'sometimes',
             'unitForm.refer_completion_unit_id' => 'sometimes',
+            'unitForm.destination' => 'sometimes',
+            'unitForm.origin' => 'sometimes',
         ];
     }
 
@@ -57,38 +63,24 @@ class Unit extends Component
     {
         $this->scopes = VmmfgScope::latest()->get();
         $this->unitSelections = [];
+        $this->unitTransferDestinationOptions = UnitTransferDestination::OPTIONS;
     }
 
     public function render()
     {
-        // $units = VmmfgUnit::query()
-        //                 ->leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')
-        //                 ->leftJoin('vmmfg_scopes', 'vmmfg_scopes.id', '=', 'vmmfg_units.vmmfg_scope_id')
-        //                 ->leftJoin('vmmfg_units AS refer_completion_units', 'refer_completion_units.id', '=', 'vmmfg_units.refer_completion_unit_id')
-        //                 ->leftJoin('vmmfg_jobs AS refer_completion_unit_jobs', 'refer_completion_unit_jobs.id', '=', 'refer_completion_units.vmmfg_job_id')
-        //                 ->select(
-        //                     '*',
-        //                     'vmmfg_units.id AS id',
-        //                     'vmmfg_units.completion_date',
-        //                     'vmmfg_units.model AS model',
-        //                     'vmmfg_units.order_date AS order_date',
-        //                     'vmmfg_units.unit_no',
-        //                     'vmmfg_units.vend_id',
-        //                     'vmmfg_jobs.batch_no',
-        //                     'vmmfg_scopes.name AS scope_name'
-        //                 );
-
-        $units = VmmfgUnit::with('vmmfgJob', 'referCompletionUnit')
+        $units = VmmfgUnit::with('vmmfgJob', 'vmmfgScope', 'referCompletionUnit')
                         ->leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')
                         ->select(
                             '*',
                             'vmmfg_units.id AS id',
                             'vmmfg_units.completion_date AS completion_date',
                             'vmmfg_units.model AS model',
-                            'vmmfg_units.order_date AS order_date'
+                            'vmmfg_units.order_date AS order_date',
+                            'vmmfg_units.refer_completion_unit_id AS refer_completion_unit_id',
+                            'vmmfg_units.origin',
+                            'vmmfg_units.destination',
                         );
 
-        // advance search
         $units = $units
                 ->when($this->filters['code'], fn($query, $input) => $query->searchLike('vmmfg_units.code', $input))
                 ->when($this->filters['unit_no'], fn($query, $input) => $query->searchLike('vmmfg_units.unit_no', $input))
@@ -129,8 +121,6 @@ class Unit extends Component
 
         $units = $units->paginate($this->itemPerPage);
 
-
-        // dd($units->toArray());
         return view('livewire.vmmfg-setting.unit', ['units' => $units]);
     }
 
@@ -148,6 +138,7 @@ class Unit extends Component
     public function edit(VmmfgUnit $unit)
     {
         $this->unitForm = $unit;
+        $this->previousUnitForm = $unit;
         $this->unitSelections = VmmfgUnit::query()
                                         ->leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')
                                         ->doesntHave('bindedCompletionUnit')
@@ -164,12 +155,23 @@ class Unit extends Component
 
     public function save()
     {
-        // dd($this->unitForm->toArray());
         $this->validate();
         $this->unitForm->save();
         $this->unitForm->update([
-            'code' => $this->unitForm->code ? $this->unitForm->code : $this->unitForm->vmmfgJob->batch_no.'-'.$this->unitForm->unit_no
+            'code' => $this->unitForm->code ? $this->unitForm->code : $this->unitForm->vmmfgJob->batch_no.'-'.$this->unitForm->unit_no,
+            'vmmfg_job_json' => $this->unitForm->vmmfgJob,
+            'vmmfg_scope_json' => $this->unitForm->vmmfgScope,
         ]);
+
+        if($this->unitForm and ($this->unitForm->destination != $this->previousUnitForm->destination)) {
+            $response = $this->createUnitTransfer();
+            if($response->failed()) {
+                $this->emit('refresh');
+                $this->emit('updated');
+                session()->flash('error', 'This Unit has Failed to Transfer');
+            }
+        }
+
         $this->emit('refresh');
         $this->emit('updated');
         session()->flash('success', 'Your entry has been updated');
@@ -228,5 +230,12 @@ class Unit extends Component
         }else {
             $this->filters[$model] = $date->subDay()->toDateString();
         }
+    }
+
+    private function createUnitTransfer()
+    {
+        $response = Http::post(UnitTransferDestination::OPTIONS[$this->unitForm->destination] . UnitTransferDestination::DIRECTORY, $this->unitForm->toArray());
+
+        return $response;
     }
 }
