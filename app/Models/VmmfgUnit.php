@@ -12,6 +12,7 @@ class VmmfgUnit extends Model
     use HasFactory, HasSearch;
 
     protected $fillable = [
+        'current',
         'destination',
         'origin',
         'origin_vmmfg_job_json',

@@ -324,6 +324,9 @@
                         <x-input type="text" model="form.batch_no">
                             {{$profile->profileSetting ? $profile->profileSetting->vmmfg_job_batch_no_title : 'Batch No'}}
                         </x-input>
+                        {{-- <x-input type="text" model="unitForm.vend_id">
+                            {{$profile->profileSetting ? $profile->profileSetting->vmmfg_unit_vend_id_title : 'Vend ID'}}
+                        </x-input> --}}
                         <x-input type="text" model="form.model">
                             Model
                         </x-input>
@@ -462,6 +465,9 @@
                     <x-input type="text" model="form.batch_no">
                         {{$profile->profileSetting ? $profile->profileSetting->vmmfg_job_batch_no_title : 'Batch No'}}
                     </x-input>
+                    {{-- <x-input type="text" model="unitForm.vend_id">
+                        {{$profile->profileSetting ? $profile->profileSetting->vmmfg_unit_vend_id_title : 'Vend ID'}}
+                    </x-input> --}}
                     <x-input type="text" model="form.model">
                         Model
                     </x-input>

@@ -10,9 +10,11 @@ class UnitTransferController extends Controller
 {
     public function store(Request $request)
     {
+        // dd($request->all());
         VmmfgUnit::create([
+            'current' => $request->current,
             'destination' => null,
-            'origin' => $request->destination,
+            'origin' => $request->current,
             'origin_vmmfg_job_json' => $request->vmmfg_job_json,
             'origin_vmmfg_scope_json' => $request->vmmfg_scope_json,
             'unit_no' => $request->unit_no ? $request->unit_no : 0,

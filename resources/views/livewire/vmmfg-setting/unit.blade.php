@@ -211,7 +211,7 @@
                                 </span>
                             @endif
                             @if($unit->destination)
-                                <span class="badge badge-success">
+                                <span class="badge badge-danger">
                                     To: {{$unit->destination}}
                                 </span>
                             @endif
@@ -376,7 +376,7 @@
                                 </span>
                             @endif
                             @if(isset($unitForm['destination']))
-                                <span class="badge badge-success">
+                                <span class="badge badge-danger">
                                     To: {{$unitForm['destination']}}
                                 </span>
                             @endif

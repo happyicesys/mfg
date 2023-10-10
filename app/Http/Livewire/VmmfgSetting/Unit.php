@@ -163,6 +163,7 @@ class Unit extends Component
             'vmmfg_scope_json' => $this->unitForm->vmmfgScope,
             'origin' => $this->unitForm->origin ? $this->unitForm->origin : null,
             'destination' => $this->unitForm->destination ? $this->unitForm->destination : null,
+            'current' => $this->unitForm->current ? $this->unitForm->current : env('APP_CURRENT_LOCATION')
         ]);
 
         if($this->unitForm->destination and ($this->unitForm->destination != $this->previousUnitForm->destination)) {
@@ -195,6 +196,9 @@ class Unit extends Component
             }
         }
         $this->unitForm->delete();
+
+        $this->unitForm = new VmmfgUnit;
+        $this->previousUnitForm = new VmmfgUnit;
         $this->emit('refresh');
         $this->emit('updated');
         session()->flash('success', 'Your entry has been deleted');
@@ -240,7 +244,7 @@ class Unit extends Component
             'debug' => true,
         ])->post(UnitTransferDestination::OPTIONS[$this->unitForm->destination] . UnitTransferDestination::DIRECTORY, $this->unitForm->toArray());
 
-        dd(UnitTransferDestination::OPTIONS[$this->unitForm->destination] . UnitTransferDestination::DIRECTORY, $response, $response->body());
+        // dd(UnitTransferDestination::OPTIONS[$this->unitForm->destination] . UnitTransferDestination::DIRECTORY, $response, $response->body());
         return $response;
     }
 }
