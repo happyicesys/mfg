@@ -170,7 +170,7 @@
                             {{-- </a> --}}
                         </td>
                         <td class="text-center">
-                            {{ $unit->vmmfgJob ? $unit->vmmfgJob->batch_no : $unit->origin_vmmfg_job_json['batch_no'] }}
+                            {{ $unit->vmmfgJob ? $unit->vmmfgJob->batch_no : (isset($unit->origin_vmmfg_job_json['batch_no']) ? $unit->origin_vmmfg_job_json['batch_no'] : null) }}
                         </td>
                         <td class="text-center">
                             @if($unit->vmmfgScope)
