@@ -163,7 +163,7 @@ class Unit extends Component
             'vmmfg_scope_json' => $this->unitForm->vmmfgScope,
         ]);
 
-        if($this->unitForm and ($this->unitForm->destination != $this->previousUnitForm->destination)) {
+        if($this->unitForm->destination and ($this->unitForm->destination != $this->previousUnitForm->destination)) {
             $response = $this->createUnitTransfer();
             if($response->failed()) {
                 $this->emit('refresh');
