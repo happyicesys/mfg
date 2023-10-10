@@ -318,19 +318,23 @@
                         <x-input type="text" model="unitForm.model">
                             Model
                         </x-input>
-                        <div class="form-group">
-                            <label for="vmmfg_scope_id">
-                                Scope
-                            </label>
-                            <select name="vmmfg_scope_id" wire:model="unitForm.vmmfg_scope_id" class="select form-control">
-                                <option value="">Select..</option>
-                                @foreach($this->scopes as $scope)
-                                    <option value="{{$scope->id}}">
-                                        {{$scope->name}} @if($scope->remarks)({{$scope->remarks}})@endif
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                        @if(isset($unitForm['origin']))
+
+                        @else
+                            <div class="form-group">
+                                <label for="vmmfg_scope_id">
+                                    Scope
+                                </label>
+                                <select name="vmmfg_scope_id" wire:model="unitForm.vmmfg_scope_id" class="select form-control">
+                                    <option value="">Select..</option>
+                                    @foreach($this->scopes as $scope)
+                                        <option value="{{$scope->id}}">
+                                            {{$scope->name}} @if($scope->remarks)({{$scope->remarks}})@endif
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif
                         <div class="form-group">
                             <label for="start_date">
                                 Start Date
