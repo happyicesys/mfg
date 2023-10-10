@@ -34,6 +34,7 @@ class Job extends Component
         'unit_number' => '',
         'vmmfg_scope_id' => '',
         'order_date' => '',
+        'vend_id' => '',
     ];
 
     public VmmfgJob $form;
@@ -49,7 +50,7 @@ class Job extends Component
             'form.order_date' => 'required',
             'form.completion_date' => 'sometimes',
             'form.remarks' => 'sometimes',
-            // 'form.vend_id' => 'sometimes',
+            'form.vend_id' => 'sometimes',
         ];
     }
 
@@ -109,6 +110,13 @@ class Job extends Component
     {
         $this->validate();
         $this->form->save();
+        if($this->form->vmmfgUnits) {
+            foreach($this->form->vmmfgUnits as $unit) {
+                $unit->update([
+                    'vend_id' => $this->form->vend_id,
+                ]);
+            }
+        }
         $this->emit('updated');
         session()->flash('success', 'Your entry has been updated');
     }
@@ -139,7 +147,7 @@ class Job extends Component
                 'vmmfg_scope_id' => $this->unitForm['vmmfg_scope_id'],
                 'model' => $this->form->model,
                 'order_date' => $this->unitForm['order_date'],
-                // 'vend_id' => $this->unitForm['vend_id'] ? $this->unitForm['vend_id'] : null,
+                'vend_id' => $this->form->vend_id ? $this->form->vend_id : null,
             ]);
 
             $vmmfgUnit->update(['code' => $vmmfgUnit->vmmfgJob->batch_no.'-'.$vmmfgUnit->unit_no]);

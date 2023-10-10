@@ -19,6 +19,7 @@ class VmmfgJob extends Model
         'due_date',
         'completion_date',
         'remarks',
+        'vend_id',
     ];
 
     // getter

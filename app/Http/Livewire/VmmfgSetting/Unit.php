@@ -240,9 +240,7 @@ class Unit extends Component
 
     private function createUnitTransfer()
     {
-        $response = Http::withOptions([
-            'debug' => true,
-        ])->post(UnitTransferDestination::OPTIONS[$this->unitForm->destination] . UnitTransferDestination::DIRECTORY, $this->unitForm->toArray());
+        $response = Http::post(UnitTransferDestination::OPTIONS[$this->unitForm->destination] . UnitTransferDestination::DIRECTORY, $this->unitForm->toArray());
 
         // dd(UnitTransferDestination::OPTIONS[$this->unitForm->destination] . UnitTransferDestination::DIRECTORY, $response, $response->body());
         return $response;
