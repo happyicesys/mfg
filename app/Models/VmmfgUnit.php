@@ -14,6 +14,8 @@ class VmmfgUnit extends Model
     protected $fillable = [
         'destination',
         'origin',
+        'origin_vmmfg_job_json',
+        'origin_vmmfg_scope_json',
         'unit_no',
         'vmmfg_job_id',
         'vmmfg_job_json',
@@ -26,6 +28,13 @@ class VmmfgUnit extends Model
         'order_date',
         'refer_completion_unit_id',
         'code'
+    ];
+
+    protected $casts = [
+        'origin_vmmfg_job_json' => 'array',
+        'origin_vmmfg_scope_json' => 'array',
+        'vmmfg_job_json' => 'array',
+        'vmmfg_scope_json' => 'array',
     ];
 
     //relationships

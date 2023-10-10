@@ -37,7 +37,7 @@
                         @foreach($units as $unit)
                             {{-- @if(!$unit->completion_date) --}}
                             <option value="{{$unit->id}}">
-                                {{$unit->vmmfgJob->batch_no}}
+                                {{$unit->vmmfgJob ? $unit->vmmfgJob->batch_no : null}}
                                 @if($unit->vend_id)
                                     - {{$unit->vend_id}}
                                 @endif
@@ -115,7 +115,7 @@
                     </tr>
                     <tr class="row_edit">
                         <td class="text-center">
-                            {{ $vmmfgUnit->first()->vmmfgJob->batch_no }}
+                            {{ $vmmfgUnit->first()->vmmfgJob ? $vmmfgUnit->first()->vmmfgJob->batch_no : null}}
                         </td>
                         <td class="text-center">
                             {{ $vmmfgUnit->first()->vend_id }}

@@ -13,9 +13,10 @@ class UnitTransferDestination extends Model
         'SG' => 'https://mfg.happyice.com.sg',
         'JB' => 'https://jbmfg.happyice.com.sg',
         'IDN' => 'https://idn-mfg.happyice.net',
+        // 'MFG2' => 'http://mfg2.test',
     ];
 
-    const DIRECTORY = '/ap/unit-transfer';
+    const DIRECTORY = '/api/unit-transfer';
 
     protected $fillable = [
         'name',

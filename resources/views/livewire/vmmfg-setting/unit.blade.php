@@ -165,17 +165,21 @@
                             {{ $index + $from}}
                         </td>
                         <td class="text-center">
-                            <a href="/vmmfg-ops?unit_id={{$unit->id}}&is_completed=''">
+                            {{-- <a href="/vmmfg-ops?unit_id={{$unit->id}}&is_completed=''"> --}}
                                 {{ $unit->code }}
-                            </a>
+                            {{-- </a> --}}
                         </td>
                         <td class="text-center">
-                            {{ $unit->vmmfgJob->batch_no }}
+                            {{ $unit->vmmfgJob ? $unit->vmmfgJob->batch_no : $unit->origin_vmmfg_job_json['batch_no'] }}
                         </td>
                         <td class="text-center">
+                            @if($unit->vmmfgScope)
                             <a href="/vmmfg-ops?unit_id={{$unit->id}}&is_completed=''">
                                 {{ $unit->unit_no }}
                             </a>
+                            @else
+                                {{ $unit->unit_no }}
+                            @endif
                         </td>
                         <td class="text-center">
                             {{ $unit->vend_id }}
@@ -184,7 +188,7 @@
                             {{ $unit->model }}
                         </td>
                         <td class="text-center">
-                            {{ $unit->vmmfgScope->name }}
+                            {{ $unit->vmmfgScope ? $unit->vmmfgScope->name : null }}
                         </td>
                         <td class="text-center">
                             {{ $unit->order_date }}
@@ -279,31 +283,15 @@
                 <x-modal id="edit-unit">
                     <x-slot name="title">
                         Edit Unit
-                        @if(isset($unitForm['origin']))
-                            <span class="badge badge-success">
-                                From: {{$unitForm['origin']}}
-                            </span>
-                        @endif
-                        @if(isset($unitForm['destination']))
-                            <span class="badge badge-success">
-                                To: {{$unitForm['destination']}}
-                            </span>
-                        @endif
                     </x-slot>
                     <x-slot name="content">
                         @if(isset($unitForm['origin']))
-                            <div class="form-group">
-                                <label for=serial_no">
-                                    Serial No
-                                </label>
-                                <input type="text" wire.model="unitForm.code" class="form-control" disabled>
-                            </div>
-                            <div class="form-group">
-                                <label for=serial_no">
-                                    Unit No
-                                </label>
-                                <input type="text" wire.model="unitForm.unit_no" class="form-control" disabled>
-                            </div>
+                            <x-input type="text" model="unitForm.code" disabled>
+                                Serial No
+                            </x-input>
+                            <x-input type="text" model="unitForm.unit_no" disabled>
+                                Unit No
+                            </x-input>
                         @else
                             <x-input type="text" model="unitForm.code">
                                 Serial No
@@ -318,37 +306,32 @@
                         <x-input type="text" model="unitForm.model">
                             Model
                         </x-input>
-                        @if(isset($unitForm['origin']))
-
-                        @else
-                            <div class="form-group">
-                                <label for="vmmfg_scope_id">
-                                    Scope
-                                </label>
-                                <select name="vmmfg_scope_id" wire:model="unitForm.vmmfg_scope_id" class="select form-control">
-                                    <option value="">Select..</option>
-                                    @foreach($this->scopes as $scope)
-                                        <option value="{{$scope->id}}">
-                                            {{$scope->name}} @if($scope->remarks)({{$scope->remarks}})@endif
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        @endif
+                        <div class="form-group">
+                            <label for="vmmfg_scope_id">
+                                Scope
+                            </label>
+                            <select name="vmmfg_scope_id" wire:model="unitForm.vmmfg_scope_id" class="select form-control">
+                                <option value="">Select..</option>
+                                @foreach($this->scopes as $scope)
+                                    <option value="{{$scope->id}}">
+                                        {{$scope->name}} @if($scope->remarks)({{$scope->remarks}})@endif
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                         <div class="form-group">
                             <label for="start_date">
                                 Start Date
                             </label>
                             <input type="date" class="form-control" wire:model.defer="unitForm.order_date">
                         </div>
+                        <hr>
                         <div class="form-group">
                             <label for="completion_date">
                                 Completion Date
                             </label>
                             <input type="date" class="form-control" wire:model.defer="unitForm.completion_date" {{isset($unitForm['refer_completion_unit_id']) ? 'disabled' : ''}}>
                         </div>
-
-                        <hr>
                         <div class="form-group">
                             <label for="refer_completion_unit_id">
                                 Refer to Completion Unit
@@ -384,6 +367,57 @@
                                 @endforeach
                             </select>
                         </div>
+
+                        @if(isset($unitForm['origin']) or isset($unitForm['destination']))
+                            <h4>
+                            @if(isset($unitForm['origin']))
+                                <span class="badge badge-success ">
+                                    From: {{$unitForm['origin']}}
+                                </span>
+                            @endif
+                            @if(isset($unitForm['destination']))
+                                <span class="badge badge-success">
+                                    To: {{$unitForm['destination']}}
+                                </span>
+                            @endif
+                            </h4>
+                            <div class="row">
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <div class="form-group">
+                                        <label for="previous_scope">
+                                            <u>
+                                                Previous Scope
+                                            </u>
+                                        </label>
+                                        <div>
+                                            @if(isset($unitForm['origin_vmmfg_scope_json']))
+                                                {{$unitForm['origin_vmmfg_scope_json']['name']}}
+                                                @if($unitForm['origin_vmmfg_scope_json']['remarks'])
+                                                    <br>({{$unitForm['origin_vmmfg_scope_json']['remarks']}})
+                                                @endif
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <div class="form-group">
+                                        <label for="previous_scope">
+                                            <u>
+                                                Previous Job
+                                            </u>
+                                        </label>
+                                        <div>
+                                            @if(isset($unitForm['origin_vmmfg_job_json']))
+                                                {{$unitForm['origin_vmmfg_job_json']['model']}}
+                                                @if($unitForm['origin_vmmfg_job_json']['remarks'])
+                                                    <br>({{$unitForm['origin_vmmfg_job_json']['remarks']}})
+                                                @endif
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
 
                     </x-slot>
                     <x-slot name="footer">
