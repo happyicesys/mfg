@@ -291,12 +291,27 @@
                         @endif
                     </x-slot>
                     <x-slot name="content">
-                        <x-input type="text" model="unitForm.code">
-                            Serial No
-                        </x-input>
-                        <x-input type="text" model="unitForm.unit_no">
-                            Unit No
-                        </x-input>
+                        @if(isset($unitForm['origin']))
+                            <div class="form-group">
+                                <label for=serial_no">
+                                    Serial No
+                                </label>
+                                <input type="text" wire.model="unitForm.code" class="form-control" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label for=serial_no">
+                                    Unit No
+                                </label>
+                                <input type="text" wire.model="unitForm.unit_no" class="form-control" disabled>
+                            </div>
+                        @else
+                            <x-input type="text" model="unitForm.code">
+                                Serial No
+                            </x-input>
+                            <x-input type="text" model="unitForm.unit_no">
+                                Unit No
+                            </x-input>
+                        @endif
                         <x-input type="text" model="unitForm.vend_id">
                             {{$profile->profileSetting ? $profile->profileSetting->vmmfg_unit_vend_id_title : 'Vend ID'}}
                         </x-input>

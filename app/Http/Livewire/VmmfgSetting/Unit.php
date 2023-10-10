@@ -161,6 +161,8 @@ class Unit extends Component
             'code' => $this->unitForm->code ? $this->unitForm->code : $this->unitForm->vmmfgJob->batch_no.'-'.$this->unitForm->unit_no,
             'vmmfg_job_json' => $this->unitForm->vmmfgJob,
             'vmmfg_scope_json' => $this->unitForm->vmmfgScope,
+            'origin' => $this->unitForm->origin ? $this->unitForm->origin : null,
+            'destination' => $this->unitForm->destination ? $this->unitForm->destination : null,
         ]);
 
         if($this->unitForm->destination and ($this->unitForm->destination != $this->previousUnitForm->destination)) {
