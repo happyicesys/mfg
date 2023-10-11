@@ -10,6 +10,7 @@ class ProfileSetting extends Model
     use HasFactory;
 
     protected $fillable = [
+        'logo_url',
         'profile_id',
         'theme_url',
         'theme_background_url',

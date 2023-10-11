@@ -1,7 +1,11 @@
+@php
+    $profile = \App\Models\Profile::where('is_primary', 1)->first();
+@endphp
+
 <nav class="navbar navbar-expand-md navbar-light navbar-laravel">
     <div class="container-fluid">
         <a class="navbar-brand" href="{{ url('/') }}">
-            <img src="/img/logo.png" style="max-width: 25%;">
+            <img src="{{$profile->profileSetting->logo_url}}" width="400" style="max-width: 25%;">
         </a>
 {{--
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">

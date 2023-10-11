@@ -15,6 +15,7 @@ class VmmfgUnit extends Model
         'current',
         'destination',
         'origin',
+        'origin_ref_id',
         'origin_vmmfg_job_json',
         'origin_vmmfg_scope_json',
         'unit_no',

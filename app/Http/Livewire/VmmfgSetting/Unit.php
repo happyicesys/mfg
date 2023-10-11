@@ -195,6 +195,9 @@ class Unit extends Component
                 $task->delete();
             }
         }
+        if($this->unitForm->origin_ref_id) {
+
+        }
         $this->unitForm->delete();
 
         $this->unitForm = new VmmfgUnit;
@@ -240,9 +243,16 @@ class Unit extends Component
 
     private function createUnitTransfer()
     {
-        $response = Http::post(UnitTransferDestination::OPTIONS[$this->unitForm->destination] . UnitTransferDestination::DIRECTORY, $this->unitForm->toArray());
-
-        // dd(UnitTransferDestination::OPTIONS[$this->unitForm->destination] . UnitTransferDestination::DIRECTORY, $response, $response->body());
+        $response = Http::post(
+            UnitTransferDestination::OPTIONS[$this->unitForm->destination] . UnitTransferDestination::CREATE_DIRECTORY,
+            $this->unitForm->toArray()
+        );
         return $response;
+    }
+
+    private function revokeUnitTransfer()
+    {
+        // $response = Http::post(UnitTransferDestination::OPTIONS[$this->unitForm->origin] . UnitTransferDestination::DELETE_DIRECTORY . '/' . $this->unitForm->id);
+        // return $response;
     }
 }

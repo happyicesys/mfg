@@ -17,7 +17,8 @@ class UnitTransferDestination extends Model
         // 'MFG2' => 'http://mfg2.test',
     ];
 
-    const DIRECTORY = '/api/unit-transfer';
+    const CREATE_DIRECTORY = '/api/unit-transfer';
+    const DELETE_DIRECTORY = '/api/unit-transfer/delete';
 
     protected $fillable = [
         'name',

@@ -15,6 +15,7 @@ class UnitTransferController extends Controller
             'current' => $request->current,
             'destination' => null,
             'origin' => $request->current,
+            'origin_ref_id' => $request->id,
             'origin_vmmfg_job_json' => $request->vmmfg_job_json,
             'origin_vmmfg_scope_json' => $request->vmmfg_scope_json,
             'unit_no' => $request->unit_no ? $request->unit_no : 0,

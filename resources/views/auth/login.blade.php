@@ -1,11 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+    $profile = \App\Models\Profile::where('is_primary', 1)->first();
+@endphp
 <div class="container">
     <x-flash></x-flash>
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <img src="/img/logo.png" class="img mx-auto d-block" style="max-width: 40%;" alt="Logo">
+            <img src="{{$profile->profileSetting->logo_url}}" class="img mx-auto d-block" style="max-width: 40%;" alt="Logo">
             <div class="card mt-4">
                 <div class="card-header">{{ env('APP_NAME') }}</div>
 

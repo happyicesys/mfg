@@ -1,9 +1,12 @@
 <!-- Sidebar -->
+@php
+    $profile = \App\Models\Profile::where('is_primary', 1)->first();
+@endphp
 <nav id="sidebar" class="sidebar-wrapper" >
   <div class="sidebar-content">
     <div class="sidebar-brand" style="background-color:#F5F5F5; border:solid black 1px;">
       <a href="/" class="text-center">
-        <img src="/img/logo.png" height="100" width="100">
+        <img src="{{$profile->profileSetting->logo_url}}" height="100" width="100">
       </a>
       <div id="close-sidebar">
         <i class="far fa-arrow-alt-circle-left"></i>

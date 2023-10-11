@@ -156,7 +156,7 @@
                                 {{ $index + $from}}
                             </td>
                             <td class="text-center">
-                                {{ $unit->vmmfgJob->batch_no }}
+                                {{ $unit->vmmfgJob ? $unit->vmmfgJob->batch_no : null }}
                             </td>
                             <td class="text-center">
                                 {{ $unit->code }}
@@ -173,7 +173,7 @@
                                 {{ $unit->model }}
                             </td>
                             <td class="text-center">
-                                {{ $unit->vmmfgScope->name }}
+                                {{ $unit->vmmfgScope ? $unit->vmmfgScope->name : null }}
                             </td>
                             <td class="text-center">
                                 {{ $unit->order_date }}
@@ -216,7 +216,8 @@
                                     //         $itemCount += $title->vmmfgItems()->count();
                                     //     }
                                     // }
-                                    $itemCount = $unit->vmmfgScope->vmmfgTitles()
+                                    $itemCount = $unit->vmmfgScope ?
+                                        $unit->vmmfgScope->vmmfgTitles()
                                         ->where('vmmfg_title_category_id', $vmmfgTitleCategory->id)
                                         ->withCount('vmmfgItems')
                                         ->get()
@@ -225,7 +226,9 @@
                                         })
                                         ->reduce(function($carry, $value) {
                                             return $carry + $value;
-                                        });
+                                        })
+                                        :
+                                        0;
                                     //    $itemCount  = 0;
                                     // count('vmmfgItems');
                                     // dd($itemCount);
