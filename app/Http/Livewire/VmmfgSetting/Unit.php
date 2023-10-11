@@ -68,19 +68,25 @@ class Unit extends Component
 
     public function render()
     {
-        $units = VmmfgUnit::with(['children', 'vmmfgJob', 'vmmfgScope', 'referCompletionUnit'])
-                        ->leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')
-                        ->select(
-                            '*',
-                            'vmmfg_units.id AS id',
-                            'vmmfg_units.completion_date AS completion_date',
-                            'vmmfg_units.model AS model',
-                            'vmmfg_units.order_date AS order_date',
-                            'vmmfg_units.refer_completion_unit_id AS refer_completion_unit_id',
-                            'vmmfg_units.origin',
-                            'vmmfg_units.destination',
-                            'vmmfg_units.vend_id'
-                        );
+        $units = VmmfgUnit::query()
+            ->with([
+                'children.vmmfgScope',
+                'children.vmmfgJob',
+                'vmmfgJob', 'vmmfgScope',
+                'referCompletionUnit'
+            ])
+            ->leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')
+            ->select(
+                '*',
+                'vmmfg_units.id AS id',
+                'vmmfg_units.completion_date AS completion_date',
+                'vmmfg_units.model AS model',
+                'vmmfg_units.order_date AS order_date',
+                'vmmfg_units.refer_completion_unit_id AS refer_completion_unit_id',
+                'vmmfg_units.origin',
+                'vmmfg_units.destination',
+                'vmmfg_units.vend_id'
+            );
 
         $units = $units
                 ->when($this->filters['code'], fn($query, $input) => $query->searchLike('vmmfg_units.code', $input))
@@ -270,12 +276,51 @@ class Unit extends Component
 
     public function rework()
     {
+        $reworkUnit = $this->unitForm->replicate()->fill([
+            'is_rework' => true,
+            'parent_id' => $this->unitForm->id,
+            'refer_completion_unit_id' => null,
+            'completion_date' => null,
+            'order_date' => Carbon::now(),
+            'status_datetime' => Carbon::now(),
+            'origin' => null,
+            'destination' => null,
+            'children_json' => null,
+            'origin_ref_id' => null,
+            'origin_vmmfg_job_json' => null,
+            'origin_vmmfg_scope_json' => null,
+            'vmmfg_job_json' => null,
+            'vmmfg_scope_json' => null,
+        ]);
+        $reworkUnit->save();
 
+        $this->emit('refresh');
+        $this->emit('updated');
+        session()->flash('success', 'Your entry has been updated');
     }
 
     public function retire()
     {
+        $this->unitForm->update([
+            'is_retired' => true,
+            'status_datetime' => Carbon::now(),
+        ]);
 
+        $this->emit('refresh');
+        $this->emit('updated');
+        session()->flash('success', 'Your entry has been updated');
+    }
+
+    public function undoRetire()
+    {
+        $this->unitForm->update([
+            'is_retired' => false,
+            'status_datetime' => null,
+        ]);
+
+        $this->emit('refresh');
+        $this->emit('updated');
+        session()->flash('success', 'Your entry has been updated');
     }
 
     private function createUnitTransfer()

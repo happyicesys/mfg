@@ -215,6 +215,11 @@
                                     To: {{$unit->destination}}
                                 </span>
                             @endif
+                            @if($unit->is_retired)
+                                <span class="badge badge-danger">
+                                    Retired
+                                </span>
+                            @endif
                         </td>
                         <td class="text-center">
                             <button type="button" wire:click="edit({{$unit->id}})" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#edit-unit">
@@ -222,52 +227,50 @@
                             </button>
                         </td>
                     </tr>
-                    {{-- <tr class="row_edit" wire:loading.class.delay="opacity-2" wire:key="row-{{$unit->id}}">
-                        <th class="text-center">
-                            <input type="checkbox" wire:model="selected" value="{{$admin->id}}">
-                        </th>
-                        <td class="text-center">
-                            {{ $index + $from}}
-                        </td>
-                        <td class="text-center">
-                            {{ $unit->batch_no }}
-                        </td>
-                        <td class="text-center">
-                            <a href="/vmmfg-ops?unit_id={{$unit->id}}">
-                                {{ $unit->unit_no }}
-                            </a>
-                        </td>
-                        <td class="text-center">
-                            {{ $unit->vend_id }}
-                        </td>
-                        <td class="text-center">
-                            {{ $unit->model }}
-                        </td>
-                        <td class="text-center">
-                            {{ $unit->scope_name }}
-                        </td>
-                        <td class="text-center">
-                            {{ $unit->order_date }}
-                        </td>
-                        <td class="text-center">
-                            {{$unit}}
-                            @if($unit->referCompletionUnit)
-                                <span class="badge badge-success">
-                                    Refer to {{$unit->referCompletionUnit->unit_no}} @if($unit->referCompletionUnit->vend_id) - {{$unit->referCompletionUnit->vend_id}} @endif
-                                    @if($unit->referCompletionUnit->vmmfgJob)
-                                        <br>{{$unit->referCompletionUnit->vmmfgJob->model}}
+                        @if($unit->children()->exists())
+                            @foreach($unit->children as $child)
+                            <tr>
+                                <td></td>
+                                <td colspan="2"></td>
+                                <td class="text-center">
+                                    @if($child->vmmfgScope)
+                                    <a href="/vmmfg-ops?unit_id={{$child->id}}&is_completed=''">
+                                        {{ $child->unit_no }}
+                                    </a>
+                                    @else
+                                        {{ $child->unit_no }}
                                     @endif
-
-                                </span>
-                            @endif
-                            {{ $unit->completion_date }}
-                        </td>
-                        <td class="text-center">
-                            <button type="button" wire:click="edit({{$unit->id}})" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#edit-unit">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                        </td>
-                    </tr> --}}
+                                </td>
+                                <td class="text-center">
+                                    {{ $child->vend_id }}
+                                </td>
+                                <td class="text-center">
+                                    {{ $child->model }}
+                                </td>
+                                <td class="text-center">
+                                    {{ $child->vmmfgScope ? $child->vmmfgScope->name : null }}
+                                </td>
+                                <td class="text-center">
+                                    {{ $child->order_date }}
+                                </td>
+                                <td class="text-center">
+                                    {{ $child->completion_date }}
+                                </td>
+                                <td>
+                                    @if($child->is_rework)
+                                        <span class="badge badge-warning">
+                                            Rework
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    <button type="button" wire:click="edit({{$unit->id}})" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#edit-unit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            @endforeach
+                        @endif
                     @empty
                     <tr>
                         <td colspan="18" class="text-center"> No Results Found </td>
@@ -423,14 +426,20 @@
 
                     </x-slot>
                     <x-slot name="footer">
-                        {{-- <div class="btn-group float-left">
+                        <div class="btn-group float-left">
                             <button type="submit" class="btn btn-warning " wire:click.prevent="rework">
                                 Rework
                             </button>
-                            <button type="submit" class="btn btn-danger" wire:click.prevent="retire">
-                                Retire
-                            </button>
-                        </div> --}}
+                            @if(isset($unitForm['is_retired']) and !$unitForm['is_retired'])
+                                <button type="submit" class="btn btn-danger" wire:click.prevent="retire">
+                                    Retire
+                                </button>
+                            @else
+                                <button type="submit" class="btn btn-default" wire:click.prevent="undoRetire">
+                                    Undo Retire
+                                </button>
+                            @endif
+                        </div>
                         <div class="btn-group float-right">
                             <button type="submit" class="btn btn-danger d-none d-sm-block" onclick="return confirm('Are you sure you want to delete this unit?') || event.stopImmediatePropagation()" wire:click.prevent="delete">
                                 Delete
