@@ -34,4 +34,14 @@ class UnitTransferController extends Controller
 
         return true;
     }
+
+    public function delete($vmmfgUnitId)
+    {
+        $vmmfgUnit = VmmfgUnit::findorFail($vmmfgUnitId);
+        $vmmfgUnit->update([
+            'destination' => null,
+        ]);
+
+        return true;
+    }
 }

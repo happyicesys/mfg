@@ -139,6 +139,11 @@
                         <i class="fas fa-caret-down"></i>
                     @endif
                 </button>
+
+                <button class="btn btn-success btn-block" wire:click="createAdmin()" data-toggle="modal" data-target="#edit-admin">
+                    <i class="fas fa-plus-circle"></i>
+                    Create
+                </button>
             </div>
             <div>
                 @if($showFilters)

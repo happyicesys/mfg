@@ -381,6 +381,7 @@
                                 </span>
                             @endif
                             </h4>
+                            @if(isset($unitForm['origin']))
                             <div class="row">
                                 <div class="col-md-6 col-sm-6 col-xs-12">
                                     <div class="form-group">
@@ -417,6 +418,7 @@
                                     </div>
                                 </div>
                             </div>
+                            @endif
                         @endif
 
                     </x-slot>

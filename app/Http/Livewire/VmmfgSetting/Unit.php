@@ -196,7 +196,7 @@ class Unit extends Component
             }
         }
         if($this->unitForm->origin_ref_id) {
-
+            $this->revokeUnitTransfer();
         }
         $this->unitForm->delete();
 
@@ -252,7 +252,7 @@ class Unit extends Component
 
     private function revokeUnitTransfer()
     {
-        // $response = Http::post(UnitTransferDestination::OPTIONS[$this->unitForm->origin] . UnitTransferDestination::DELETE_DIRECTORY . '/' . $this->unitForm->id);
-        // return $response;
+        $response = Http::post(UnitTransferDestination::OPTIONS[$this->unitForm->origin] . UnitTransferDestination::DELETE_DIRECTORY . '/' . $this->unitForm->origin_ref_id);
+        return $response;
     }
 }

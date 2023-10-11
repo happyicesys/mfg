@@ -11,4 +11,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('unit-transfer', [UnitTransferController::class, 'store']);
+Route::prefix('unit-transfer')->group(function() {
+    Route::post('/', [UnitTransferController::class, 'store']);
+    Route::post('/delete/{vmmfgUnitId}', [UnitTransferController::class, 'delete']);
+});
+
