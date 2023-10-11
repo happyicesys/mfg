@@ -264,7 +264,7 @@
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    <button type="button" wire:click="edit({{$unit->id}})" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#edit-unit">
+                                    <button type="button" wire:click="edit({{$child->id}})" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#edit-unit">
                                         <i class="fas fa-edit"></i>
                                     </button>
                                 </td>
@@ -427,9 +427,12 @@
                     </x-slot>
                     <x-slot name="footer">
                         <div class="btn-group float-left">
-                            <button type="submit" class="btn btn-warning " wire:click.prevent="rework">
-                                Rework
-                            </button>
+                            @if(isset($unitForm['is_rework']) and !$unitForm['is_rework'])
+                                <button type="submit" class="btn btn-warning " wire:click.prevent="rework">
+                                    Rework
+                                </button>
+                            @endif
+
                             @if(isset($unitForm['is_retired']) and !$unitForm['is_retired'])
                                 <button type="submit" class="btn btn-danger" wire:click.prevent="retire">
                                     Retire
