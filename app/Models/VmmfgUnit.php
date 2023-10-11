@@ -12,12 +12,17 @@ class VmmfgUnit extends Model
     use HasFactory, HasSearch;
 
     protected $fillable = [
+        'children_json',
         'current',
         'destination',
+        'is_rework',
+        'is_retired',
         'origin',
         'origin_ref_id',
         'origin_vmmfg_job_json',
         'origin_vmmfg_scope_json',
+        'parent_id',
+        'status_datetime',
         'unit_no',
         'vmmfg_job_id',
         'vmmfg_job_json',
@@ -33,6 +38,7 @@ class VmmfgUnit extends Model
     ];
 
     protected $casts = [
+        'children_json' => 'array',
         'origin_vmmfg_job_json' => 'array',
         'origin_vmmfg_scope_json' => 'array',
         'vmmfg_job_json' => 'array',
@@ -40,6 +46,16 @@ class VmmfgUnit extends Model
     ];
 
     //relationships
+    public function children()
+    {
+        return $this->hasMany(VmmfgUnit::class, 'parent_id')->oldest();
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(VmmfgUnit::class, 'parent_id');
+    }
+
     public function vmmfgJob()
     {
         return $this->belongsTo(VmmfgJob::class)->orderBy('batch_no', 'desc');

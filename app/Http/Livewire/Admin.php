@@ -41,9 +41,9 @@ class Admin extends Component
     {
         return [
             'form.name' => 'required',
-            'form.username' => 'required|unique:users,username,' . $this->form->id,
-            'form.phone_number' => 'numeric',
-            'form.email' => 'email',
+            'form.username' => 'required_without:form.email|unique:users,username,' . $this->form->id,
+            'form.phone_number' => 'numeric|nullable',
+            'form.email' => 'email|required_without:form.username|nullable',
             'form.password' => 'sometimes',
         ];
     }
@@ -99,7 +99,6 @@ class Admin extends Component
 
     public function save()
     {
-        // dd($this->form->toArray(), $this->role_id);
         $this->validate();
         $this->form->save();
         if($this->role_id) {

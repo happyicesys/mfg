@@ -423,7 +423,15 @@
 
                     </x-slot>
                     <x-slot name="footer">
-                        <div class="btn-group">
+                        {{-- <div class="btn-group float-left">
+                            <button type="submit" class="btn btn-warning " wire:click.prevent="rework">
+                                Rework
+                            </button>
+                            <button type="submit" class="btn btn-danger" wire:click.prevent="retire">
+                                Retire
+                            </button>
+                        </div> --}}
+                        <div class="btn-group float-right">
                             <button type="submit" class="btn btn-danger d-none d-sm-block" onclick="return confirm('Are you sure you want to delete this unit?') || event.stopImmediatePropagation()" wire:click.prevent="delete">
                                 Delete
                             </button>
@@ -431,10 +439,10 @@
                                 Delete
                             </button>
                             <button type="submit" class="btn btn-success d-none d-sm-block" wire:click.prevent="save">
-                                Submit
+                                Save
                             </button>
                             <button type="submit" class="btn btn-success btn-block d-block d-sm-none" wire:click.prevent="save">
-                                Submit
+                                Save
                             </button>
                         </div>
                     </x-slot>

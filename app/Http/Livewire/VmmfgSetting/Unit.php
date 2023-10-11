@@ -68,7 +68,7 @@ class Unit extends Component
 
     public function render()
     {
-        $units = VmmfgUnit::with('vmmfgJob', 'vmmfgScope', 'referCompletionUnit')
+        $units = VmmfgUnit::with(['children', 'vmmfgJob', 'vmmfgScope', 'referCompletionUnit'])
                         ->leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')
                         ->select(
                             '*',
@@ -79,6 +79,7 @@ class Unit extends Component
                             'vmmfg_units.refer_completion_unit_id AS refer_completion_unit_id',
                             'vmmfg_units.origin',
                             'vmmfg_units.destination',
+                            'vmmfg_units.vend_id'
                         );
 
         $units = $units
@@ -112,6 +113,9 @@ class Unit extends Component
                 }
             });
         }
+
+        // exclude children
+        $units = $units->whereNull('vmmfg_units.parent_id');
 
         if($sortKey = $this->sortKey) {
             $units = $units->orderBy($sortKey, $this->sortAscending ? 'asc' : 'desc');
@@ -157,6 +161,8 @@ class Unit extends Component
     {
         $this->validate();
         $this->unitForm->save();
+
+        // save form
         $this->unitForm->update([
             'code' => $this->unitForm->code ? $this->unitForm->code : $this->unitForm->vmmfgJob->batch_no.'-'.$this->unitForm->unit_no,
             'vmmfg_job_json' => $this->unitForm->vmmfgJob,
@@ -166,6 +172,14 @@ class Unit extends Component
             'current' => $this->unitForm->current ? $this->unitForm->current : env('APP_CURRENT_LOCATION')
         ]);
 
+        // store children json at parent
+        if($this->unitForm->children()->exists()) {
+            $this->unitForm->update([
+                'children_json' => $this->unitForm->children()->get()
+            ]);
+        }
+
+        // send unit to another mfg upon option chosen
         if($this->unitForm->destination and ($this->unitForm->destination != $this->previousUnitForm->destination)) {
             $response = $this->createUnitTransfer();
             if($response->failed()) {
@@ -175,6 +189,13 @@ class Unit extends Component
             }
         }
 
+        // record timestamp when unit is rework or retired
+        if($this->unitForm->is_rework or $this->unitForm->is_retired) {
+            $this->unitForm->update([
+                'status_datetime' => Carbon::now()
+            ]);
+        }
+
         $this->emit('refresh');
         $this->emit('updated');
         session()->flash('success', 'Your entry has been updated');
@@ -182,24 +203,30 @@ class Unit extends Component
 
     public function delete()
     {
+        // delete tasks and attachments if exists
         if($this->unitForm->vmmfgTasks()->exists()) {
             foreach($this->unitForm->vmmfgTasks() as $task) {
                 if($task->attachments()->exists()) {
                     foreach($task->attachments() as $attachment) {
                         $this->deleteAttachment($attachment);
-
-                        // Storage::disk('digitaloceanspaces')->delete($attachment->url);
-                        // $attachment->delete();
                     }
                 }
                 $task->delete();
             }
         }
+        // delete children if exists
+        if($this->unitForm->children()->exists()) {
+            foreach($this->unitForm->children() as $child) {
+                $child->delete();
+            }
+        }
+        // notify origin to delete unit transfer record
         if($this->unitForm->origin_ref_id) {
             $this->revokeUnitTransfer();
         }
         $this->unitForm->delete();
 
+        // refresh form after delete (avoid livewire error)
         $this->unitForm = new VmmfgUnit;
         $this->previousUnitForm = new VmmfgUnit;
         $this->emit('refresh');
@@ -239,6 +266,16 @@ class Unit extends Component
         }else {
             $this->filters[$model] = $date->subDay()->toDateString();
         }
+    }
+
+    public function rework()
+    {
+
+    }
+
+    public function retire()
+    {
+
     }
 
     private function createUnitTransfer()
