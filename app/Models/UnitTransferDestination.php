@@ -13,8 +13,8 @@ class UnitTransferDestination extends Model
         'SG' => 'https://mfg.happyice.com.sg',
         'JB' => 'https://jbmfg.happyice.com.sg',
         'IDN' => 'https://idn-mfg.happyice.net',
-        'MFG' => 'http://mfg.test',
-        'MFG2' => 'http://mfg2.test',
+        // 'MFG' => 'http://mfg.test',
+        // 'MFG2' => 'http://mfg2.test',
     ];
 
     const CREATE_DIRECTORY = '/api/unit-transfer';

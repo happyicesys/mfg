@@ -125,7 +125,7 @@ class VmmfgOpsPublic extends Component
         ];
 
         $vmmfgUnit = $this->mainCollections($filters);
-        dd($vmmfgUnit);
+        // dd($vmmfgUnit);
 
         if($vmmfgUnit) {
             if($vmmfgUnit->first()->vmmfgTasks) {
