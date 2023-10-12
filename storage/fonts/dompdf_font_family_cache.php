@@ -89,7 +89,7 @@ return array (
     'bold' => $fontDir . '/fireflysung_bold_1a240bb048cf296d53ffc25714f1396b',
   ),
   'founder-type' => array(
-    'bold' => $fontDir . '/founder_type_bold_e17a477358db4a46a0414e35a68935dd',
+    'bold' => $fontDir . '/founder_type_bold_ed797207de2dc98a4f91a8addaaf9beb',
   ),
 );
 }; ?>

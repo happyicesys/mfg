@@ -395,7 +395,9 @@
                                         </label>
                                         <div>
                                             @if(isset($unitForm['origin_vmmfg_scope_json']))
-                                                {{$unitForm['origin_vmmfg_scope_json']['name']}}
+                                                <a href="{{\App\Models\UnitTransferDestination::OPTIONS[$unitForm['origin']].'/api/vmmfg-ops-public?unit_id='.$unitForm['origin_ref_id']}}" target="_blank">
+                                                    {{$unitForm['origin_vmmfg_scope_json']['name']}}
+                                                </a>
                                                 @if($unitForm['origin_vmmfg_scope_json']['remarks'])
                                                     <br>({{$unitForm['origin_vmmfg_scope_json']['remarks']}})
                                                 @endif

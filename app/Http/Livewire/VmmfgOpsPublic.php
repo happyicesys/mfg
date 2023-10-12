@@ -19,7 +19,7 @@ use Spatie\Permission\Models\Permission;
 use Storage;
 
 
-class VmmfgOps extends Component
+class VmmfgOpsPublic extends Component
 {
     use HasDateControl, WithFileUploads;
 
@@ -125,6 +125,7 @@ class VmmfgOps extends Component
         ];
 
         $vmmfgUnit = $this->mainCollections($filters);
+        dd($vmmfgUnit);
 
         if($vmmfgUnit) {
             if($vmmfgUnit->first()->vmmfgTasks) {
@@ -137,8 +138,8 @@ class VmmfgOps extends Component
             $this->form['completion_date'] = $vmmfgUnit->first()->completion_date;
         }
 
-        return view('livewire.vmmfg-ops', ['vmmfgUnit' => $vmmfgUnit]);
-        // return view('livewire.vmmfg-ops-public', ['vmmfgUnit' => $vmmfgUnit])->layout('layouts.app-public');
+        // return view('livewire.vmmfg-ops', ['vmmfgUnit' => $vmmfgUnit]);
+        return view('livewire.vmmfg-ops-public', ['vmmfgUnit' => $vmmfgUnit])->layout('layouts.app-public');
     }
 
     public function edit(VmmfgJob $job)
