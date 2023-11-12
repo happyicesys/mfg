@@ -20,9 +20,6 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    @php
-        $profile = \App\Models\Profile::where('is_primary', 1)->first();
-    @endphp
     <style>
         body {
             background-image: url("{{ $profile->profileSetting->theme_background_url}}");

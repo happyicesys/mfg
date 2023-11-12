@@ -243,7 +243,7 @@
                         {{ $admin->is_active ? 'Active' : 'Inactive' }}
                     </td>
                     <td class="text-center">
-                        {{ $admin->roles()->exists() ? $admin->roles()->first()->name : '' }}
+                        {{ count($admin->roles) > 0 ? $admin->roles()->first()->name : '' }}
                     </td>
                     <td class="text-center">
                         {{ $admin->created_at }}

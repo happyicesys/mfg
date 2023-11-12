@@ -205,6 +205,20 @@
                             {{ $unit->completion_date }}
                         </td>
                         <td class="text-center">
+                            @if($unit->referCompletionUnit)
+                                <a href="vmmfg-setting-unit?filters[code]={{$unit->referCompletionUnit->code}}">
+                                    <span class="badge badge-success">
+                                        Before of: {{$unit->referCompletionUnit->vmmfgJob->batch_no}} ({{$unit->referCompletionUnit->unit_no}})
+                                    </span>
+                                </a>
+                            @endif
+                            @if($unit->bindedCompletionUnit)
+                                <a href="vmmfg-setting-unit?filters[code]={{$unit->bindedCompletionUnit->code}}">
+                                    <span class="badge badge-success">
+                                        After of: {{$unit->bindedCompletionUnit->vmmfgJob->batch_no}} ({{$unit->bindedCompletionUnit->unit_no}})
+                                    </span>
+                                </a>
+                            @endif
                             @if($unit->origin)
                                 <span class="badge badge-success">
                                     From: {{$unit->origin}}
@@ -227,7 +241,7 @@
                             </button>
                         </td>
                     </tr>
-                        @if($unit->children()->exists())
+                        @if($unit->children)
                             @foreach($unit->children as $child)
                             <tr>
                                 <td></td>
@@ -347,9 +361,9 @@
                                         Select..
                                     @endif
                                 </option>
-                                @foreach($unitSelections as $unitSelection)
-                                    <option value="{{$unitSelection->id}}">
-                                        Unit No: {{$unitSelection->unit_no}} @if($unitSelection->vend_id)({{$profile->profileSetting ? $profile->profileSetting->vmmfg_unit_vend_id_title : 'Vend ID'}}: {{$unitSelection->vend_id}})@endif @if($unitSelection->model) Model: {{$unitSelection->model}}@endif
+                                @foreach($editUnitSelections as $editUnitSelection)
+                                    <option value="{{$editUnitSelection->id}}" @if($editUnitSelection->id == $unitForm->refer_completion_unit_id) 'selected' @endif>
+                                        Unit No: {{$editUnitSelection->unit_no}} @if($editUnitSelection->vend_id)({{$profile->profileSetting ? $profile->profileSetting->vmmfg_unit_vend_id_title : 'Vend ID'}}: {{$editUnitSelection->vend_id}})@endif @if($editUnitSelection->model) Model: {{$editUnitSelection->model}}@endif
                                     </option>
                                 @endforeach
                             </select>

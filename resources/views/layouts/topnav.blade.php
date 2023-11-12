@@ -1,6 +1,6 @@
-@php
+{{-- @php
     $profile = \App\Models\Profile::where('is_primary', 1)->first();
-@endphp
+@endphp --}}
 
 <nav class="navbar navbar-expand-md navbar-light navbar-laravel">
     <div class="container-fluid">

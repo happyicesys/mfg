@@ -45,6 +45,10 @@ class VmmfgUnit extends Model
         'vmmfg_scope_json' => 'array',
     ];
 
+    protected $with = [
+        'vmmfgJob',
+    ];
+
     //relationships
     public function children()
     {

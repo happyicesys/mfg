@@ -19,6 +19,10 @@ class Profile extends Model
         'is_primary',
     ];
 
+    protected $with = [
+        'profileSetting'
+    ];
+
     // relationships
     public function addresses()
     {

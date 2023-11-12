@@ -54,9 +54,8 @@ class Admin extends Component
 
         // advance search
         $admins = $admins
-                ->with(['roles' => function($query) {
-                    $query->first();
-                }])
+                ->with(['roles'])
+                // ->with(['role'])
                 ->when($this->filters['name'], fn($query, $input) => $query->searchLike('name', $input))
                 ->when($this->filters['phone_number'], fn($query, $input) => $query->searchLike('phone_number', $input))
                 ->when($this->filters['email'], fn($query, $input) => $query->searchLike('email', $input))

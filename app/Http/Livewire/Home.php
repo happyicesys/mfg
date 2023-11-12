@@ -69,12 +69,12 @@ class Home extends Component
                 ];
                 foreach($jobs as $job) {
                     if($job->order_month === $index and $job->order_year === $year) {
-                        if(!$job->bindedCompletionUnit()->exists()) {
+                        if(!$job->bindedCompletionUnit) {
                             $dataArr[$year][$index]['order'] += 1;
                         }
                     }
                     if($job->completion_month === $index and $job->refer_completion_unit_id === null and $job->completion_year === $year) {
-                        if(!$job->referCompletionUnit()->exists()) {
+                        if(!$job->referCompletionUnit) {
                             $dataArr[$year][$index]['completion'] += 1;
                         }
                     }

@@ -33,7 +33,7 @@ class Unit extends Component
         'is_completed' => '0',
     ];
     public $scopes;
-    public $unitSelections;
+    public $editUnitSelections;
     public $unitTransferDestinationOptions;
 
     public VmmfgUnit $previousUnitForm;
@@ -41,6 +41,10 @@ class Unit extends Component
 
     protected $listeners = [
         'refresh' => '$refresh',
+    ];
+
+    protected $queryString = [
+        'filters'
     ];
 
     public function rules()
@@ -62,7 +66,7 @@ class Unit extends Component
     public function mount()
     {
         $this->scopes = VmmfgScope::latest()->get();
-        $this->unitSelections = [];
+        $this->editUnitSelections = [];
         $this->unitTransferDestinationOptions = UnitTransferDestination::OPTIONS;
     }
 
@@ -72,7 +76,8 @@ class Unit extends Component
             ->with([
                 'children.vmmfgScope',
                 'children.vmmfgJob',
-                'vmmfgJob', 'vmmfgScope',
+                'vmmfgJob',
+                'vmmfgScope',
                 'referCompletionUnit'
             ])
             ->leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')
@@ -89,27 +94,27 @@ class Unit extends Component
             );
 
         $units = $units
-                ->when($this->filters['code'], fn($query, $input) => $query->searchLike('vmmfg_units.code', $input))
-                ->when($this->filters['unit_no'], fn($query, $input) => $query->searchLike('vmmfg_units.unit_no', $input))
-                ->when($this->filters['vend_id'], fn($query, $input) => $query->searchLike('vmmfg_units.vend_id', $input));
+                ->when(isset($this->filters['code']) ? $this->filters['code'] : false, fn($query, $input) => $query->searchLike('vmmfg_units.code', $input))
+                ->when(isset($this->filters['unit_no']) ? $this->filters['unit_no'] : false, fn($query, $input) => $query->searchLike('vmmfg_units.unit_no', $input))
+                ->when(isset($this->filters['vend_id']) ? $this->filters['vend_id'] : false, fn($query, $input) => $query->searchLike('vmmfg_units.vend_id', $input));
 
-        if($input = $this->filters['batch_no']) {
+        if($input = isset($this->filters['batch_no']) ? $this->filters['batch_no'] : false) {
             $units = $units->whereHas('vmmfgJob', function($query) use ($input) {
                 $query->searchLike('batch_no', $input);
             });
         }
-        if($dateFrom = $this->filters['date_from']) {
+        if($dateFrom = isset($this->filters['date_from']) ? $this->filters['date_from'] : false) {
             $units = $units->where(function($query) use ($dateFrom) {
                 $query->searchFromDate('vmmfg_units.order_date', $dateFrom);
             });
         }
-        if($dateTo = $this->filters['date_to']) {
+        if($dateTo = isset($this->filters['date_to']) ? $this->filters['date_to'] : false) {
             $units = $units->where(function($query) use ($dateTo) {
                 $query->searchToDate('vmmfg_units.order_date', $dateTo);
             });
         }
 
-        if($this->filters['is_completed'] !== '') {
+        if(isset($this->filters['is_completed']) and ($this->filters['is_completed'] !== '')) {
             $isCompleted = $this->filters['is_completed'];
             $units = $units->where(function($query) use ($isCompleted) {
                 if($isCompleted == 1) {
@@ -147,20 +152,29 @@ class Unit extends Component
 
     public function edit(VmmfgUnit $unit)
     {
+        $this->unitForm = new VmmfgUnit();
+        $this->previousUnitForm = new VmmfgUnit();
+        $this->editUnitSelections = [];
+
         $this->unitForm = $unit;
         $this->previousUnitForm = $unit;
-        $this->unitSelections = VmmfgUnit::query()
-                                        ->leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')
-                                        ->doesntHave('bindedCompletionUnit')
-                                        ->where('vmmfg_units.id', '<>', $unit->id)
-                                        ->select(
-                                            '*',
-                                            'vmmfg_units.id'
-                                            )
-                                        ->orderBy('vmmfg_units.order_date', 'desc')
-                                        ->orderBy('batch_no', 'desc')
-                                        ->orderBy('unit_no', 'desc')
-                                        ->get();
+
+        $this->editUnitSelections = VmmfgUnit::query()
+            ->with('vmmfgJob')
+            ->leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')
+            ->doesntHave('referCompletionUnit')
+            ->whereDoesntHave('bindedCompletionUnit', function($query) use ($unit) {
+                $query->where('id', '<>', $unit->id);
+            })
+            ->select(
+                '*',
+                'vmmfg_units.id'
+                )
+            ->orderBy('vmmfg_units.order_date', 'desc')
+            ->orderBy('batch_no', 'desc')
+            ->orderBy('unit_no', 'desc')
+            ->get();
+
     }
 
     public function save()
@@ -175,7 +189,8 @@ class Unit extends Component
             'vmmfg_scope_json' => $this->unitForm->vmmfgScope,
             'origin' => $this->unitForm->origin ? $this->unitForm->origin : null,
             'destination' => $this->unitForm->destination ? $this->unitForm->destination : null,
-            'current' => $this->unitForm->current ? $this->unitForm->current : env('APP_CURRENT_LOCATION')
+            'current' => $this->unitForm->current ? $this->unitForm->current : env('APP_CURRENT_LOCATION'),
+            'refer_completion_unit_id' => $this->unitForm->refer_completion_unit_id ? $this->unitForm->refer_completion_unit_id : null,
         ]);
 
         // store children json at parent

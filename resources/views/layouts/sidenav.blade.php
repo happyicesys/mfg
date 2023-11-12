@@ -1,7 +1,7 @@
 <!-- Sidebar -->
-@php
+{{-- @php
     $profile = \App\Models\Profile::where('is_primary', 1)->first();
-@endphp
+@endphp --}}
 <nav id="sidebar" class="sidebar-wrapper" >
   <div class="sidebar-content">
     <div class="sidebar-brand" style="background-color:#F5F5F5; border:solid black 1px;">
