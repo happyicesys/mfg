@@ -196,7 +196,7 @@
                         <td class="text-center">
                             @if($unit->referCompletionUnit)
                                 <span class="badge badge-success">
-                                    Refer: {{$unit->referCompletionUnit->vmmfgJob->batch_no}} ({{$unit->referCompletionUnit->unit_no}})
+                                    Refer: {{$unit->referCompletionUnit->vmmfgJob ? $unit->referCompletionUnit->vmmfgJob->batch_no : null}} ({{$unit->referCompletionUnit->unit_no}})
                                     <br> {{$unit->referCompletionUnit->vend_id}}
                                     <br> {{$unit->referCompletionUnit->model}}
                                 </span>
@@ -208,14 +208,14 @@
                             @if($unit->referCompletionUnit)
                                 <a href="vmmfg-setting-unit?filters[code]={{$unit->referCompletionUnit->code}}">
                                     <span class="badge badge-success">
-                                        Before of: {{$unit->referCompletionUnit->vmmfgJob->batch_no}} ({{$unit->referCompletionUnit->unit_no}})
+                                        Before of: {{$unit->referCompletionUnit->vmmfgJob ? $unit->referCompletionUnit->vmmfgJob->batch_no : null}} ({{$unit->referCompletionUnit->unit_no}})
                                     </span>
                                 </a>
                             @endif
                             @if($unit->bindedCompletionUnit)
                                 <a href="vmmfg-setting-unit?filters[code]={{$unit->bindedCompletionUnit->code}}">
                                     <span class="badge badge-success">
-                                        After of: {{$unit->bindedCompletionUnit->vmmfgJob->batch_no}} ({{$unit->bindedCompletionUnit->unit_no}})
+                                        After of: {{$unit->bindedCompletionUnit->vmmfgJob ? $unit->bindedCompletionUnit->vmmfgJob->batch_no : null}} ({{$unit->bindedCompletionUnit->unit_no}})
                                     </span>
                                 </a>
                             @endif
