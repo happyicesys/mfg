@@ -50,7 +50,6 @@ class Job extends Component
             'form.order_date' => 'required',
             'form.completion_date' => 'sometimes',
             'form.remarks' => 'sometimes',
-            'form.vend_id' => 'sometimes',
         ];
     }
 
