@@ -45,7 +45,7 @@ class Job extends Component
     {
         return [
             // 'form.id' => 'sometimes|same:id',
-            'form.batch_no' => 'required|unique:vmmfg_jobs,batch_no,'.$this->form->id,
+            'form.batch_no' => 'required',
             'form.model' => 'sometimes',
             'form.order_date' => 'required',
             'form.completion_date' => 'sometimes',
