@@ -17,7 +17,6 @@ trait HasProgress
           ->groupBy('vmmfg_title_categories.id')
           ->select(
               'vmmfg_title_categories.id AS vmmfg_title_category_id',
-              'vmmfg_title_categories.name AS vmmfg_title_category_name',
               DB::raw('COUNT(vmmfg_tasks.id) AS total'),
               DB::raw('CAST(SUM(vmmfg_tasks.is_done) + COUNT(CASE WHEN vmmfg_tasks.cancelled_by IS NOT NULL THEN 1 END) AS SIGNED) AS done'),
               DB::raw('COUNT(vmmfg_tasks.id)  - CAST(SUM(vmmfg_tasks.is_done) AS SIGNED) AS undone'),
