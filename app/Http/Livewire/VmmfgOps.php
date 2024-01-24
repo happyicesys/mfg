@@ -400,7 +400,7 @@ class VmmfgOps extends Component
                             'referCompletionUnit',
                             'bindedCompletionUnit',
                             'vmmfgJob',
-                            'vmmfgTasks',
+                            'vmmfgTasks.vmmfgItem',
                             'vmmfgScope',
                             'vmmfgScope.vmmfgTitles',
                             'vmmfgScope.vmmfgTitles.vmmfgTitleCategory',
