@@ -46,14 +46,15 @@ class VmmfgProgress extends Component
     public function render()
     {
         $units = VmmfgUnit::with([
-            'vmmfgJob',
-            'vmmfgScope.vmmfgTitles' => function($query) {
-                $query->withCount('vmmfgItems');
-            },
-            'vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTitle',
-            'vmmfgTasks.vmmfgItem.vmmfgTitle.vmmfgItems',
+            // 'vmmfgJob',
+            'vmmfgScope',
+            // 'vmmfgScope.vmmfgTitles' => function($query) {
+            //     $query->withCount('vmmfgItems');
+            // },
+            // 'vmmfgScope.vmmfgTitles.vmmfgItems.vmmfgTitle',
+            // 'vmmfgTasks.vmmfgItem.vmmfgTitle.vmmfgItems',
             ])
-            ->withCount('vmmfgTasks')
+            // ->withCount('vmmfgTasks')
             ->leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')
             ->leftJoin('vmmfg_scopes', 'vmmfg_scopes.id', '=', 'vmmfg_units.vmmfg_scope_id');
 
