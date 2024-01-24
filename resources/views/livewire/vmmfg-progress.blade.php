@@ -165,9 +165,13 @@
                                 {{ $unit->vend_id }}
                             </td>
                             <td class="text-center">
-                                <a href="/vmmfg-ops?unit_id={{$unit->id}}&is_completed=''">
+                                @if($unit->vmmfgScope)
+                                    <a href="/vmmfg-ops?unit_id={{$unit->id}}&is_completed=''">
+                                        {{ $unit->unit_no }}
+                                    </a>
+                                @else
                                     {{ $unit->unit_no }}
-                                </a>
+                                @endif
                             </td>
                             <td class="text-center">
                                 {{ $unit->model }}
@@ -182,111 +186,41 @@
                                 {{ $unit->completion_date }}
                             </td>
                             @foreach($vmmfgTitleCategories as $vmmfgTitleCategory)
-                                @php
-                                    $itemCount = 0;
-                                    $taskCount = 0;
-                                    $checkedTaskCount = 0;
-                                    $eachColor = '';
-
-                                    $taskCount = $unit
-                                        ->vmmfgTasks()
-                                        ->with(['vmmfgItem', 'vmmfgItem.vmmfgTitle'])
-                                        ->whereHas('vmmfgItem', function($query) use ($vmmfgTitleCategory) {
-                                            $query->whereHas('vmmfgTitle', function($query) use ($vmmfgTitleCategory) {
-                                                $query->where('vmmfg_title_category_id', $vmmfgTitleCategory->id);
-                                            });
-                                        })->whereIn('status', [1, 2, 98])
-                                        ->count();
-
-                                    $checkedTaskCount = $unit
-                                                        ->vmmfgTasks()
-                                                        ->with(['vmmfgItem', 'vmmfgItem.vmmfgTitle'])
-                                                        ->whereHas('vmmfgItem', function($query) use ($vmmfgTitleCategory) {
-                                                            $query->whereHas('vmmfgTitle', function($query) use ($vmmfgTitleCategory) {
-                                                                $query->where('vmmfg_title_category_id', $vmmfgTitleCategory->id);
-                                                            });
-                                                        })->where(function($query) {
-                                                            $query->where('is_checked', true)->orWhere('status', 98);
-                                                        })
-                                                        ->count();
-
-
-                                    // foreach($unit->vmmfgScope->vmmfgTitles as $title) {
-                                    //     if($title->vmmfg_title_category_id === $vmmfgTitleCategory->id) {
-                                    //         $itemCount += $title->vmmfgItems()->count();
-                                    //     }
-                                    // }
-                                    $itemCount = $unit->vmmfgScope ?
-                                        $unit->vmmfgScope->vmmfgTitles()
-                                        ->where('vmmfg_title_category_id', $vmmfgTitleCategory->id)
-                                        ->withCount('vmmfgItems')
-                                        ->get()
-                                        ->map(function($title) {
-                                            return $title->vmmfg_items_count;
-                                        })
-                                        ->reduce(function($carry, $value) {
-                                            return $carry + $value;
-                                        })
-                                        :
-                                        0;
-                                    //    $itemCount  = 0;
-                                    // count('vmmfgItems');
-                                    // dd($itemCount);
-                                    $eachProgressPercent = round($taskCount/($itemCount ? $itemCount : 1) * 100);
-
-                                    if($eachProgressPercent == 100) {
-                                        $eachColor = 'bg-success';
-                                    }else if($eachProgressPercent >= 80 and $eachProgressPercent < 100) {
-                                        $eachColor = 'bg-warning';
-                                    }
-                                    $totalItemCount += $itemCount;
-                                    $totalTaskCount += $taskCount;
-                                    $totalCheckedTaskCount += $checkedTaskCount;
-
-                                @endphp
-                                <td class="text-center text-dark {{$eachColor}}">
-                                    {{ $taskCount }} /
-                                    {{ $itemCount }}
-                                    <br>
-                                    @if($vmmfgTitleCategory->id == 2 and
-                                        $unit->vmmfgTasks()->whereHas('vmmfgItem', function($query) {
-                                                $query->where('sequence', 'SG-8003-01');
-                                        })->where('is_done', true)->where('is_checked', true)->first()
-                                    )
-                                        <i class="fas fa-check-circle" style="color: green;"></i>
-                                    @endif
-                                </td>
-                            @endforeach
                             @php
-                                $color = '';
-                                $checkedColor = '';
-
-                                $progressPercent = round($totalTaskCount/($totalItemCount ? $totalItemCount : 1) * 100);
-
-                                if($progressPercent == 100) {
-                                    $color = 'bg-success';
-                                }else if($progressPercent >= 80 and $progressPercent < 100) {
-                                    $color = 'bg-warning';
-                                }
-
-                                $checkedProgressPercent = round($totalCheckedTaskCount/($totalItemCount ? $totalItemCount : 1) * 100);
-
-                                if($checkedProgressPercent == 100) {
-                                    $checkedColor = 'bg-success';
-                                }else if($checkedProgressPercent >= 80 and $checkedProgressPercent < 100) {
-                                    $checkedColor = 'bg-warning';
-                                }
+                                $createDiv = true;
                             @endphp
-                            {{-- @dd($unit->toArray()) --}}
-                            {{-- <td class="text-center text-dark">
-                                {{ $taskCount }} / {{ $itemCount }}
-                            </td> --}}
-                            <td class="text-center text-dark {{$color}}">
-                                {{ $progressPercent }}
+                                @if($unit->progress_json)
+                                    @foreach($unit->progress_json['data'] as $progress)
+                                        @if($progress['vmmfg_title_category_id'] == $vmmfgTitleCategory->id)
+                                            @php
+                                                $createDiv = false;
+                                            @endphp
+                                            <td class="text-center text-dark {{$progress['done']/ $progress['total'] * 100 == 100 ? 'bg-success' : (($progress['done']/ $progress['total'] * 100) >= 80 && ($progress['done']/ $progress['total'] * 100) < 100 ? 'bg-warning' : '')}}">
+                                                {{ $progress['done'] }} /
+                                                {{ $progress['total'] }}
+                                                <br>
+                                                @if($progress['is_stocked'])
+                                                    <i class="fas fa-check-circle" style="color: green;"></i>
+                                                @endif
+                                            </td>
+                                        @endif
+                                    @endforeach
+                                @endif
+
+                                @if($createDiv)
+                                    <td class="text-center text-dark">
+                                        0 / 0
+                                    </td>
+                                @endif
+
+                            @endforeach
+
+                            <td class="text-center text-dark {{$unit->progress_json['done']/ ($unit->progress_json['total'] ? $unit->progress_json['total'] : 1) * 100 == 100 ? 'bg-success' : ($unit->progress_json['done']/ ($unit->progress_json['total'] ? $unit->progress_json['total'] : 1) * 100 >= 80 && $unit->progress_json['done']/ ($unit->progress_json['total'] ? $unit->progress_json['total'] : 1) * 100 < 100 ? 'bg-warning' : '')}}">
+                                {{ round($unit->progress_json['done']/ ($unit->progress_json['total'] ? $unit->progress_json['total'] : 1) * 100) }}
                             </td>
-                            <td class="text-center text-dark {{$checkedColor}}">
-                                {{ $totalCheckedTaskCount }} /
-                                {{ $totalItemCount }}
+                            <td class="text-center text-dark {{$unit->progress_json['checked']/ ($unit->progress_json['total'] ? $unit->progress_json['total'] : 1) * 100 == 100 ? 'bg-success' : ($unit->progress_json['checked']/ ($unit->progress_json['total'] ? $unit->progress_json['total'] : 1) * 100 >= 80 && $unit->progress_json['done']/ ($unit->progress_json['total'] ? $unit->progress_json['total'] : 1) * 100 < 100 ? 'bg-warning' : '')}}">
+                                {{ $unit->progress_json['checked'] }} /
+                                {{ ($unit->progress_json['total'] ? $unit->progress_json['total'] : 0) }}
                             </td>
                         </tr>
                     @empty

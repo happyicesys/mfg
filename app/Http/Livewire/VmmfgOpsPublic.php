@@ -206,7 +206,7 @@ class VmmfgOpsPublic extends Component
             ]);
         }
 
-        VmmfgTask::updateOrCreate([
+        $task = VmmfgTask::updateOrCreate([
             'vmmfg_item_id' => $item->id,
             'vmmfg_unit_id' => $this->unit_id,
         ], [
@@ -218,6 +218,7 @@ class VmmfgOpsPublic extends Component
             'undo_done_by' => null,
             'undo_done_time' => null,
         ]);
+        $this->syncProgress($task->vmmfgUnit);
 
         // $this->emit('updated');
         session()->flash('success', 'Your entry has been updated');
@@ -232,6 +233,7 @@ class VmmfgOpsPublic extends Component
                 'undo_done_time' => Carbon::now(),
                 'status' => VmmfgTask::STATUS_UNDONE,
             ]);
+            $this->syncProgress($task->vmmfgUnit);
         // }else {
         //     $task->delete();
         // }
@@ -255,6 +257,7 @@ class VmmfgOpsPublic extends Component
                 'vmmfg_unit_id' => $this->unit_id,
                 'status' => VmmfgTask::STATUS_NEW,
             ]);
+            $this->syncProgress($task->vmmfgUnit);
         }
 
         $url = $this->file->storePublicly('tasks', 'digitaloceanspaces');
@@ -300,6 +303,7 @@ class VmmfgOpsPublic extends Component
             'checked_by' => auth()->user()->id,
             'status' => VmmfgTask::STATUS_CHECKED,
         ]);
+        $this->syncProgress($task->vmmfgUnit);
         session()->flash('success', 'Your entry has been updated');
     }
 
@@ -311,12 +315,13 @@ class VmmfgOpsPublic extends Component
             'checked_by' => null,
             'status' => VmmfgTask::STATUS_DONE,
         ]);
+        $this->syncProgress($task->vmmfgUnit);
         session()->flash('success', 'Your entry has been updated');
     }
 
     public function onCancelledClicked(VmmfgItem $item)
     {
-        VmmfgTask::updateOrCreate([
+        $task = VmmfgTask::updateOrCreate([
             'vmmfg_item_id' => $item->id,
             'vmmfg_unit_id' => $this->unit_id,
         ], [
@@ -324,6 +329,7 @@ class VmmfgOpsPublic extends Component
             'cancelled_time' => Carbon::now(),
             'cancelled_by' => auth()->user()->id,
         ]);
+        $this->syncProgress($task->vmmfgUnit);
         session()->flash('success', 'Your entry has been updated');
     }
 

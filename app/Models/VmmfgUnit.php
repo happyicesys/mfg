@@ -22,6 +22,7 @@ class VmmfgUnit extends Model
         'origin_vmmfg_job_json',
         'origin_vmmfg_scope_json',
         'parent_id',
+        'progress_json',
         'status_datetime',
         'unit_no',
         'vmmfg_job_id',
@@ -41,6 +42,7 @@ class VmmfgUnit extends Model
         'children_json' => 'array',
         'origin_vmmfg_job_json' => 'array',
         'origin_vmmfg_scope_json' => 'array',
+        'progress_json' => 'array',
         'vmmfg_job_json' => 'array',
         'vmmfg_scope_json' => 'array',
     ];

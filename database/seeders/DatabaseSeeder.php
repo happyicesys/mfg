@@ -39,6 +39,7 @@ class DatabaseSeeder extends Seeder
             // SupervisorRoleSeeder::class,
             // VmmfgUnitCodeSeeder::class,
             // UnitTransferDestinationSeeder::class,
+            SyncProgressSeeder::class,
        ]);
     //    \App\Models\User::factory(150)->create();
     }

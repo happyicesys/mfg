@@ -10,7 +10,9 @@ use App\Models\VmmfgScope;
 use App\Models\VmmfgTask;
 use App\Models\VmmfgUnit;
 use App\Traits\HasDateControl;
+use App\Traits\HasProgress;
 use Carbon\Carbon;
+use DB;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use PDF;
@@ -21,7 +23,7 @@ use Storage;
 
 class VmmfgOps extends Component
 {
-    use HasDateControl, WithFileUploads;
+    use HasDateControl, HasProgress, WithFileUploads;
 
     protected $paginationTheme = 'bootstrap';
     public $itemPerPage = 100;
@@ -205,7 +207,7 @@ class VmmfgOps extends Component
             ]);
         }
 
-        VmmfgTask::updateOrCreate([
+        $task = VmmfgTask::updateOrCreate([
             'vmmfg_item_id' => $item->id,
             'vmmfg_unit_id' => $this->unit_id,
         ], [
@@ -217,6 +219,7 @@ class VmmfgOps extends Component
             'undo_done_by' => null,
             'undo_done_time' => null,
         ]);
+        $this->syncProgress($task->vmmfgUnit);
 
         // $this->emit('updated');
         session()->flash('success', 'Your entry has been updated');
@@ -231,6 +234,7 @@ class VmmfgOps extends Component
                 'undo_done_time' => Carbon::now(),
                 'status' => VmmfgTask::STATUS_UNDONE,
             ]);
+        $this->syncProgress($task->vmmfgUnit);
         // }else {
         //     $task->delete();
         // }
@@ -254,6 +258,7 @@ class VmmfgOps extends Component
                 'vmmfg_unit_id' => $this->unit_id,
                 'status' => VmmfgTask::STATUS_NEW,
             ]);
+            $this->syncProgress($task->vmmfgUnit);
         }
 
         $url = $this->file->storePublicly('tasks', 'digitaloceanspaces');
@@ -299,6 +304,7 @@ class VmmfgOps extends Component
             'checked_by' => auth()->user()->id,
             'status' => VmmfgTask::STATUS_CHECKED,
         ]);
+        $this->syncProgress($task->vmmfgUnit);
         session()->flash('success', 'Your entry has been updated');
     }
 
@@ -310,12 +316,13 @@ class VmmfgOps extends Component
             'checked_by' => null,
             'status' => VmmfgTask::STATUS_DONE,
         ]);
+        $this->syncProgress($task->vmmfgUnit);
         session()->flash('success', 'Your entry has been updated');
     }
 
     public function onCancelledClicked(VmmfgItem $item)
     {
-        VmmfgTask::updateOrCreate([
+        $task = VmmfgTask::updateOrCreate([
             'vmmfg_item_id' => $item->id,
             'vmmfg_unit_id' => $this->unit_id,
         ], [
@@ -323,12 +330,14 @@ class VmmfgOps extends Component
             'cancelled_time' => Carbon::now(),
             'cancelled_by' => auth()->user()->id,
         ]);
+        $this->syncProgress($task->vmmfgUnit);
         session()->flash('success', 'Your entry has been updated');
     }
 
     public function onUndoCancelledClicked(VmmfgTask $task)
     {
         $task->delete();
+        $this->syncProgress($task->vmmfgUnit);
         session()->flash('success', 'Your entry has been updated');
     }
 

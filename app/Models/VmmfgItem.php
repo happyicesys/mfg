@@ -15,6 +15,8 @@ class VmmfgItem extends Model
         2 => 'Updated',
     ];
 
+    const STOCK_IN_SEQUENCE = 'SG-8003-01';
+
     protected $fillable = [
         'sequence',
         'name',
