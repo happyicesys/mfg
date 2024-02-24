@@ -109,8 +109,12 @@
         <li class="{{ $name == 'vmmfg-setting-job' ? 'active' : '' }}">
           <a href="{{ route('vmmfg-setting-job') }}"><i class="fas fa-cog"></i>Jobs</a>
         </li>
+        <li class="{{ $name == 'master-unit' ? 'active' : '' }}">
+          {{-- <a href="{{ route('master-unit') }}" style="color:grey;" onclick="return false;"><i class="fas fa-cog"></i>Units</a> --}}
+          <a href="#" style="color:grey;" onclick="return false;"><i class="fas fa-cog"></i>Units</a>
+        </li>
         <li class="{{ $name == 'vmmfg-setting-unit' ? 'active' : '' }}">
-          <a href="{{ route('vmmfg-setting-unit') }}"><i class="fas fa-cog"></i>Units</a>
+          <a href="{{ route('vmmfg-setting-unit') }}"><i class="fas fa-cog"></i>Unit Job</a>
         </li>
         <li class="{{ $name == 'vmmfg-setting-scope' ? 'active' : '' }}">
           <a href="{{ route('vmmfg-setting-scope') }}"><i class="fas fa-cog"></i>Scopes</a>

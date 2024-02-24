@@ -56,7 +56,8 @@ class VmmfgProgress extends Component
             ])
             // ->withCount('vmmfgTasks')
             ->leftJoin('vmmfg_jobs', 'vmmfg_jobs.id', '=', 'vmmfg_units.vmmfg_job_id')
-            ->leftJoin('vmmfg_scopes', 'vmmfg_scopes.id', '=', 'vmmfg_units.vmmfg_scope_id');
+            ->leftJoin('vmmfg_scopes', 'vmmfg_scopes.id', '=', 'vmmfg_units.vmmfg_scope_id')
+            ->select('*', 'vmmfg_units.id as id');
 
         // advance search
         $units = $units

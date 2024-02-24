@@ -74,8 +74,8 @@ class Unit extends Component
     {
         $units = VmmfgUnit::query()
             ->with([
-                'children.vmmfgScope',
-                'children.vmmfgJob',
+                // 'children.vmmfgScope',
+                // 'children.vmmfgJob',
                 'vmmfgJob',
                 'vmmfgScope',
                 'referCompletionUnit'
@@ -126,7 +126,7 @@ class Unit extends Component
         }
 
         // exclude children
-        $units = $units->whereNull('vmmfg_units.parent_id');
+        // $units = $units->whereNull('vmmfg_units.parent_id');
 
         if($sortKey = $this->sortKey) {
             $units = $units->orderBy($sortKey, $this->sortAscending ? 'asc' : 'desc');
@@ -293,7 +293,7 @@ class Unit extends Component
     {
         $reworkUnit = $this->unitForm->replicate()->fill([
             'is_rework' => true,
-            'parent_id' => $this->unitForm->id,
+            // 'parent_id' => $this->unitForm->id,
             'refer_completion_unit_id' => null,
             'completion_date' => null,
             'order_date' => Carbon::now(),

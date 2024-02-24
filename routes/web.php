@@ -11,6 +11,7 @@ use App\Http\Livewire\BomSupplier;
 use App\Http\Livewire\Currency;
 use App\Http\Livewire\Customer;
 use App\Http\Livewire\Home;
+use App\Http\Livewire\MasterUnit;
 use App\Http\Livewire\Product;
 use App\Http\Livewire\Profile;
 use App\Http\Livewire\SelfSetting;
@@ -58,6 +59,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::group(['middleware' => ['permission:vmmfg-setting-access']], function() {
         Route::get('/vmmfg-setting-job', VmmfgSettingJob::class)->name('vmmfg-setting-job');
+        Route::get('/master-unit', MasterUnit::class)->name('master-unit');
         Route::get('/vmmfg-setting-unit', VmmfgSettingUnit::class)->name('vmmfg-setting-unit');
         Route::get('/vmmfg-setting-scope', VmmfgSettingScope::class)->name('vmmfg-setting-scope');
     });

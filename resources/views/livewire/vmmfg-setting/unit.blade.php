@@ -442,7 +442,7 @@
 
                     </x-slot>
                     <x-slot name="footer">
-                        <div class="btn-group float-left">
+                        {{-- <div class="btn-group float-left">
                             @if(isset($unitForm['is_rework']) and !$unitForm['is_rework'])
                                 <button type="submit" class="btn btn-warning " wire:click.prevent="rework">
                                     Rework
@@ -458,7 +458,7 @@
                                     Undo Retire
                                 </button>
                             @endif
-                        </div>
+                        </div> --}}
                         <div class="btn-group float-right">
                             <button type="submit" class="btn btn-danger d-none d-sm-block" onclick="return confirm('Are you sure you want to delete this unit?') || event.stopImmediatePropagation()" wire:click.prevent="delete">
                                 Delete
