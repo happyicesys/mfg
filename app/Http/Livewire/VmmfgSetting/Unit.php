@@ -6,6 +6,7 @@ use App\Models\Attachment;
 use App\Models\UnitTransferDestination;
 use App\Models\VmmfgScope;
 use App\Models\VmmfgUnit;
+use App\Traits\HasProgress;
 use DB;
 use Carbon\Carbon;
 use Livewire\Component;
@@ -14,7 +15,7 @@ use Illuminate\Support\Facades\Http;
 
 class Unit extends Component
 {
-    use WithPagination;
+    use HasProgress, WithPagination;
 
     protected $paginationTheme = 'bootstrap';
     public $itemPerPage = 100;
@@ -194,11 +195,11 @@ class Unit extends Component
         ]);
 
         // store children json at parent
-        if($this->unitForm->children()->exists()) {
-            $this->unitForm->update([
-                'children_json' => $this->unitForm->children()->get()
-            ]);
-        }
+        // if($this->unitForm->children()->exists()) {
+        //     $this->unitForm->update([
+        //         'children_json' => $this->unitForm->children()->get()
+        //     ]);
+        // }
 
         // send unit to another mfg upon option chosen
         if($this->unitForm->destination and ($this->unitForm->destination != $this->previousUnitForm->destination)) {
@@ -216,6 +217,8 @@ class Unit extends Component
                 'status_datetime' => Carbon::now()
             ]);
         }
+
+        $this->syncProgress($this->unitForm);
 
         $this->emit('refresh');
         $this->emit('updated');
@@ -236,11 +239,11 @@ class Unit extends Component
             }
         }
         // delete children if exists
-        if($this->unitForm->children()->exists()) {
-            foreach($this->unitForm->children() as $child) {
-                $child->delete();
-            }
-        }
+        // if($this->unitForm->children()->exists()) {
+        //     foreach($this->unitForm->children() as $child) {
+        //         $child->delete();
+        //     }
+        // }
         // notify origin to delete unit transfer record
         if($this->unitForm->origin_ref_id) {
             $this->revokeUnitTransfer();
